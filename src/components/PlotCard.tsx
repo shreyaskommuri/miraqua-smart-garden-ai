@@ -1,9 +1,8 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Droplets, Thermometer, Sun, Calendar, MoreVertical } from "lucide-react";
+import { Droplets, Thermometer, Sun, Calendar, MoreVertical, ArrowRight } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface PlotCardProps {
@@ -22,10 +21,10 @@ interface PlotCardProps {
 const PlotCard = ({ plot }: PlotCardProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "healthy": return "bg-green-100 text-green-800";
-      case "needs-water": return "bg-yellow-100 text-yellow-800";
-      case "overwatered": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "healthy": return "bg-green-100 text-green-700 border-green-200";
+      case "needs-water": return "bg-yellow-100 text-yellow-700 border-yellow-200";
+      case "overwatered": return "bg-red-100 text-red-700 border-red-200";
+      default: return "bg-gray-100 text-gray-700 border-gray-200";
     }
   };
 
@@ -45,94 +44,66 @@ const PlotCard = ({ plot }: PlotCardProps) => {
   };
 
   return (
-    <Card className="bg-white/70 backdrop-blur-sm border-green-100 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-lg text-green-800 mb-1">{plot.name}</CardTitle>
-            <CardDescription className="text-green-600">{plot.crop}</CardDescription>
+    <Card className="border-0 bg-white shadow-sm hover:shadow-md transition-all duration-200">
+      <CardContent className="p-4">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-900 mb-1">{plot.name}</h3>
+            <p className="text-sm text-gray-500">{plot.crop}</p>
           </div>
           <div className="flex items-center space-x-2">
-            <Badge className={getStatusColor(plot.status)}>
+            <Badge className={`text-xs border ${getStatusColor(plot.status)}`}>
               {getStatusText(plot.status)}
             </Badge>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <MoreVertical className="h-4 w-4" />
+                <Button variant="ghost" size="sm" className="w-6 h-6 p-0">
+                  <MoreVertical className="w-3 h-3" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>View Details</DropdownMenuItem>
-                <DropdownMenuItem>Edit Settings</DropdownMenuItem>
                 <DropdownMenuItem>Water Now</DropdownMenuItem>
-                <DropdownMenuItem className="text-red-600">Delete Plot</DropdownMenuItem>
+                <DropdownMenuItem>Edit Settings</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
-      </CardHeader>
 
-      <CardContent className="space-y-4">
-        {/* Metrics Grid */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="text-center p-3 bg-blue-50 rounded-lg">
-            <Droplets className={`w-5 h-5 mx-auto mb-1 ${getMoistureColor(plot.moisture)}`} />
-            <div className={`text-lg font-bold ${getMoistureColor(plot.moisture)}`}>
+        {/* Metrics */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="text-center p-2 bg-blue-50 rounded-lg">
+            <Droplets className={`w-4 h-4 mx-auto mb-1 ${getMoistureColor(plot.moisture)}`} />
+            <div className={`text-sm font-semibold ${getMoistureColor(plot.moisture)}`}>
               {plot.moisture}%
             </div>
-            <div className="text-xs text-gray-600">Moisture</div>
           </div>
-
-          <div className="text-center p-3 bg-orange-50 rounded-lg">
-            <Thermometer className="w-5 h-5 text-orange-600 mx-auto mb-1" />
-            <div className="text-lg font-bold text-orange-700">{plot.temperature}°F</div>
-            <div className="text-xs text-gray-600">Temp</div>
+          <div className="text-center p-2 bg-orange-50 rounded-lg">
+            <Thermometer className="w-4 h-4 text-orange-600 mx-auto mb-1" />
+            <div className="text-sm font-semibold text-orange-600">{plot.temperature}°F</div>
           </div>
-
-          <div className="text-center p-3 bg-yellow-50 rounded-lg">
-            <Sun className="w-5 h-5 text-yellow-600 mx-auto mb-1" />
-            <div className="text-lg font-bold text-yellow-700">{plot.sunlight}</div>
-            <div className="text-xs text-gray-600">Lux</div>
+          <div className="text-center p-2 bg-yellow-50 rounded-lg">
+            <Sun className="w-4 h-4 text-yellow-600 mx-auto mb-1" />
+            <div className="text-sm font-semibold text-yellow-600">{plot.sunlight}</div>
           </div>
-        </div>
-
-        {/* Moisture Progress */}
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-700">Soil Moisture</span>
-            <span className={`text-sm font-medium ${getMoistureColor(plot.moisture)}`}>
-              {plot.moisture}%
-            </span>
-          </div>
-          <Progress value={plot.moisture} className="h-2" />
         </div>
 
         {/* Next Watering */}
-        <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg mb-3">
           <div className="flex items-center space-x-2">
-            <Calendar className="w-4 h-4 text-green-600" />
-            <span className="text-sm font-medium text-green-700">Next Watering</span>
+            <Calendar className="w-4 h-4 text-gray-600" />
+            <span className="text-sm text-gray-700">{plot.nextWatering}</span>
           </div>
-          <span className="text-sm font-bold text-green-800">{plot.nextWatering}</span>
         </div>
 
-        {/* Actions */}
-        <div className="flex space-x-2 pt-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex-1 border-green-200 text-green-700 hover:bg-green-50"
-          >
-            View Schedule
-          </Button>
-          <Button 
-            size="sm" 
-            className="flex-1 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
-          >
-            Water Now
-          </Button>
-        </div>
+        {/* Action Button */}
+        <Button 
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white h-10"
+        >
+          View Details
+          <ArrowRight className="w-4 h-4 ml-2" />
+        </Button>
       </CardContent>
     </Card>
   );
