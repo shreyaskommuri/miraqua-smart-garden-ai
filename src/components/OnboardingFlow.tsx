@@ -97,6 +97,7 @@ const OnboardingFlow = ({ onComplete, onCancel }: OnboardingFlowProps) => {
   };
 
   const progress = ((currentStep + 1) / steps.length) * 100;
+  const CurrentIcon = steps[currentStep].icon;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 flex items-center justify-center p-4">
@@ -104,7 +105,7 @@ const OnboardingFlow = ({ onComplete, onCancel }: OnboardingFlowProps) => {
         <CardHeader className="text-center pb-6">
           <div className="flex items-center justify-center mb-4">
             <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-emerald-500 rounded-2xl flex items-center justify-center">
-              {steps[currentStep].icon && <steps[currentStep].icon className="w-8 h-8 text-white" />}
+              <CurrentIcon className="w-8 h-8 text-white" />
             </div>
           </div>
           <CardTitle className="text-2xl text-green-800">{steps[currentStep].title}</CardTitle>
