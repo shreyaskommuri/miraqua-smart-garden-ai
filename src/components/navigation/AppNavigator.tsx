@@ -17,9 +17,9 @@ import FarmerChatScreen from "../screens/FarmerChatScreen";
 const AppNavigator = () => {
   return (
     <Routes>
+      <Route path="/welcome" element={<WelcomeScreen />} />
       <Route path="/signin" element={<SignInScreen />} />
       <Route path="/signup" element={<SignUpScreen />} />
-      <Route path="/welcome" element={<WelcomeScreen />} />
       <Route path="/onboarding/crop" element={<OnboardingCropScreen />} />
       <Route path="/onboarding/location" element={<OnboardingLocationScreen />} />
       <Route path="/onboarding/advanced" element={<OnboardingAdvancedSettingsScreen />} />
@@ -28,7 +28,8 @@ const AppNavigator = () => {
       <Route path="/plot/:id" element={<PlotDetailsScreen />} />
       <Route path="/plot/:id/day/:date" element={<SpecificDayScreen />} />
       <Route path="/chat" element={<FarmerChatScreen />} />
-      <Route path="/*" element={<MainTabs />} />
+      <Route path="/app/*" element={<MainTabs />} />
+      <Route path="/*" element={<WelcomeScreen />} />
     </Routes>
   );
 };

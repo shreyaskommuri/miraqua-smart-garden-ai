@@ -11,11 +11,18 @@ const MainTabs = () => {
   const location = useLocation();
 
   const tabs = [
-    { path: "/", icon: Home, label: "Home" },
-    { path: "/analytics", icon: BarChart3, label: "Analytics" },
+    { path: "/app", icon: Home, label: "Home" },
+    { path: "/app/analytics", icon: BarChart3, label: "Analytics" },
     { path: "/chat", icon: MessageSquare, label: "AI Chat" },
-    { path: "/account", icon: User, label: "Account" },
+    { path: "/app/account", icon: User, label: "Account" },
   ];
+
+  const isActive = (path: string) => {
+    if (path === "/app") {
+      return location.pathname === "/app" || location.pathname === "/";
+    }
+    return location.pathname.startsWith(path);
+  };
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
@@ -27,11 +34,11 @@ const MainTabs = () => {
         </Routes>
       </div>
       
-      {/* Bottom Tab Navigation */}
-      <div className="bg-white border-t border-gray-200 px-4 py-2 safe-area-pb">
+      {/* Enhanced Bottom Tab Navigation */}
+      <div className="bg-white border-t border-gray-100 px-4 py-2 safe-area-pb shadow-lg">
         <div className="flex justify-around items-center">
           {tabs.map((tab) => {
-            const isActive = location.pathname === tab.path;
+            const active = isActive(tab.path);
             const Icon = tab.icon;
             
             return (
@@ -39,19 +46,25 @@ const MainTabs = () => {
                 key={tab.path}
                 to={tab.path}
                 className={cn(
-                  "flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-200",
-                  isActive 
-                    ? "bg-blue-50 text-blue-600" 
-                    : "text-gray-500 hover:text-gray-700"
+                  "flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-300 transform",
+                  active 
+                    ? "bg-gradient-to-r from-blue-50 to-green-50 text-blue-600 scale-105 shadow-md" 
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                 )}
               >
-                <Icon className={cn("w-6 h-6 mb-1", isActive && "text-blue-600")} />
+                <Icon className={cn(
+                  "w-6 h-6 mb-1 transition-colors duration-200", 
+                  active && "text-blue-600"
+                )} />
                 <span className={cn(
-                  "text-xs font-medium",
-                  isActive ? "text-blue-600" : "text-gray-500"
+                  "text-xs font-medium transition-colors duration-200",
+                  active ? "text-blue-600" : "text-gray-500"
                 )}>
                   {tab.label}
                 </span>
+                {active && (
+                  <div className="absolute -top-1 w-1 h-1 bg-blue-600 rounded-full"></div>
+                )}
               </Link>
             );
           })}
