@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight, Droplets, Calendar, MapPin, Settings, Check, Sparkles } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChevronLeft, ChevronRight, Droplets, Calendar, MapPin, Settings, Check, Sparkles, Navigation, Map } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface OnboardingFlowProps {
@@ -16,13 +17,18 @@ interface OnboardingFlowProps {
 
 const OnboardingFlow = ({ onComplete, onCancel }: OnboardingFlowProps) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [locationMethod, setLocationMethod] = useState<'coordinates' | 'current'>('coordinates');
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [locationError, setLocationError] = useState("");
+  
   const [plotData, setPlotData] = useState({
     name: "",
     crop: "",
     area: "",
     areaUnit: "sq ft",
     plantingDate: "",
-    zipCode: "",
+    latitude: "",
+    longitude: "",
     flexType: "daily"
   });
 
@@ -39,7 +45,7 @@ const OnboardingFlow = ({ onComplete, onCancel }: OnboardingFlowProps) => {
     },
     {
       title: "Location Setup",
-      description: "Configure your location and preferences",
+      description: "Configure your precise location",
       icon: MapPin
     },
     {
@@ -54,6 +60,45 @@ const OnboardingFlow = ({ onComplete, onCancel }: OnboardingFlowProps) => {
     "Cucumbers", "Beans", "Squash", "Corn", "Other"
   ];
 
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by this browser.");
+      return;
+    }
+
+    setIsLoadingLocation(true);
+    setLocationError("");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude.toFixed(6);
+        const lon = position.coords.longitude.toFixed(6);
+        setPlotData(prev => ({ ...prev, latitude: lat, longitude: lon }));
+        setIsLoadingLocation(false);
+      },
+      (error) => {
+        setLocationError("Unable to get your location. Please enter coordinates manually.");
+        setIsLoadingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000
+      }
+    );
+  };
+
+  const validateCoordinates = () => {
+    const lat = parseFloat(plotData.latitude);
+    const lon = parseFloat(plotData.longitude);
+    
+    if (isNaN(lat) || isNaN(lon)) {
+      return false;
+    }
+    
+    return lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
+  };
+
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -61,6 +106,8 @@ const OnboardingFlow = ({ onComplete, onCancel }: OnboardingFlowProps) => {
       // Complete onboarding
       const newPlot = {
         ...plotData,
+        latitude: parseFloat(plotData.latitude),
+        longitude: parseFloat(plotData.longitude),
         moisture: Math.floor(Math.random() * 40) + 60,
         temperature: Math.floor(Math.random() * 10) + 68,
         sunlight: Math.floor(Math.random() * 200) + 800,
@@ -88,7 +135,7 @@ const OnboardingFlow = ({ onComplete, onCancel }: OnboardingFlowProps) => {
       case 1:
         return plotData.name && plotData.crop && plotData.area && plotData.plantingDate;
       case 2:
-        return plotData.zipCode.length === 5;
+        return validateCoordinates();
       case 3:
         return true;
       default:
@@ -214,18 +261,101 @@ const OnboardingFlow = ({ onComplete, onCancel }: OnboardingFlowProps) => {
 
           {currentStep === 2 && (
             <div className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="zipCode" className="text-sm font-medium text-gray-700">ZIP Code</Label>
-                <Input
-                  id="zipCode"
-                  placeholder="94583"
-                  maxLength={5}
-                  value={plotData.zipCode}
-                  onChange={(e) => setPlotData({ ...plotData, zipCode: e.target.value.replace(/\D/g, '') })}
-                  className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                />
-                <p className="text-sm text-gray-500">Used for weather data and local conditions</p>
-              </div>
+              <Tabs value={locationMethod} onValueChange={(value) => setLocationMethod(value as 'coordinates' | 'current')} className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="coordinates" className="flex items-center space-x-2">
+                    <Map className="w-4 h-4" />
+                    <span>Enter Coordinates</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="current" className="flex items-center space-x-2">
+                    <Navigation className="w-4 h-4" />
+                    <span>Use Current Location</span>
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="coordinates" className="space-y-4 mt-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="latitude" className="text-sm font-medium text-gray-700">Latitude</Label>
+                      <Input
+                        id="latitude"
+                        type="number"
+                        placeholder="37.7749"
+                        value={plotData.latitude}
+                        onChange={(e) => setPlotData({ ...plotData, latitude: e.target.value })}
+                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                        min={-90}
+                        max={90}
+                        step={0.000001}
+                      />
+                      <p className="text-xs text-gray-500">Range: -90 to 90</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="longitude" className="text-sm font-medium text-gray-700">Longitude</Label>
+                      <Input
+                        id="longitude"
+                        type="number"
+                        placeholder="-122.4194"
+                        value={plotData.longitude}
+                        onChange={(e) => setPlotData({ ...plotData, longitude: e.target.value })}
+                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                        min={-180}
+                        max={180}
+                        step={0.000001}
+                      />
+                      <p className="text-xs text-gray-500">Range: -180 to 180</p>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="current" className="space-y-4 mt-4">
+                  <div className="text-center">
+                    <Button
+                      onClick={getCurrentLocation}
+                      disabled={isLoadingLocation}
+                      className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      {isLoadingLocation ? (
+                        "Getting your location..."
+                      ) : (
+                        <>
+                          <Navigation className="w-4 h-4 mr-2" />
+                          Get Current Location
+                        </>
+                      )}
+                    </Button>
+                    
+                    {locationError && (
+                      <p className="text-sm text-red-600 mt-2">{locationError}</p>
+                    )}
+                    
+                    {plotData.latitude && plotData.longitude && (
+                      <div className="mt-4 p-4 bg-green-50 rounded-lg">
+                        <p className="text-sm text-green-800">
+                          <strong>Location found:</strong><br />
+                          Lat: {plotData.latitude}, Lon: {plotData.longitude}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+              </Tabs>
+
+              {validateCoordinates() && (
+                <Card className="border-blue-200 bg-blue-50">
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-3">
+                      <MapPin className="w-5 h-5 text-blue-600" />
+                      <div>
+                        <h4 className="font-semibold text-blue-900">Valid Coordinates</h4>
+                        <p className="text-sm text-blue-700">
+                          Lat: {parseFloat(plotData.latitude).toFixed(4)}, Lon: {parseFloat(plotData.longitude).toFixed(4)}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               <div className="space-y-3">
                 <Label className="text-sm font-medium text-gray-700">Watering Flexibility</Label>
@@ -261,7 +391,12 @@ const OnboardingFlow = ({ onComplete, onCancel }: OnboardingFlowProps) => {
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Perfect!</h3>
                 <p className="text-gray-600 max-w-md mx-auto">
-                  Your plot "{plotData.name}" is ready for AI-powered irrigation. 
+                  Your plot "{plotData.name}" is ready for AI-powered irrigation at coordinates{' '}
+                  {plotData.latitude && plotData.longitude && (
+                    <span className="font-medium">
+                      {parseFloat(plotData.latitude).toFixed(4)}, {parseFloat(plotData.longitude).toFixed(4)}
+                    </span>
+                  )}. 
                   The system will analyze weather and soil conditions automatically.
                 </p>
               </div>

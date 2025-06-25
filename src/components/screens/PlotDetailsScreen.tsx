@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
   ArrowLeft, 
   Droplets, 
@@ -18,7 +21,10 @@ import {
   Edit,
   Camera,
   Share,
-  MoreHorizontal
+  MoreHorizontal,
+  Copy,
+  Map,
+  ExternalLink
 } from "lucide-react";
 
 const PlotDetailsScreen = () => {
@@ -26,9 +32,10 @@ const PlotDetailsScreen = () => {
   const navigate = useNavigate();
   const [tempUnit, setTempUnit] = useState<'F' | 'C'>('F');
   const [scheduleView, setScheduleView] = useState<'original' | 'modified'>('modified');
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   // Mock data - in real app this would come from API
-  const plotData = {
+  const [plotData, setPlotData] = useState({
     id: parseInt(id || '1'),
     name: "Tomato Garden",
     crop: "Tomatoes",
@@ -37,6 +44,8 @@ const PlotDetailsScreen = () => {
     area: "12 sq ft",
     soilType: "Loamy",
     flexType: "Daily",
+    latitude: 37.7749,
+    longitude: -122.4194,
     moisture: 65,
     temperature: 73,
     sunlight: 85,
@@ -45,7 +54,12 @@ const PlotDetailsScreen = () => {
     photo: null,
     lastWatered: "2 hours ago",
     totalWater: "24.5L this week"
-  };
+  });
+
+  const [editForm, setEditForm] = useState({
+    latitude: plotData.latitude.toString(),
+    longitude: plotData.longitude.toString()
+  });
 
   const weeklySchedule = [
     { day: 'Mon', date: '25', scheduled: true, time: '6:00 AM', volume: '2.5L', completed: true },
@@ -66,7 +80,36 @@ const PlotDetailsScreen = () => {
 
   const handleDayClick = (day: any) => {
     if (day.scheduled) {
-      navigate(`/plot/${id}/day/${day.date}`);
+      navigate(`/plot/${id}/day/${day.date}?lat=${plotData.latitude}&lon=${plotData.longitude}`);
+    }
+  };
+
+  const copyCoordinates = async () => {
+    const coords = `${plotData.latitude}, ${plotData.longitude}`;
+    try {
+      await navigator.clipboard.writeText(coords);
+      // You could show a toast here
+    } catch (err) {
+      console.error('Failed to copy coordinates:', err);
+    }
+  };
+
+  const openInMaps = () => {
+    const url = `https://maps.google.com/?q=${plotData.latitude},${plotData.longitude}`;
+    window.open(url, '_blank');
+  };
+
+  const handleLocationUpdate = () => {
+    const lat = parseFloat(editForm.latitude);
+    const lon = parseFloat(editForm.longitude);
+    
+    if (!isNaN(lat) && !isNaN(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+      setPlotData(prev => ({
+        ...prev,
+        latitude: lat,
+        longitude: lon
+      }));
+      setEditDialogOpen(false);
     }
   };
 
@@ -92,7 +135,7 @@ const PlotDetailsScreen = () => {
         </div>
       </header>
 
-      {/* Photo Banner */}
+      {/* Photo Banner with Location */}
       <div className="relative h-48 bg-gradient-to-r from-green-400 to-blue-500">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="absolute inset-0 flex items-center justify-center">
@@ -109,10 +152,28 @@ const PlotDetailsScreen = () => {
           <div className="flex items-center justify-between">
             <div className="text-white">
               <h2 className="text-2xl font-bold">{plotData.name}</h2>
-              <p className="text-sm opacity-90 flex items-center">
-                <MapPin className="w-4 h-4 mr-1" />
-                {plotData.location}
-              </p>
+              <div className="space-y-1">
+                <p className="text-sm opacity-90 flex items-center">
+                  <MapPin className="w-4 h-4 mr-1" />
+                  {plotData.location}
+                </p>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={copyCoordinates}
+                    className="text-xs opacity-80 hover:opacity-100 flex items-center space-x-1 bg-white/20 px-2 py-1 rounded"
+                  >
+                    <span>{plotData.latitude.toFixed(4)}, {plotData.longitude.toFixed(4)}</span>
+                    <Copy className="w-3 h-3" />
+                  </button>
+                  <button
+                    onClick={openInMaps}
+                    className="text-xs opacity-80 hover:opacity-100 flex items-center space-x-1 bg-white/20 px-2 py-1 rounded"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    <span>View on Map</span>
+                  </button>
+                </div>
+              </div>
             </div>
             <div className="flex space-x-2">
               <Button size="sm" variant="outline" className="bg-white/20 border-white/30 text-white hover:bg-white/30">
@@ -232,7 +293,8 @@ const PlotDetailsScreen = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-amber-800 leading-relaxed">
-                  Your tomatoes are in their flowering stage. With current conditions, expect to see small fruits 
+                  Your tomatoes are in their flowering stage. With current conditions at your location 
+                  ({plotData.latitude.toFixed(4)}, {plotData.longitude.toFixed(4)}), expect to see small fruits 
                   forming in the next 2-3 weeks. The moisture levels are perfect, and the temperature is ideal 
                   for fruit set. Continue with the current watering schedule.
                 </p>
@@ -244,10 +306,55 @@ const PlotDetailsScreen = () => {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">Plot Information</CardTitle>
-                  <Button variant="outline" size="sm">
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit
-                  </Button>
+                  <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit Location
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Edit Plot Location</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="edit-latitude">Latitude</Label>
+                            <Input
+                              id="edit-latitude"
+                              type="number"
+                              value={editForm.latitude}
+                              onChange={(e) => setEditForm(prev => ({ ...prev, latitude: e.target.value }))}
+                              min={-90}
+                              max={90}
+                              step={0.000001}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="edit-longitude">Longitude</Label>
+                            <Input
+                              id="edit-longitude"
+                              type="number"
+                              value={editForm.longitude}
+                              onChange={(e) => setEditForm(prev => ({ ...prev, longitude: e.target.value }))}
+                              min={-180}
+                              max={180}
+                              step={0.000001}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+                            Cancel
+                          </Button>
+                          <Button onClick={handleLocationUpdate}>
+                            Update Location
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -269,8 +376,13 @@ const PlotDetailsScreen = () => {
                     <p className="font-medium">{plotData.soilType}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Flex Type</p>
-                    <p className="font-medium">{plotData.flexType}</p>
+                    <p className="text-sm text-gray-600">Coordinates</p>
+                    <div className="flex items-center space-x-2">
+                      <p className="font-medium">{plotData.latitude.toFixed(6)}, {plotData.longitude.toFixed(6)}</p>
+                      <Button variant="ghost" size="sm" onClick={copyCoordinates} className="p-1">
+                        <Copy className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Water Used</p>
@@ -350,6 +462,30 @@ const PlotDetailsScreen = () => {
                 </Card>
               ))}
             </div>
+
+            {/* Map Integration Card */}
+            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center">
+                  <Map className="w-5 h-5 mr-2" />
+                  Location Context
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-900">Plot Location</p>
+                    <p className="text-sm text-gray-600">
+                      {plotData.latitude.toFixed(6)}, {plotData.longitude.toFixed(6)}
+                    </p>
+                  </div>
+                  <Button variant="outline" onClick={openInMaps}>
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    View on Map
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Legend */}
             <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">

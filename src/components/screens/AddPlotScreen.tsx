@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   ArrowLeft, 
   ArrowRight, 
@@ -16,7 +18,9 @@ import {
   Ruler,
   Settings,
   Check,
-  Plus
+  Plus,
+  Navigation,
+  Map
 } from "lucide-react";
 
 interface AdvancedSettings {
@@ -29,7 +33,8 @@ interface AdvancedSettings {
 interface FormData {
   name: string;
   description: string;
-  zipCode: string;
+  latitude: string;
+  longitude: string;
   cropType: string;
   plantingDate: string;
   area: string;
@@ -41,10 +46,15 @@ interface FormData {
 const AddPlotScreen = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [locationMethod, setLocationMethod] = useState<'coordinates' | 'current'>('coordinates');
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [locationError, setLocationError] = useState("");
+  
   const [formData, setFormData] = useState<FormData>({
     name: "",
     description: "",
-    zipCode: "",
+    latitude: "",
+    longitude: "",
     cropType: "",
     plantingDate: "",
     area: "",
@@ -99,6 +109,46 @@ const AddPlotScreen = () => {
     }
   };
 
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by this browser.");
+      return;
+    }
+
+    setIsLoadingLocation(true);
+    setLocationError("");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude.toFixed(6);
+        const lon = position.coords.longitude.toFixed(6);
+        updateFormData("latitude", lat);
+        updateFormData("longitude", lon);
+        setIsLoadingLocation(false);
+      },
+      (error) => {
+        setLocationError("Unable to get your location. Please enter coordinates manually.");
+        setIsLoadingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000
+      }
+    );
+  };
+
+  const validateCoordinates = () => {
+    const lat = parseFloat(formData.latitude);
+    const lon = parseFloat(formData.longitude);
+    
+    if (isNaN(lat) || isNaN(lon)) {
+      return false;
+    }
+    
+    return lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
+  };
+
   const handleNext = () => {
     if (step < totalSteps) {
       setStep(step + 1);
@@ -112,15 +162,22 @@ const AddPlotScreen = () => {
   };
 
   const handleSubmit = () => {
-    // In real app, this would submit to API
-    console.log('Submitting plot data:', formData);
+    // Store coordinates in session storage for persistence
+    const plotData = {
+      ...formData,
+      latitude: parseFloat(formData.latitude),
+      longitude: parseFloat(formData.longitude)
+    };
+    
+    sessionStorage.setItem('new_plot_data', JSON.stringify(plotData));
+    console.log('Submitting plot data:', plotData);
     navigate('/app');
   };
 
   const isStepValid = () => {
     switch (step) {
       case 1: return formData.name.trim() !== "";
-      case 2: return formData.zipCode.length === 5;
+      case 2: return validateCoordinates();
       case 3: return formData.cropType !== "" && formData.plantingDate !== "";
       case 4: return formData.area !== "" && formData.soilType !== "";
       case 5: return formData.flexType !== "";
@@ -175,37 +232,95 @@ const AddPlotScreen = () => {
                 <MapPin className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-3">Location</h2>
-              <p className="text-gray-600">We need your location for accurate weather data</p>
+              <p className="text-gray-600">We need precise coordinates for accurate weather data</p>
             </div>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="zipCode">ZIP Code *</Label>
-                <Input
-                  id="zipCode"
-                  type="text"
-                  placeholder="Enter your ZIP code"
-                  value={formData.zipCode}
-                  onChange={(e) => updateFormData("zipCode", e.target.value)}
-                  className="h-12 text-lg"
-                  maxLength={5}
-                />
-              </div>
+            <Tabs value={locationMethod} onValueChange={(value) => setLocationMethod(value as 'coordinates' | 'current')} className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="coordinates" className="flex items-center space-x-2">
+                  <Map className="w-4 h-4" />
+                  <span>Coordinates</span>
+                </TabsTrigger>
+                <TabsTrigger value="current" className="flex items-center space-x-2">
+                  <Navigation className="w-4 h-4" />
+                  <span>Current Location</span>
+                </TabsTrigger>
+              </TabsList>
 
-              {formData.zipCode.length === 5 && (
-                <Card className="border-blue-200 bg-blue-50">
-                  <CardContent className="p-4">
-                    <div className="flex items-center space-x-3">
-                      <MapPin className="w-5 h-5 text-blue-600" />
-                      <div>
-                        <h4 className="font-semibold text-blue-900">Location Found</h4>
-                        <p className="text-sm text-blue-700">San Francisco, CA - Zone 10a</p>
-                      </div>
+              <TabsContent value="coordinates" className="space-y-4 mt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="latitude">Latitude *</Label>
+                    <Input
+                      id="latitude"
+                      type="number"
+                      placeholder="37.7749"
+                      value={formData.latitude}
+                      onChange={(e) => updateFormData("latitude", e.target.value)}
+                      className="h-12 text-lg"
+                      min={-90}
+                      max={90}
+                      step={0.000001}
+                    />
+                    <p className="text-xs text-gray-500">Range: -90 to 90</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="longitude">Longitude *</Label>
+                    <Input
+                      id="longitude"
+                      type="number"
+                      placeholder="-122.4194"
+                      value={formData.longitude}
+                      onChange={(e) => updateFormData("longitude", e.target.value)}
+                      className="h-12 text-lg"
+                      min={-180}
+                      max={180}
+                      step={0.000001}
+                    />
+                    <p className="text-xs text-gray-500">Range: -180 to 180</p>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="current" className="space-y-4 mt-4">
+                <div className="text-center">
+                  <Button
+                    onClick={getCurrentLocation}
+                    disabled={isLoadingLocation}
+                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    {isLoadingLocation ? (
+                      "Getting your location..."
+                    ) : (
+                      <>
+                        <Navigation className="w-4 h-4 mr-2" />
+                        Get Current Location
+                      </>
+                    )}
+                  </Button>
+                  
+                  {locationError && (
+                    <p className="text-sm text-red-600 mt-2">{locationError}</p>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+
+            {validateCoordinates() && (
+              <Card className="border-blue-200 bg-blue-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <MapPin className="w-5 h-5 text-blue-600" />
+                    <div>
+                      <h4 className="font-semibold text-blue-900">Valid Coordinates</h4>
+                      <p className="text-sm text-blue-700">
+                        Lat: {parseFloat(formData.latitude).toFixed(4)}, Lon: {parseFloat(formData.longitude).toFixed(4)}
+                      </p>
                     </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         );
 
@@ -357,6 +472,40 @@ const AddPlotScreen = () => {
                 </Card>
               ))}
             </div>
+
+            {/* Location Summary */}
+            {validateCoordinates() && (
+              <Card className="border-green-200 bg-green-50">
+                <CardHeader>
+                  <CardTitle className="text-lg text-green-900 flex items-center">
+                    <MapPin className="w-5 h-5 mr-2" />
+                    Plot Summary
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-green-700 font-medium">Location</p>
+                      <p className="text-green-600">
+                        {parseFloat(formData.latitude).toFixed(4)}, {parseFloat(formData.longitude).toFixed(4)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-green-700 font-medium">Area</p>
+                      <p className="text-green-600">{formData.area} sq ft</p>
+                    </div>
+                    <div>
+                      <p className="text-green-700 font-medium">Crop</p>
+                      <p className="text-green-600">{cropTypes.find(c => c.id === formData.cropType)?.name}</p>
+                    </div>
+                    <div>
+                      <p className="text-green-700 font-medium">Soil</p>
+                      <p className="text-green-600">{soilTypes.find(s => s.id === formData.soilType)?.name}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         );
 
