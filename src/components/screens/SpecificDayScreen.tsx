@@ -1,52 +1,66 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Droplets, Clock, CloudRain, Sun, Thermometer, CheckCircle } from "lucide-react";
+import { 
+  ArrowLeft, 
+  Droplets, 
+  Thermometer, 
+  Sun, 
+  Clock,
+  Calendar,
+  Play,
+  Edit,
+  Save,
+  X
+} from "lucide-react";
 
 const SpecificDayScreen = () => {
   const { id, date } = useParams();
   const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
+  const [waterDuration, setWaterDuration] = useState(15);
+  const [notes, setNotes] = useState("");
+  const [isWatering, setIsWatering] = useState(false);
 
-  // Mock data for the specific day
+  // Mock data - in real app this would come from API
   const dayData = {
-    date: "March 26, 2024",
-    time: "6:00 AM",
-    amount: "2.5L",
-    status: "pending",
-    weather: {
-      condition: "Sunny",
-      temperature: 75,
-      humidity: 65,
-      precipitation: 0
-    },
-    soilMoisture: 72,
-    notes: "",
-    plotName: "Tomato Garden"
+    date: `December ${date}, 2024`,
+    scheduledTime: "6:00 AM",
+    scheduledVolume: "2.5L",
+    estimatedDuration: "15 minutes",
+    status: "scheduled", // scheduled, completed, skipped
+    moisture: 65,
+    temperature: 73,
+    sunlight: 85,
+    weather: "Sunny, 75°F",
+    notes: "Plants looking healthy. No signs of stress."
   };
 
   const handleWaterNow = () => {
-    // Water now logic
-    console.log("Watering now...");
+    setIsWatering(true);
+    // Simulate watering process
+    setTimeout(() => {
+      setIsWatering(false);
+      // In real app, this would update the backend
+      navigate(`/plot/${id}`);
+    }, 3000);
   };
 
-  const handleSkip = () => {
-    // Skip watering logic
-    console.log("Skipping watering...");
-  };
-
-  const handleComplete = () => {
-    // Mark as completed logic
-    console.log("Marking as completed...");
+  const handleSaveNotes = () => {
+    setIsEditing(false);
+    // In real app, this would save to backend
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <Button 
@@ -58,8 +72,8 @@ const SpecificDayScreen = () => {
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div className="text-center">
-              <h1 className="text-lg font-semibold text-gray-900">{dayData.plotName}</h1>
-              <p className="text-sm text-gray-500">{dayData.date}</p>
+              <h1 className="text-lg font-semibold text-gray-900">{dayData.date}</h1>
+              <p className="text-sm text-gray-500">Tomato Garden</p>
             </div>
             <div className="w-9"></div>
           </div>
@@ -67,148 +81,168 @@ const SpecificDayScreen = () => {
       </header>
 
       <div className="px-6 py-6 space-y-6">
-        {/* Watering Schedule Card */}
-        <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+        {/* Schedule Overview */}
+        <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                  <Droplets className="w-6 h-6 text-white" />
-                </div>
+                <Calendar className="w-6 h-6" />
                 <div>
-                  <h3 className="text-xl font-bold">Scheduled Watering</h3>
-                  <p className="text-blue-100">{dayData.time}</p>
+                  <h2 className="text-xl font-bold">Today's Schedule</h2>
+                  <p className="text-sm opacity-90">Planned watering session</p>
                 </div>
               </div>
-              <Badge className="bg-white/20 text-white border-white/30">
-                {dayData.status.charAt(0).toUpperCase() + dayData.status.slice(1)}
+              <Badge className={`${
+                dayData.status === 'completed' ? 'bg-green-100 text-green-700' :
+                dayData.status === 'skipped' ? 'bg-red-100 text-red-700' :
+                'bg-blue-100 text-blue-700'
+              } border-0`}>
+                {dayData.status === 'completed' ? 'Completed' :
+                 dayData.status === 'skipped' ? 'Skipped' : 'Scheduled'}
               </Badge>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-blue-100 text-sm">Amount</p>
-                <p className="text-2xl font-bold">{dayData.amount}</p>
-              </div>
-              <div>
-                <p className="text-blue-100 text-sm">Duration</p>
-                <p className="text-2xl font-bold">15 min</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Weather Conditions */}
-        <Card className="border-0 shadow-md">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center space-x-2">
-              <Sun className="w-5 h-5 text-orange-500" />
-              <span>Weather Conditions</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-4 bg-orange-50 rounded-xl">
-                <Thermometer className="w-6 h-6 text-orange-600 mx-auto mb-2" />
-                <div className="text-xl font-bold text-orange-900">{dayData.weather.temperature}°F</div>
-                <div className="text-sm text-orange-700">{dayData.weather.condition}</div>
-              </div>
-              <div className="text-center p-4 bg-blue-50 rounded-xl">
-                <CloudRain className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                <div className="text-xl font-bold text-blue-900">{dayData.weather.humidity}%</div>
-                <div className="text-sm text-blue-700">Humidity</div>
-              </div>
-            </div>
             
-            <div className="mt-4 p-4 bg-green-50 rounded-xl">
-              <div className="flex items-center justify-between">
-                <span className="text-green-700 font-medium">Soil Moisture</span>
-                <span className="text-green-900 font-bold">{dayData.soilMoisture}%</span>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center">
+                <Clock className="w-5 h-5 mx-auto mb-2 opacity-80" />
+                <div className="text-lg font-bold">{dayData.scheduledTime}</div>
+                <div className="text-xs opacity-80">Time</div>
               </div>
-              <div className="w-full bg-green-200 rounded-full h-2 mt-2">
-                <div 
-                  className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${dayData.soilMoisture}%` }}
-                ></div>
+              <div className="text-center">
+                <Droplets className="w-5 h-5 mx-auto mb-2 opacity-80" />
+                <div className="text-lg font-bold">{dayData.scheduledVolume}</div>
+                <div className="text-xs opacity-80">Volume</div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* AI Recommendation */}
-        <Card className="border-0 shadow-md bg-gradient-to-r from-purple-50 to-indigo-50">
-          <CardContent className="p-5">
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-bold">AI</span>
-              </div>
-              <div className="flex-1">
-                <h4 className="font-semibold text-purple-900 mb-2">Smart Recommendation</h4>
-                <p className="text-purple-700 text-sm">
-                  Perfect conditions for watering! Soil moisture is at optimal level. 
-                  The sunny weather will help plants absorb water efficiently.
-                </p>
+              <div className="text-center">
+                <Play className="w-5 h-5 mx-auto mb-2 opacity-80" />
+                <div className="text-lg font-bold">{dayData.estimatedDuration}</div>
+                <div className="text-xs opacity-80">Duration</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Notes Section */}
-        <Card className="border-0 shadow-md">
+        {/* Environmental Snapshot */}
+        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="text-lg">Notes</CardTitle>
+            <CardTitle className="text-lg">Environmental Snapshot</CardTitle>
+            <p className="text-sm text-gray-600">{dayData.weather}</p>
           </CardHeader>
-          <CardContent>
-            <Textarea
-              placeholder="Add notes about today's watering session..."
-              className="min-h-20"
-              value={dayData.notes}
-            />
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-blue-50 rounded-xl">
+                <Droplets className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                <div className="text-xl font-bold text-blue-900">{dayData.moisture}%</div>
+                <div className="text-xs text-blue-700">Moisture</div>
+              </div>
+              <div className="text-center p-4 bg-orange-50 rounded-xl">
+                <Thermometer className="w-8 h-8 text-orange-600 mx-auto mb-2" />
+                <div className="text-xl font-bold text-orange-900">{dayData.temperature}°F</div>
+                <div className="text-xs text-orange-700">Temperature</div>
+              </div>
+              <div className="text-center p-4 bg-yellow-50 rounded-xl">
+                <Sun className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
+                <div className="text-xl font-bold text-yellow-900">{dayData.sunlight}%</div>
+                <div className="text-xs text-yellow-700">Sunlight</div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Action Buttons */}
-        <div className="space-y-3">
-          {dayData.status === "pending" && (
-            <>
+        {/* Water Now Section */}
+        {dayData.status === 'scheduled' && (
+          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-lg">Manual Watering</CardTitle>
+              <p className="text-sm text-gray-600">Water your plants now if needed</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="duration">Duration (minutes)</Label>
+                <Input
+                  id="duration"
+                  type="number"
+                  value={waterDuration}
+                  onChange={(e) => setWaterDuration(parseInt(e.target.value))}
+                  min="1"
+                  max="60"
+                  className="h-12"
+                />
+              </div>
+              
               <Button
                 onClick={handleWaterNow}
-                className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold shadow-lg"
+                disabled={isWatering}
+                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium"
               >
-                <Droplets className="w-5 h-5 mr-2" />
-                Water Now ({dayData.amount})
+                {isWatering ? (
+                  <>
+                    <Droplets className="w-5 h-5 mr-2 animate-pulse" />
+                    Watering... ({waterDuration}min)
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-5 h-5 mr-2" />
+                    Water Now ({waterDuration} minutes)
+                  </>
+                )}
               </Button>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  onClick={handleComplete}
-                  variant="outline"
-                  className="h-12 border-green-500 text-green-600 hover:bg-green-50"
-                >
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Mark Complete
-                </Button>
-                <Button
-                  onClick={handleSkip}
-                  variant="outline"
-                  className="h-12"
-                >
-                  <Clock className="w-4 h-4 mr-2" />
-                  Skip Today
-                </Button>
-              </div>
-            </>
-          )}
+            </CardContent>
+          </Card>
+        )}
 
-          {dayData.status === "completed" && (
-            <Card className="border-green-200 bg-green-50">
-              <CardContent className="p-4 text-center">
-                <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                <h4 className="font-semibold text-green-900">Watering Completed</h4>
-                <p className="text-sm text-green-700">Great job taking care of your plants!</p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+        {/* Notes Section */}
+        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg">Notes</CardTitle>
+              {!isEditing ? (
+                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit
+                </Button>
+              ) : (
+                <div className="flex space-x-2">
+                  <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
+                    <X className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" onClick={handleSaveNotes}>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save
+                  </Button>
+                </div>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isEditing ? (
+              <Textarea
+                value={notes || dayData.notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Add your observations..."
+                className="min-h-[100px]"
+              />
+            ) : (
+              <p className="text-gray-700 leading-relaxed">
+                {notes || dayData.notes || "No notes added yet."}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Weather Impact */}
+        <Card className="border-0 shadow-lg bg-green-50 border-green-200">
+          <CardHeader>
+            <CardTitle className="text-lg text-green-900">Weather Impact</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-green-800 leading-relaxed">
+              Today's sunny conditions are perfect for your tomatoes. The moderate temperature 
+              and good sunlight will help with photosynthesis. No rain expected, so proceed 
+              with scheduled watering.
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Bottom safe area */}

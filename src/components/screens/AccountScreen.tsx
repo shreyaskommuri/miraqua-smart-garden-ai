@@ -1,12 +1,14 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { User, Settings, Bell, Shield, HelpCircle, LogOut, ChevronRight, Star, Droplets } from "lucide-react";
 
 const AccountScreen = () => {
+  const navigate = useNavigate();
+  
   const menuItems = [
     { icon: User, title: "Profile Settings", subtitle: "Update your personal information", path: "/profile" },
     { icon: Bell, title: "Notifications", subtitle: "Manage alerts and reminders", path: "/notifications" },
@@ -74,8 +76,8 @@ const AccountScreen = () => {
           {menuItems.map((item, index) => {
             const Icon = item.icon;
             return (
-              <Link key={index} to={item.path}>
-                <Card className="border-0 shadow-md hover:shadow-lg transition-shadow duration-200">
+              <div key={index} onClick={() => navigate(item.path)}>
+                <Card className="border-0 shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer">
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-4">
                       <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
@@ -89,7 +91,7 @@ const AccountScreen = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </Link>
+              </div>
             );
           })}
         </div>
@@ -137,6 +139,7 @@ const AccountScreen = () => {
         <Button
           variant="outline"
           className="w-full h-12 border-red-200 text-red-600 hover:bg-red-50"
+          onClick={() => navigate('/welcome')}
         >
           <LogOut className="w-5 h-5 mr-2" />
           Sign Out

@@ -32,7 +32,7 @@ const WelcomeScreen = () => {
   ];
 
   const handleGetStarted = () => {
-    navigate("/onboarding/crop");
+    navigate("/signup");
   };
 
   const handleSignIn = () => {

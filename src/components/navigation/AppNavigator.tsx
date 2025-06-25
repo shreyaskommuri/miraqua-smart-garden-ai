@@ -13,6 +13,7 @@ import AddPlotScreen from "../screens/AddPlotScreen";
 import PlotDetailsScreen from "../screens/PlotDetailsScreen";
 import SpecificDayScreen from "../screens/SpecificDayScreen";
 import FarmerChatScreen from "../screens/FarmerChatScreen";
+import HelpScreen from "../screens/HelpScreen";
 
 const AppNavigator = () => {
   return (
@@ -28,6 +29,7 @@ const AppNavigator = () => {
       <Route path="/plot/:id" element={<PlotDetailsScreen />} />
       <Route path="/plot/:id/day/:date" element={<SpecificDayScreen />} />
       <Route path="/chat" element={<FarmerChatScreen />} />
+      <Route path="/help" element={<HelpScreen />} />
       <Route path="/app/*" element={<MainTabs />} />
       <Route path="/*" element={<WelcomeScreen />} />
     </Routes>
