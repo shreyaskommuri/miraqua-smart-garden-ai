@@ -9,18 +9,20 @@ import AppNavigator from "./components/navigation/AppNavigator";
 
 const queryClient = new QueryClient();
 
-const App: React.FC = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <div className="w-full">
-          <AppNavigator />
-        </div>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App: React.FC = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <div className="w-full">
+            <AppNavigator />
+          </div>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
