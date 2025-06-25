@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,10 +19,29 @@ import {
   Plus
 } from "lucide-react";
 
+interface AdvancedSettings {
+  wateringDepth: string;
+  fertilizer: boolean;
+  mulch: boolean;
+  drainageType: string;
+}
+
+interface FormData {
+  name: string;
+  description: string;
+  zipCode: string;
+  cropType: string;
+  plantingDate: string;
+  area: string;
+  soilType: string;
+  flexType: string;
+  advancedSettings: AdvancedSettings;
+}
+
 const AddPlotScreen = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     description: "",
     zipCode: "",
@@ -67,13 +85,15 @@ const AddPlotScreen = () => {
   const updateFormData = (field: string, value: any) => {
     if (field.includes('.')) {
       const [parent, child] = field.split('.');
-      setFormData(prev => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent as keyof typeof prev],
-          [child]: value
-        }
-      }));
+      if (parent === 'advancedSettings') {
+        setFormData(prev => ({
+          ...prev,
+          advancedSettings: {
+            ...prev.advancedSettings,
+            [child]: value
+          }
+        }));
+      }
     } else {
       setFormData(prev => ({ ...prev, [field]: value }));
     }
