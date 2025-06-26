@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,36 +7,40 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   ArrowLeft, 
   ArrowRight, 
-  MapPin, 
   Leaf, 
   Calendar,
   Ruler,
   Settings,
   Check,
   Plus,
-  Navigation,
+  Save,
+  MapPin,
   Map
 } from "lucide-react";
+import { LocationPicker } from "@/components/ui/LocationPicker";
 
 interface AdvancedSettings {
   wateringDepth: string;
   fertilizer: boolean;
   mulch: boolean;
   drainageType: string;
+  irrigationType: string;
+  soilPh: string;
 }
 
 interface FormData {
   name: string;
   description: string;
-  latitude: string;
-  longitude: string;
+  latitude: number;
+  longitude: number;
   cropType: string;
   plantingDate: string;
   area: string;
+  areaUnit: 'sqft' | 'sqm';
   soilType: string;
   flexType: string;
   advancedSettings: AdvancedSettings;
@@ -46,50 +49,70 @@ interface FormData {
 const AddPlotScreen = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [locationMethod, setLocationMethod] = useState<'coordinates' | 'current'>('coordinates');
-  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
-  const [locationError, setLocationError] = useState("");
+  const [canResume, setCanResume] = useState(false);
   
   const [formData, setFormData] = useState<FormData>({
     name: "",
     description: "",
-    latitude: "",
-    longitude: "",
+    latitude: 0,
+    longitude: 0,
     cropType: "",
     plantingDate: "",
     area: "",
+    areaUnit: 'sqft',
     soilType: "",
     flexType: "",
     advancedSettings: {
       wateringDepth: "6",
       fertilizer: false,
       mulch: false,
-      drainageType: "good"
+      drainageType: "good",
+      irrigationType: "drip",
+      soilPh: "neutral"
     }
   });
 
   const totalSteps = 5;
   const progress = (step / totalSteps) * 100;
 
+  // Load saved data on mount
+  React.useEffect(() => {
+    const saved = sessionStorage.getItem('add_plot_draft');
+    if (saved) {
+      const data = JSON.parse(saved);
+      setFormData(data.formData);
+      setStep(data.step);
+      setCanResume(true);
+    }
+  }, []);
+
+  // Auto-save draft
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      sessionStorage.setItem('add_plot_draft', JSON.stringify({ formData, step }));
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [formData, step]);
+
   const cropTypes = [
-    { id: "tomatoes", name: "Tomatoes", icon: "🍅", difficulty: "Easy", season: "Spring/Summer" },
-    { id: "herbs", name: "Herbs", icon: "🌿", difficulty: "Easy", season: "Year-round" },
-    { id: "lettuce", name: "Lettuce", icon: "🥬", difficulty: "Easy", season: "Cool weather" },
-    { id: "peppers", name: "Peppers", icon: "🌶️", difficulty: "Medium", season: "Summer" },
-    { id: "carrots", name: "Carrots", icon: "🥕", difficulty: "Medium", season: "Cool weather" },
-    { id: "cucumbers", name: "Cucumbers", icon: "🥒", difficulty: "Medium", season: "Summer" },
+    { id: "tomatoes", name: "Tomatoes", icon: "🍅", difficulty: "Easy", season: "Spring/Summer", waterNeeds: "Medium" },
+    { id: "herbs", name: "Herbs", icon: "🌿", difficulty: "Easy", season: "Year-round", waterNeeds: "Low" },
+    { id: "lettuce", name: "Lettuce", icon: "🥬", difficulty: "Easy", season: "Cool weather", waterNeeds: "High" },
+    { id: "peppers", name: "Peppers", icon: "🌶️", difficulty: "Medium", season: "Summer", waterNeeds: "Medium" },
+    { id: "carrots", name: "Carrots", icon: "🥕", difficulty: "Medium", season: "Cool weather", waterNeeds: "Medium" },
+    { id: "cucumbers", name: "Cucumbers", icon: "🥒", difficulty: "Medium", season: "Summer", waterNeeds: "High" },
   ];
 
   const soilTypes = [
-    { id: "clay", name: "Clay", description: "Heavy, retains water well" },
-    { id: "sandy", name: "Sandy", description: "Light, drains quickly" },
-    { id: "loamy", name: "Loamy", description: "Balanced, ideal for most plants" },
-    { id: "silty", name: "Silty", description: "Smooth, holds nutrients well" },
+    { id: "clay", name: "Clay", description: "Heavy, retains water well", drainageRate: "Slow" },
+    { id: "sandy", name: "Sandy", description: "Light, drains quickly", drainageRate: "Fast" },
+    { id: "loamy", name: "Loamy", description: "Balanced, ideal for most plants", drainageRate: "Medium" },
+    { id: "silty", name: "Silty", description: "Smooth, holds nutrients well", drainageRate: "Medium" },
   ];
 
   const flexTypes = [
-    { id: "daily", name: "Daily Flexibility", description: "Adjust watering times within the same day", timeRange: "±2 hours" },
-    { id: "weekly", name: "Weekly Flexibility", description: "Move watering days within the week", timeRange: "±2 days" },
+    { id: "daily", name: "Daily Flexibility", description: "Adjust watering times within the same day", timeRange: "±2 hours", efficiency: "+15%" },
+    { id: "weekly", name: "Weekly Flexibility", description: "Move watering days within the week", timeRange: "±2 days", efficiency: "+25%" },
   ];
 
   const updateFormData = (field: string, value: any) => {
@@ -109,44 +132,15 @@ const AddPlotScreen = () => {
     }
   };
 
-  const getCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      setLocationError("Geolocation is not supported by this browser.");
-      return;
-    }
-
-    setIsLoadingLocation(true);
-    setLocationError("");
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude.toFixed(6);
-        const lon = position.coords.longitude.toFixed(6);
-        updateFormData("latitude", lat);
-        updateFormData("longitude", lon);
-        setIsLoadingLocation(false);
-      },
-      (error) => {
-        setLocationError("Unable to get your location. Please enter coordinates manually.");
-        setIsLoadingLocation(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 300000
-      }
-    );
+  const handleLocationChange = ({ lat, lon }: { lat: number; lon: number }) => {
+    updateFormData('latitude', lat);
+    updateFormData('longitude', lon);
   };
 
   const validateCoordinates = () => {
-    const lat = parseFloat(formData.latitude);
-    const lon = parseFloat(formData.longitude);
-    
-    if (isNaN(lat) || isNaN(lon)) {
-      return false;
-    }
-    
-    return lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
+    return formData.latitude >= -90 && formData.latitude <= 90 && 
+           formData.longitude >= -180 && formData.longitude <= 180 &&
+           formData.latitude !== 0 && formData.longitude !== 0;
   };
 
   const handleNext = () => {
@@ -161,14 +155,19 @@ const AddPlotScreen = () => {
     }
   };
 
+  const handleSaveDraft = () => {
+    sessionStorage.setItem('add_plot_draft', JSON.stringify({ formData, step }));
+    navigate('/app');
+  };
+
   const handleSubmit = () => {
-    // Store coordinates in session storage for persistence
     const plotData = {
       ...formData,
-      latitude: parseFloat(formData.latitude),
-      longitude: parseFloat(formData.longitude)
+      id: Date.now(),
+      createdAt: new Date().toISOString()
     };
     
+    sessionStorage.removeItem('add_plot_draft');
     sessionStorage.setItem('new_plot_data', JSON.stringify(plotData));
     console.log('Submitting plot data:', plotData);
     navigate('/app');
@@ -208,6 +207,7 @@ const AddPlotScreen = () => {
                   onChange={(e) => updateFormData("name", e.target.value)}
                   className="h-12 text-lg"
                 />
+                <p className="text-xs text-gray-500">Choose a unique, descriptive name</p>
               </div>
 
               <div className="space-y-2">
@@ -221,6 +221,16 @@ const AddPlotScreen = () => {
                 />
               </div>
             </div>
+
+            {canResume && (
+              <Card className="border-blue-200 bg-blue-50">
+                <CardContent className="p-4">
+                  <p className="text-sm text-blue-800">
+                    💡 We found a saved draft from your previous session. Continue where you left off!
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         );
 
@@ -229,92 +239,27 @@ const AddPlotScreen = () => {
           <div className="space-y-6">
             <div className="text-center mb-8">
               <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MapPin className="w-8 h-8 text-white" />
+                <Leaf className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">Location</h2>
-              <p className="text-gray-600">We need precise coordinates for accurate weather data</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">Choose Location</h2>
+              <p className="text-gray-600">Precise coordinates help us provide accurate weather data</p>
             </div>
 
-            <Tabs value={locationMethod} onValueChange={(value) => setLocationMethod(value as 'coordinates' | 'current')} className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="coordinates" className="flex items-center space-x-2">
-                  <Map className="w-4 h-4" />
-                  <span>Coordinates</span>
-                </TabsTrigger>
-                <TabsTrigger value="current" className="flex items-center space-x-2">
-                  <Navigation className="w-4 h-4" />
-                  <span>Current Location</span>
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="coordinates" className="space-y-4 mt-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="latitude">Latitude *</Label>
-                    <Input
-                      id="latitude"
-                      type="number"
-                      placeholder="37.7749"
-                      value={formData.latitude}
-                      onChange={(e) => updateFormData("latitude", e.target.value)}
-                      className="h-12 text-lg"
-                      min={-90}
-                      max={90}
-                      step={0.000001}
-                    />
-                    <p className="text-xs text-gray-500">Range: -90 to 90</p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="longitude">Longitude *</Label>
-                    <Input
-                      id="longitude"
-                      type="number"
-                      placeholder="-122.4194"
-                      value={formData.longitude}
-                      onChange={(e) => updateFormData("longitude", e.target.value)}
-                      className="h-12 text-lg"
-                      min={-180}
-                      max={180}
-                      step={0.000001}
-                    />
-                    <p className="text-xs text-gray-500">Range: -180 to 180</p>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="current" className="space-y-4 mt-4">
-                <div className="text-center">
-                  <Button
-                    onClick={getCurrentLocation}
-                    disabled={isLoadingLocation}
-                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    {isLoadingLocation ? (
-                      "Getting your location..."
-                    ) : (
-                      <>
-                        <Navigation className="w-4 h-4 mr-2" />
-                        Get Current Location
-                      </>
-                    )}
-                  </Button>
-                  
-                  {locationError && (
-                    <p className="text-sm text-red-600 mt-2">{locationError}</p>
-                  )}
-                </div>
-              </TabsContent>
-            </Tabs>
+            <LocationPicker
+              initialLat={formData.latitude || 37.7749}
+              initialLon={formData.longitude || -122.4194}
+              onChange={handleLocationChange}
+            />
 
             {validateCoordinates() && (
-              <Card className="border-blue-200 bg-blue-50">
+              <Card className="border-green-200 bg-green-50">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
-                    <MapPin className="w-5 h-5 text-blue-600" />
+                    <Check className="w-5 h-5 text-green-600" />
                     <div>
-                      <h4 className="font-semibold text-blue-900">Valid Coordinates</h4>
-                      <p className="text-sm text-blue-700">
-                        Lat: {parseFloat(formData.latitude).toFixed(4)}, Lon: {parseFloat(formData.longitude).toFixed(4)}
+                      <h4 className="font-semibold text-green-900">Location Set</h4>
+                      <p className="text-sm text-green-700">
+                        {formData.latitude.toFixed(4)}, {formData.longitude.toFixed(4)}
                       </p>
                     </div>
                   </div>
@@ -351,10 +296,16 @@ const AddPlotScreen = () => {
                     >
                       <CardContent className="p-4 text-center">
                         <div className="text-2xl mb-2">{crop.icon}</div>
-                        <h3 className="font-semibold text-gray-900 text-sm">{crop.name}</h3>
-                        <Badge className="text-xs mt-1" variant="outline">
-                          {crop.difficulty}
-                        </Badge>
+                        <h3 className="font-semibold text-gray-900 text-sm mb-1">{crop.name}</h3>
+                        <div className="flex justify-center space-x-1 mb-2">
+                          <Badge className="text-xs" variant="outline">
+                            {crop.difficulty}
+                          </Badge>
+                          <Badge className="text-xs" variant="outline">
+                            {crop.waterNeeds}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-500">{crop.season}</p>
                       </CardContent>
                     </Card>
                   ))}
@@ -370,6 +321,7 @@ const AddPlotScreen = () => {
                   onChange={(e) => updateFormData("plantingDate", e.target.value)}
                   className="h-12"
                 />
+                <p className="text-xs text-gray-500">This helps calculate optimal watering schedules</p>
               </div>
             </div>
           </div>
@@ -388,15 +340,26 @@ const AddPlotScreen = () => {
 
             <div className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="area">Plot Area (sq ft) *</Label>
-                <Input
-                  id="area"
-                  type="number"
-                  placeholder="e.g., 12"
-                  value={formData.area}
-                  onChange={(e) => updateFormData("area", e.target.value)}
-                  className="h-12"
-                />
+                <Label htmlFor="area">Plot Area *</Label>
+                <div className="flex space-x-2">
+                  <Input
+                    id="area"
+                    type="number"
+                    placeholder="25"
+                    value={formData.area}
+                    onChange={(e) => updateFormData("area", e.target.value)}
+                    className="h-12 flex-1"
+                  />
+                  <Select value={formData.areaUnit} onValueChange={(value) => updateFormData("areaUnit", value)}>
+                    <SelectTrigger className="w-24 h-12">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sqft">sq ft</SelectItem>
+                      <SelectItem value="sqm">sq m</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="space-y-4">
@@ -414,8 +377,13 @@ const AddPlotScreen = () => {
                     >
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-semibold text-gray-900">{soil.name}</h3>
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3 mb-1">
+                              <h3 className="font-semibold text-gray-900">{soil.name}</h3>
+                              <Badge variant="outline" className="text-xs">
+                                {soil.drainageRate} drainage
+                              </Badge>
+                            </div>
                             <p className="text-sm text-gray-600">{soil.description}</p>
                           </div>
                           {formData.soilType === soil.id && (
@@ -438,7 +406,7 @@ const AddPlotScreen = () => {
               <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Settings className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">Schedule Flexibility</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">Smart Scheduling</h2>
               <p className="text-gray-600">How flexible can your watering schedule be?</p>
             </div>
 
@@ -461,6 +429,9 @@ const AddPlotScreen = () => {
                           <Badge variant="outline" className="text-xs">
                             {flex.timeRange}
                           </Badge>
+                          <Badge className="text-xs bg-green-100 text-green-700">
+                            {flex.efficiency} more efficient
+                          </Badge>
                         </div>
                         <p className="text-gray-600 text-sm">{flex.description}</p>
                       </div>
@@ -473,34 +444,34 @@ const AddPlotScreen = () => {
               ))}
             </div>
 
-            {/* Location Summary */}
-            {validateCoordinates() && (
+            {/* Review Summary */}
+            {validateCoordinates() && formData.cropType && formData.area && formData.soilType && (
               <Card className="border-green-200 bg-green-50">
                 <CardHeader>
                   <CardTitle className="text-lg text-green-900 flex items-center">
-                    <MapPin className="w-5 h-5 mr-2" />
-                    Plot Summary
+                    <Check className="w-5 h-5 mr-2" />
+                    Ready to Create
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
+                <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-green-700 font-medium">Location</p>
-                      <p className="text-green-600">
-                        {parseFloat(formData.latitude).toFixed(4)}, {parseFloat(formData.longitude).toFixed(4)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-green-700 font-medium">Area</p>
-                      <p className="text-green-600">{formData.area} sq ft</p>
+                      <p className="text-green-700 font-medium">Plot Name</p>
+                      <p className="text-green-600">{formData.name}</p>
                     </div>
                     <div>
                       <p className="text-green-700 font-medium">Crop</p>
                       <p className="text-green-600">{cropTypes.find(c => c.id === formData.cropType)?.name}</p>
                     </div>
                     <div>
-                      <p className="text-green-700 font-medium">Soil</p>
-                      <p className="text-green-600">{soilTypes.find(s => s.id === formData.soilType)?.name}</p>
+                      <p className="text-green-700 font-medium">Area</p>
+                      <p className="text-green-600">{formData.area} {formData.areaUnit}</p>
+                    </div>
+                    <div>
+                      <p className="text-green-700 font-medium">Location</p>
+                      <p className="text-green-600">
+                        {formData.latitude.toFixed(3)}, {formData.longitude.toFixed(3)}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -532,7 +503,14 @@ const AddPlotScreen = () => {
               <h1 className="text-lg font-semibold text-gray-900">Add New Plot</h1>
               <p className="text-sm text-gray-500">Step {step} of {totalSteps}</p>
             </div>
-            <div className="w-9"></div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleSaveDraft}
+              className="p-2"
+            >
+              <Save className="w-5 h-5" />
+            </Button>
           </div>
         </div>
       </header>
@@ -544,7 +522,7 @@ const AddPlotScreen = () => {
             <span className="text-sm text-gray-600">Progress</span>
             <span className="text-sm text-gray-600">{Math.round(progress)}%</span>
           </div>
-          <Progress value={progress} className="h-2" />
+          <Progress value={progress} className="h-3" />
         </div>
 
         {/* Step Content */}
