@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -187,8 +188,8 @@ const HomeScreen = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-purple-50">
-      {/* Sticky Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
+      {/* Fixed Header */}
+      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-40">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -275,20 +276,18 @@ const HomeScreen = () => {
         </div>
       </header>
 
-      {/* Scrollable Content */}
-      <ScrollArea className="h-[calc(100vh-200px)]">
+      {/* Main Content with proper top padding */}
+      <div className="pt-48 pb-20">
         <div className="px-6 py-6 space-y-8">
-          {/* Global Stats - Sticky */}
-          <div className="sticky top-4 z-30">
-            <GlobalStatsPanel 
-              totalWaterUsed={142}
-              avgMoisture={68}
-              nextWateringIn="2h 15m"
-              activePlots={plots.length}
-              waterSavings={23}
-              moistureTrend="up"
-            />
-          </div>
+          {/* Global Stats */}
+          <GlobalStatsPanel 
+            totalWaterUsed={142}
+            avgMoisture={68}
+            nextWateringIn="2h 15m"
+            activePlots={plots.length}
+            waterSavings={23}
+            moistureTrend="up"
+          />
 
           {/* Quick Actions */}
           <Card className="border-0 shadow-lg bg-gradient-to-r from-green-500 to-blue-600 text-white">
@@ -425,10 +424,7 @@ const HomeScreen = () => {
             )}
           </div>
         </div>
-      </ScrollArea>
-
-      {/* Bottom safe area */}
-      <div className="h-20"></div>
+      </div>
     </div>
   );
 };
