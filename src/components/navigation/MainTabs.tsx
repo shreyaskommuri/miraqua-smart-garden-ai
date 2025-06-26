@@ -1,10 +1,11 @@
 
 import React from "react";
 import { Routes, Route, useLocation, Link } from "react-router-dom";
-import { Home, BarChart3, User, MessageSquare } from "lucide-react";
+import { Home, BarChart3, User, MessageSquare, Users } from "lucide-react";
 import HomeScreen from "../screens/HomeScreen";
 import AnalyticsScreen from "../screens/AnalyticsScreen";
 import AccountScreen from "../screens/AccountScreen";
+import CollaborationScreen from "../screens/CollaborationScreen";
 import { cn } from "@/lib/utils";
 
 const MainTabs = () => {
@@ -14,6 +15,7 @@ const MainTabs = () => {
     { path: "/app", icon: Home, label: "Home" },
     { path: "/app/analytics", icon: BarChart3, label: "Analytics" },
     { path: "/chat", icon: MessageSquare, label: "AI Chat" },
+    { path: "/collaboration", icon: Users, label: "Team" },
     { path: "/app/account", icon: User, label: "Account" },
   ];
 

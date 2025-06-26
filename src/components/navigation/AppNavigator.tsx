@@ -14,6 +14,10 @@ import PlotDetailsScreen from "../screens/PlotDetailsScreen";
 import SpecificDayScreen from "../screens/SpecificDayScreen";
 import FarmerChatScreen from "../screens/FarmerChatScreen";
 import HelpScreen from "../screens/HelpScreen";
+import WeatherForecastScreen from "../screens/WeatherForecastScreen";
+import ExportReportsScreen from "../screens/ExportReportsScreen";
+import CollaborationScreen from "../screens/CollaborationScreen";
+import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 
 const AppNavigator = () => {
   return (
@@ -21,6 +25,7 @@ const AppNavigator = () => {
       <Route path="/welcome" element={<WelcomeScreen />} />
       <Route path="/signin" element={<SignInScreen />} />
       <Route path="/signup" element={<SignUpScreen />} />
+      <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
       <Route path="/onboarding/crop" element={<OnboardingCropScreen />} />
       <Route path="/onboarding/location" element={<OnboardingLocationScreen />} />
       <Route path="/onboarding/advanced" element={<OnboardingAdvancedSettingsScreen />} />
@@ -30,6 +35,9 @@ const AppNavigator = () => {
       <Route path="/plot/:id/day/:date" element={<SpecificDayScreen />} />
       <Route path="/chat" element={<FarmerChatScreen />} />
       <Route path="/help" element={<HelpScreen />} />
+      <Route path="/weather" element={<WeatherForecastScreen />} />
+      <Route path="/export" element={<ExportReportsScreen />} />
+      <Route path="/collaboration" element={<CollaborationScreen />} />
       <Route path="/app/*" element={<MainTabs />} />
       <Route path="/*" element={<WelcomeScreen />} />
     </Routes>
