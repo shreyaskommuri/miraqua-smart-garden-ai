@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate, useFocusEffect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -136,16 +136,14 @@ const HomeScreen = () => {
     };
   }, []);
 
-  // Refresh plots data when returning to screen
-  useFocusEffect(
-    useCallback(() => {
-      const getPlots = async () => {
-        // In real app, this would be an API call
-        console.log('Refreshing plots data');
-      };
-      getPlots();
-    }, [])
-  );
+  // Refresh plots data when component mounts
+  useEffect(() => {
+    const getPlots = async () => {
+      // In real app, this would be an API call
+      console.log('Refreshing plots data');
+    };
+    getPlots();
+  }, []);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);

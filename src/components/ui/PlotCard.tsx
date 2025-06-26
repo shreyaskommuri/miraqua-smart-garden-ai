@@ -107,6 +107,7 @@ export const PlotCard: React.FC<PlotCardProps> = ({
                     onWaterNow?.(plot.id);
                   }}
                   className="bg-blue-600 hover:bg-blue-700 text-white"
+                  aria-label="Water Now, 5 minute default"
                 >
                   <Play className="w-3 h-3" />
                 </Button>
@@ -201,7 +202,7 @@ export const PlotCard: React.FC<PlotCardProps> = ({
                   onWaterNow?.(plot.id);
                 }}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
-                accessibilityLabel="Water Now, 5 minute default"
+                aria-label="Water Now, 5 minute default"
               >
                 <Play className="w-4 h-4 mr-1" />
                 Water Now
