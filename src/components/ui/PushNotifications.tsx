@@ -156,11 +156,7 @@ export const PushNotificationManager: React.FC<PushNotificationManagerProps> = (
         body: notification.body,
         icon: '/favicon.png',
         tag: id,
-        requireInteraction: notification.type === 'alert',
-        actions: notification.type === 'watering' ? [
-          { action: 'water-now', title: 'Water Now' },
-          { action: 'snooze', title: 'Remind Later' }
-        ] : undefined
+        requireInteraction: notification.type === 'alert'
       });
 
       browserNotification.onclick = () => {
