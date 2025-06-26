@@ -6,6 +6,7 @@ import HomeScreen from "../screens/HomeScreen";
 import AnalyticsScreen from "../screens/AnalyticsScreen";
 import AccountScreen from "../screens/AccountScreen";
 import CollaborationScreen from "../screens/CollaborationScreen";
+import FarmerChatScreen from "../screens/FarmerChatScreen";
 import { cn } from "@/lib/utils";
 
 const MainTabs = () => {
@@ -14,14 +15,14 @@ const MainTabs = () => {
   const tabs = [
     { path: "/app", icon: Home, label: "Home" },
     { path: "/app/analytics", icon: BarChart3, label: "Analytics" },
-    { path: "/chat", icon: MessageSquare, label: "AI Chat" },
-    { path: "/collaboration", icon: Users, label: "Team" },
+    { path: "/app/chat", icon: MessageSquare, label: "AI Chat" },
+    { path: "/app/collaboration", icon: Users, label: "Team" },
     { path: "/app/account", icon: User, label: "Account" },
   ];
 
   const isActive = (path: string) => {
     if (path === "/app") {
-      return location.pathname === "/app" || location.pathname === "/";
+      return location.pathname === "/app";
     }
     return location.pathname.startsWith(path);
   };
@@ -32,6 +33,8 @@ const MainTabs = () => {
         <Routes>
           <Route path="/" element={<HomeScreen />} />
           <Route path="/analytics" element={<AnalyticsScreen />} />
+          <Route path="/chat" element={<FarmerChatScreen />} />
+          <Route path="/collaboration" element={<CollaborationScreen />} />
           <Route path="/account" element={<AccountScreen />} />
         </Routes>
       </div>

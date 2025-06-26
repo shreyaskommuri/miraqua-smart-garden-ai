@@ -4,12 +4,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter } from "react-router-dom";
-import AppNavigator from "./components/navigation/AppNavigator";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CommandPalette } from "./components/ui/CommandPalette";
 import { VoiceCommand } from "./components/ui/VoiceCommand";
-import { NotificationPermission, PushNotificationManager, useNotifications } from "./components/ui/PushNotifications";
+import { NotificationPermission, PushNotificationManager } from "./components/ui/PushNotifications";
 import { RealTimeProvider, RealTimeIndicator } from "./components/ui/RealTimeUpdates";
+import MainTabs from "./components/navigation/MainTabs";
+import Index from "./pages/Index";
 
 const queryClient = new QueryClient();
 
@@ -51,8 +52,11 @@ const App: React.FC = () => {
                 <RealTimeIndicator />
               </div>
 
-              {/* Main app content */}
-              <AppNavigator />
+              {/* Main app routes */}
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/app/*" element={<MainTabs />} />
+              </Routes>
 
               {/* Command Palette */}
               <CommandPalette
