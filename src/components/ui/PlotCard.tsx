@@ -76,14 +76,14 @@ export const PlotCard: React.FC<PlotCardProps> = ({
   if (compact) {
     return (
       <Card 
-        className="border-0 shadow-md bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300 cursor-pointer"
+        className="border-0 shadow-md bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-150 cursor-pointer hover:scale-[1.02] m-3 p-4"
         onClick={() => onViewDetails?.(plot.id)}
       >
-        <CardContent className="p-4">
+        <CardContent className="p-0">
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-1">
-                <h3 className="font-semibold text-gray-900">{plot.name}</h3>
+                <h3 className="font-semibold text-gray-900 text-base">{plot.name}</h3>
                 <Badge className={`text-xs ${statusConfig.color}`}>
                   {statusConfig.icon} {statusConfig.label}
                 </Badge>
@@ -120,10 +120,10 @@ export const PlotCard: React.FC<PlotCardProps> = ({
 
   return (
     <Card 
-      className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
+      className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-150 cursor-pointer hover:scale-[1.02] m-3 p-4"
       onClick={() => onViewDetails?.(plot.id)}
     >
-      <CardContent className="p-5">
+      <CardContent className="p-0">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
@@ -201,6 +201,7 @@ export const PlotCard: React.FC<PlotCardProps> = ({
                   onWaterNow?.(plot.id);
                 }}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
+                accessibilityLabel="Water Now, 5 minute default"
               >
                 <Play className="w-4 h-4 mr-1" />
                 Water Now

@@ -39,17 +39,28 @@ export const designTokens = {
       700: '#374151',
       800: '#1f2937',
       900: '#111827'
+    },
+    // Improved contrast colors
+    contrast: {
+      light: '#E0E0E0', // Better contrast than #F5F5F5
+      medium: '#D1D5DB',
+      dark: '#4B5563'
     }
   },
   spacing: {
     xs: '0.25rem',
     sm: '0.5rem',
-    md: '1rem',
+    md: '1rem',    // 16px - standardized
     lg: '1.5rem',
     xl: '2rem',
     '2xl': '3rem'
   },
   typography: {
+    // Standardized font sizes
+    caption: '0.75rem',   // 12pt
+    body: '1rem',         // 16pt
+    h2: '1.25rem',        // 20pt
+    h1: '1.5rem',         // 24pt
     xs: '0.75rem',
     sm: '0.875rem',
     base: '1rem',
@@ -69,6 +80,12 @@ export const designTokens = {
     md: '0.5rem',
     lg: '0.75rem',
     xl: '1rem'
+  },
+  animations: {
+    // Standardized animation durations
+    fast: '150ms',
+    normal: '200ms',
+    slow: '300ms'
   }
 };
 
