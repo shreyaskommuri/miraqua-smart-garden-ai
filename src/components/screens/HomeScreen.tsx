@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,9 +14,13 @@ import {
   Play,
   Loader2,
   AlertTriangle,
-  RefreshCw
+  RefreshCw,
+  Camera,
+  Target,
+  Zap
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { RealTimeIndicator, usePlotUpdates } from "@/components/ui/RealTimeUpdates";
 
 interface Plot {
   id: number;
@@ -155,13 +158,7 @@ const HomeScreen = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-          <div className="px-4 py-4">
-            <h1 className="text-xl font-bold text-gray-900">Garden Dashboard</h1>
-          </div>
-        </header>
-        
+      <div className="min-h-screen bg-gray-50 pt-16 lg:pt-0 lg:pl-64">
         <div className="p-4 space-y-4">
           {/* Stats Skeleton */}
           <div className="grid grid-cols-2 gap-4">
@@ -181,13 +178,7 @@ const HomeScreen = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-          <div className="px-4 py-4">
-            <h1 className="text-xl font-bold text-gray-900">Garden Dashboard</h1>
-          </div>
-        </header>
-        
+      <div className="min-h-screen bg-gray-50 pt-16 lg:pt-0 lg:pl-64">
         <div className="p-4">
           <Card className="border-red-200 bg-red-50">
             <CardContent className="p-6 text-center">
@@ -205,22 +196,7 @@ const HomeScreen = () => {
 
   if (!loading && plots.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-          <div className="px-4 py-4">
-            <div className="flex items-center justify-between">
-              <h1 className="text-xl font-bold text-gray-900">Garden Dashboard</h1>
-              <Button
-                onClick={() => navigate('/onboarding/crop')}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Plot
-              </Button>
-            </div>
-          </div>
-        </header>
-        
+      <div className="min-h-screen bg-gray-50 pt-16 lg:pt-0 lg:pl-64">
         <div className="p-4">
           <Card className="border-0 shadow-lg">
             <CardContent className="p-8 text-center">
@@ -244,12 +220,15 @@ const HomeScreen = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <div className="min-h-screen bg-gray-50 pt-16 lg:pt-0 lg:pl-64">
+      {/* Header - Mobile Only */}
+      <header className="lg:hidden bg-white border-b border-gray-200 sticky top-16 z-30">
         <div className="px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-gray-900">Garden Dashboard</h1>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">Garden Dashboard</h1>
+              <RealTimeIndicator className="mt-1" />
+            </div>
             <div className="flex items-center space-x-2">
               <Button
                 variant="ghost"
@@ -265,6 +244,44 @@ const HomeScreen = () => {
                 className="bg-green-600 hover:bg-green-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
+                Add
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Desktop Header */}
+      <header className="hidden lg:block bg-white border-b border-gray-200 sticky top-0 z-30">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Garden Dashboard</h1>
+              <div className="flex items-center space-x-4 mt-1">
+                <RealTimeIndicator />
+                <span className="text-sm text-gray-600">Last updated: just now</span>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="outline"
+                onClick={() => navigate('/analytics/predictive')}
+              >
+                <Target className="w-4 h-4 mr-2" />
+                AI Insights
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => navigate('/analytics/plant-health')}
+              >
+                <Camera className="w-4 h-4 mr-2" />
+                Scan Plants
+              </Button>
+              <Button
+                onClick={() => navigate('/onboarding/crop')}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <Plus className="w-4 h-4 mr-2" />
                 Add Plot
               </Button>
             </div>
@@ -272,55 +289,106 @@ const HomeScreen = () => {
         </div>
       </header>
 
-      <ScrollArea className="h-[calc(100vh-80px)]">
-        <div className="p-4 space-y-6">
-          {/* Stats Panel - Sticky */}
-          <div className="grid grid-cols-2 gap-4">
-            <Card className="bg-gradient-to-br from-blue-50 to-blue-100">
+      <ScrollArea className="h-[calc(100vh-160px)] lg:h-[calc(100vh-100px)]">
+        <div className="p-4 lg:p-6 space-y-6">
+          {/* Quick Actions - Desktop Only */}
+          <div className="hidden lg:grid lg:grid-cols-4 gap-4">
+            <Button
+              variant="outline"
+              className="h-auto p-4 flex-col space-y-2"
+              onClick={() => navigate('/analytics/anomalies')}
+            >
+              <Zap className="w-6 h-6 text-yellow-600" />
+              <span>Check Alerts</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto p-4 flex-col space-y-2"
+              onClick={() => navigate('/analytics/predictive')}
+            >
+              <Target className="w-6 h-6 text-blue-600" />
+              <span>AI Forecast</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto p-4 flex-col space-y-2"
+              onClick={() => navigate('/community/challenges')}
+            >
+              <TrendingUp className="w-6 h-6 text-green-600" />
+              <span>Challenges</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto p-4 flex-col space-y-2"
+              onClick={() => navigate('/marketplace')}
+            >
+              <Plus className="w-6 h-6 text-purple-600" />
+              <span>Marketplace</span>
+            </Button>
+          </div>
+
+          {/* Stats Panel */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-0 shadow-lg">
               <CardContent className="p-4 text-center">
                 <Droplets className="w-6 h-6 text-blue-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-blue-900">{stats?.totalWaterUsed}L</div>
-                <div className="text-sm text-blue-700">Total Water Used</div>
+                <div className="text-sm text-blue-700">Water Used</div>
+                <div className="text-xs text-blue-600 mt-1">↓ 23% vs last week</div>
               </CardContent>
             </Card>
             
-            <Card className="bg-gradient-to-br from-green-50 to-green-100">
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-0 shadow-lg">
               <CardContent className="p-4 text-center">
                 <TrendingUp className="w-6 h-6 text-green-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-green-900">{stats?.avgMoisture}%</div>
                 <div className="text-sm text-green-700">Avg Moisture</div>
+                <div className="text-xs text-green-600 mt-1">↑ 8% improvement</div>
               </CardContent>
             </Card>
             
-            <Card className="bg-gradient-to-br from-purple-50 to-purple-100">
+            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-0 shadow-lg">
               <CardContent className="p-4 text-center">
                 <Sun className="w-6 h-6 text-purple-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-purple-900">{stats?.activePlots}</div>
                 <div className="text-sm text-purple-700">Active Plots</div>
+                <div className="text-xs text-purple-600 mt-1">All healthy</div>
               </CardContent>
             </Card>
             
-            <Card className="bg-gradient-to-br from-orange-50 to-orange-100">
+            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-0 shadow-lg">
               <CardContent className="p-4 text-center">
                 <Thermometer className="w-6 h-6 text-orange-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-orange-900">{stats?.nextWateringDue}</div>
                 <div className="text-sm text-orange-700">Next Due</div>
+                <div className="text-xs text-orange-600 mt-1">Optimal timing</div>
               </CardContent>
             </Card>
           </div>
 
           {/* Plot Cards */}
           <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">Your Gardens</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/map')}
+              >
+                View Map
+              </Button>
+            </div>
+            
             {plots.map((plot) => (
               <Card 
                 key={plot.id} 
-                className="border-0 shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+                className="border-0 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:-translate-y-1"
                 onClick={() => navigate(`/plot/${plot.id}?lat=${plot.lat}&lon=${plot.lon}`)}
               >
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between mb-3">
+                <CardContent className="p-4 lg:p-6">
+                  <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="font-bold text-gray-900">{plot.name}</h3>
+                      <h3 className="font-bold text-gray-900 text-lg">{plot.name}</h3>
                       <p className="text-sm text-gray-600">{plot.crop}</p>
                     </div>
                     <Badge className={getStatusColor(plot.status)}>
@@ -329,19 +397,19 @@ const HomeScreen = () => {
                   </div>
                   
                   <div className="grid grid-cols-3 gap-3 mb-4">
-                    <div className="text-center p-2 bg-blue-50 rounded-lg">
-                      <Droplets className="w-4 h-4 text-blue-600 mx-auto mb-1" />
-                      <div className="text-sm font-bold text-blue-900">{plot.moisture}%</div>
+                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                      <Droplets className="w-5 h-5 text-blue-600 mx-auto mb-2" />
+                      <div className="text-lg font-bold text-blue-900">{plot.moisture}%</div>
                       <div className="text-xs text-blue-700">Moisture</div>
                     </div>
-                    <div className="text-center p-2 bg-orange-50 rounded-lg">
-                      <Thermometer className="w-4 h-4 text-orange-600 mx-auto mb-1" />
-                      <div className="text-sm font-bold text-orange-900">{plot.temperature}°F</div>
+                    <div className="text-center p-3 bg-orange-50 rounded-lg">
+                      <Thermometer className="w-5 h-5 text-orange-600 mx-auto mb-2" />
+                      <div className="text-lg font-bold text-orange-900">{plot.temperature}°F</div>
                       <div className="text-xs text-orange-700">Temperature</div>
                     </div>
-                    <div className="text-center p-2 bg-green-50 rounded-lg">
-                      <Sun className="w-4 h-4 text-green-600 mx-auto mb-1" />
-                      <div className="text-sm font-bold text-green-900">{plot.nextWatering}</div>
+                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                      <Sun className="w-5 h-5 text-green-600 mx-auto mb-2" />
+                      <div className="text-lg font-bold text-green-900">{plot.nextWatering}</div>
                       <div className="text-xs text-green-700">Next Water</div>
                     </div>
                   </div>
@@ -368,13 +436,48 @@ const HomeScreen = () => {
                       className="flex-1"
                     >
                       <MessageCircle className="w-4 h-4 mr-1" />
-                      Chat AI
+                      Ask AI
                     </Button>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
+
+          {/* AI Insights Card */}
+          <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-50 to-green-50">
+            <CardContent className="p-6">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center">
+                  <Target className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900 mb-2">Today's AI Insights</h3>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li>• Your garden saved 1,200L last week with AI optimization</li>
+                    <li>• Sensor #42 battery running low - replace within 7 days</li>
+                    <li>• Rain expected tomorrow - watering schedule adjusted</li>
+                    <li>• Tomato plants showing excellent health indicators</li>
+                  </ul>
+                  <div className="flex space-x-2 mt-4">
+                    <Button 
+                      size="sm" 
+                      onClick={() => navigate('/analytics/predictive')}
+                    >
+                      View Forecast
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => navigate('/analytics/anomalies')}
+                    >
+                      Check Alerts
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </ScrollArea>
     </div>
