@@ -104,10 +104,10 @@ const AdvancedNavigation = () => {
       <div key={item.id} className={cn("w-full", isSubItem && "ml-4")}>
         <div
           className={cn(
-            "flex items-center justify-between w-full p-3 rounded-lg transition-all duration-200 cursor-pointer",
+            "flex items-center justify-between w-full p-3 rounded-xl transition-all duration-200 cursor-pointer",
             active 
-              ? "bg-gradient-to-r from-blue-50 to-green-50 text-blue-600 shadow-sm" 
-              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+              ? "bg-gradient-to-r from-emerald-50 to-blue-50 text-emerald-700 shadow-sm border border-emerald-200/50" 
+              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
             isSubItem && "p-2 text-sm"
           )}
           onClick={() => {
@@ -122,17 +122,17 @@ const AdvancedNavigation = () => {
           <div className="flex items-center space-x-3">
             <Icon className={cn(
               "w-5 h-5",
-              active ? "text-blue-600" : "text-gray-500",
+              active ? "text-emerald-600" : "text-slate-500",
               isSubItem && "w-4 h-4"
             )} />
             <span className={cn(
               "font-medium",
-              active ? "text-blue-600" : "text-gray-700"
+              active ? "text-emerald-700" : "text-slate-700"
             )}>
               {item.label}
             </span>
             {item.badge && (
-              <Badge className="bg-red-500 text-white text-xs px-1.5 py-0.5">
+              <Badge className="bg-rose-500 text-white text-xs px-1.5 py-0.5 rounded-full">
                 {item.badge}
               </Badge>
             )}
@@ -142,7 +142,7 @@ const AdvancedNavigation = () => {
               "transform transition-transform duration-200",
               isExpanded ? "rotate-90" : "rotate-0"
             )}>
-              <div className="w-2 h-2 border-r-2 border-b-2 border-gray-400 transform rotate-45"></div>
+              <div className="w-2 h-2 border-r-2 border-b-2 border-slate-400 transform rotate-45"></div>
             </div>
           )}
         </div>
@@ -159,17 +159,18 @@ const AdvancedNavigation = () => {
   return (
     <>
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
+      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-slate-200 z-50">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center space-x-3">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsOpen(true)}
+              className="hover:bg-slate-100"
             >
               <Menu className="w-5 h-5" />
             </Button>
-            <div className="text-lg font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+            <div className="text-lg font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
               Miraqua
             </div>
           </div>
@@ -178,23 +179,23 @@ const AdvancedNavigation = () => {
             {/* Real-time sync indicator */}
             <div className="flex items-center space-x-1">
               {isOnline ? (
-                <Wifi className="w-4 h-4 text-green-500" />
+                <Wifi className="w-4 h-4 text-emerald-500" />
               ) : (
-                <WifiOff className="w-4 h-4 text-red-500" />
+                <WifiOff className="w-4 h-4 text-rose-500" />
               )}
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-slate-500">
                 {isOnline ? "Synced 3s ago" : "Offline"}
               </span>
             </div>
             
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" className="relative hover:bg-slate-100">
               <Bell className="w-5 h-5" />
-              <Badge className="absolute -top-1 -right-1 bg-red-500 text-white w-5 h-5 text-xs">
+              <Badge className="absolute -top-1 -right-1 bg-rose-500 text-white w-5 h-5 text-xs rounded-full">
                 7
               </Badge>
             </Button>
             
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" className="hover:bg-slate-100">
               <Search className="w-5 h-5" />
             </Button>
           </div>
@@ -202,9 +203,9 @@ const AdvancedNavigation = () => {
       </div>
 
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:border-r lg:border-gray-200 lg:bg-white lg:z-40">
-        <div className="flex items-center justify-center h-16 border-b border-gray-200">
-          <div className="text-xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+      <div className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:border-r lg:border-slate-200 lg:bg-white lg:z-40">
+        <div className="flex items-center justify-center h-16 border-b border-slate-200">
+          <div className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
             Miraqua Pro
           </div>
         </div>
@@ -215,12 +216,12 @@ const AdvancedNavigation = () => {
           </div>
           
           {/* Quick Actions */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <div className="text-sm font-medium text-gray-700 mb-3">Quick Actions</div>
+          <div className="mt-8 pt-6 border-t border-slate-200">
+            <div className="text-sm font-medium text-slate-700 mb-3">Quick Actions</div>
             <div className="space-y-2">
               <Button 
                 variant="outline" 
-                className="w-full justify-start"
+                className="w-full justify-start border-emerald-200 text-emerald-700 hover:bg-emerald-50"
                 onClick={() => navigate('/add-plot')}
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -228,7 +229,7 @@ const AdvancedNavigation = () => {
               </Button>
               <Button 
                 variant="outline" 
-                className="w-full justify-start"
+                className="w-full justify-start border-blue-200 text-blue-700 hover:bg-blue-50"
                 onClick={() => navigate('/analytics/plant-health')}
               >
                 <Camera className="w-4 h-4 mr-2" />
@@ -239,13 +240,13 @@ const AdvancedNavigation = () => {
         </ScrollArea>
         
         {/* Status Footer */}
-        <div className="p-4 border-t border-gray-200">
-          <div className="flex items-center justify-between text-xs text-gray-500">
+        <div className="p-4 border-t border-slate-200">
+          <div className="flex items-center justify-between text-xs text-slate-500">
             <div className="flex items-center space-x-2">
               {isOnline ? (
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
               ) : (
-                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
               )}
               <span>{isOnline ? "All systems online" : "Offline mode"}</span>
             </div>
@@ -262,14 +263,15 @@ const AdvancedNavigation = () => {
             onClick={() => setIsOpen(false)}
           />
           <div className="relative flex flex-col w-80 bg-white shadow-xl">
-            <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-              <div className="text-lg font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+            <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200">
+              <div className="text-lg font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
                 Miraqua Pro
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsOpen(false)}
+                className="hover:bg-slate-100"
               >
                 <X className="w-5 h-5" />
               </Button>
@@ -283,21 +285,6 @@ const AdvancedNavigation = () => {
           </div>
         </div>
       )}
-
-      {/* PWA Install Prompt */}
-      <div className="fixed bottom-4 right-4 z-50">
-        <div className="bg-gradient-to-r from-blue-500 to-green-500 text-white p-4 rounded-lg shadow-lg max-w-sm animate-slide-up">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="font-medium">Install Miraqua</div>
-              <div className="text-sm opacity-90">Get the full experience</div>
-            </div>
-            <Button size="sm" variant="secondary">
-              Install
-            </Button>
-          </div>
-        </div>
-      </div>
     </>
   );
 };
