@@ -51,7 +51,7 @@ const WelcomeScreen = () => {
       {/* Scrollable Content */}
       <ScrollArea className="h-screen">
         <div className="relative z-10 px-6 py-12 pb-32 min-h-screen">
-          {/* Hero Section */}
+          {/* Hero Section - Full-screen hero illustration/video */}
           <div className="text-center mb-8 mt-8">
             <div className="w-24 h-24 bg-gradient-to-br from-blue-500 via-green-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl animate-scale-in">
               <Droplets className="w-12 h-12 text-white" />
@@ -69,7 +69,7 @@ const WelcomeScreen = () => {
             </p>
           </div>
 
-          {/* Features Grid */}
+          {/* 3-4 "Why Miraqua" benefit bullets with icons */}
           <div className="flex-1 mb-8">
             <div className="grid grid-cols-1 gap-4 max-w-md mx-auto">
               {features.map((feature, index) => {
@@ -131,7 +131,7 @@ const WelcomeScreen = () => {
         </div>
       </ScrollArea>
 
-      {/* Sticky Action Buttons */}
+      {/* Sticky "Get Started" button */}
       <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 p-6 space-y-4 animate-fade-in" style={{ animationDelay: '0.9s' }}>
         <Button
           onClick={handleGetStarted}
@@ -149,6 +149,28 @@ const WelcomeScreen = () => {
           I Already Have an Account
         </Button>
       </div>
+
+      {/* Add CSS animations */}
+      <style jsx>{`
+        @keyframes scale-in {
+          0% { transform: scale(0.8); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes fade-in {
+          0% { opacity: 0; transform: translateY(20px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-scale-in {
+          animation: scale-in 0.6s ease-out forwards;
+        }
+        
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out forwards;
+          opacity: 0;
+        }
+      `}</style>
     </div>
   );
 };
