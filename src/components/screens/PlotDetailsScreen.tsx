@@ -1,458 +1,330 @@
 
-import React, { useState } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  ArrowLeft, 
-  Droplets, 
-  Thermometer, 
-  Sun, 
-  Calendar,
-  Settings,
-  MapPin,
-  Copy,
-  ExternalLink,
-  Edit,
-  TrendingUp,
-  TrendingDown,
-  Activity,
-  AlertCircle,
-  CheckCircle,
-  Clock
-} from "lucide-react";
-import { MiniMap } from "@/components/ui/MiniMap";
+import { ArrowLeft, Settings, Droplets, Thermometer, Sun, MapPin, Calendar, Loader2 } from "lucide-react";
 
 const PlotDetailsScreen = () => {
-  const { id } = useParams();
   const navigate = useNavigate();
+  const { plotId } = useParams();
   const [searchParams] = useSearchParams();
+  const [plotData, setPlotData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("details");
-  const [scheduleView, setScheduleView] = useState<'original' | 'ai'>('ai');
 
-  // Get coordinates from URL params or defaults
-  const latitude = searchParams.get('lat') ? parseFloat(searchParams.get('lat')!) : 37.7749;
-  const longitude = searchParams.get('lon') ? parseFloat(searchParams.get('lon')!) : -122.4194;
+  const latitude = searchParams.get('lat') || 37.7749;
+  const longitude = searchParams.get('lon') || -122.4194;
 
-  // Mock data - in real app this would come from API
-  const plotData = {
-    id: parseInt(id || '1'),
-    name: "Tomato Garden",
-    crop: "Tomatoes",
-    variety: "Cherokee Purple",
-    area: 25,
-    areaUnit: "sq ft",
-    plantingDate: "2024-03-15",
-    location: "North Yard",
-    latitude,
-    longitude,
-    status: "optimal",
-    moisture: 68,
-    temperature: 73,
-    sunlight: 85,
-    soilPh: 6.8,
-    lastWatered: "Yesterday 6:00 AM",
-    nextWatering: "Today 6:00 AM",
-    totalWaterUsed: 45.2,
-    daysActive: 45,
-    healthScore: 92
-  };
+  useEffect(() => {
+    fetchPlotDetails();
+  }, [plotId]);
 
-  const weeklySchedule = {
-    original: [
-      { day: 'Mon', time: '6:00 AM', duration: 15, volume: '2.5L', status: 'completed' },
-      { day: 'Tue', time: '6:00 AM', duration: 15, volume: '2.5L', status: 'completed' },
-      { day: 'Wed', time: '6:00 AM', duration: 15, volume: '2.5L', status: 'scheduled' },
-      { day: 'Thu', time: '6:00 AM', duration: 15, volume: '2.5L', status: 'scheduled' },
-      { day: 'Fri', time: '6:00 AM', duration: 15, volume: '2.5L', status: 'scheduled' },
-      { day: 'Sat', time: '6:00 AM', duration: 15, volume: '2.5L', status: 'scheduled' },
-      { day: 'Sun', time: 'Skip', duration: 0, volume: '0L', status: 'skip' }
-    ],
-    ai: [
-      { day: 'Mon', time: '5:45 AM', duration: 12, volume: '2.2L', status: 'completed', reason: 'Cooler morning' },
-      { day: 'Tue', time: 'Skip', duration: 0, volume: '0L', status: 'skip', reason: 'Rain expected' },
-      { day: 'Wed', time: '6:15 AM', duration: 18, volume: '3.1L', status: 'scheduled', reason: 'Higher temps' },
-      { day: 'Thu', time: '5:30 AM', duration: 15, volume: '2.6L', status: 'scheduled', reason: 'Optimal window' },
-      { day: 'Fri', time: '6:00 AM', duration: 14, volume: '2.4L', status: 'scheduled', reason: 'Standard' },
-      { day: 'Sat', time: 'Skip', duration: 0, volume: '0L', status: 'skip', reason: 'Weekend rain' },
-      { day: 'Sun', time: '7:00 AM', duration: 20, volume: '3.5L', status: 'scheduled', reason: 'Catch-up water' }
-    ]
-  };
-
-  const metrics = [
-    {
-      label: 'Soil Moisture',
-      value: plotData.moisture,
-      unit: '%',
-      icon: Droplets,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100',
-      trend: 'up',
-      change: '+5%',
-      status: plotData.moisture > 60 ? 'good' : plotData.moisture > 40 ? 'warning' : 'danger'
-    },
-    {
-      label: 'Temperature',
-      value: plotData.temperature,
-      unit: '°F',
-      icon: Thermometer,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-100',
-      trend: 'stable',
-      change: '±1°F',
-      status: 'good'
-    },
-    {
-      label: 'Sunlight',
-      value: plotData.sunlight,
-      unit: '%',
-      icon: Sun,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-100',
-      trend: 'up',
-      change: '+8%',
-      status: 'good'
-    },
-    {
-      label: 'Soil pH',
-      value: plotData.soilPh,
-      unit: '',
-      icon: Activity,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100',
-      trend: 'stable',
-      change: '±0.1',
-      status: 'good'
-    }
-  ];
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed': return <CheckCircle className="w-4 h-4 text-green-600" />;
-      case 'scheduled': return <Clock className="w-4 h-4 text-blue-600" />;
-      case 'skip': return <AlertCircle className="w-4 h-4 text-gray-400" />;
-      default: return <Clock className="w-4 h-4 text-gray-400" />;
-    }
-  };
-
-  const copyCoordinates = async () => {
-    const coords = `${latitude}, ${longitude}`;
+  const fetchPlotDetails = async () => {
+    setIsLoading(true);
+    setError("");
+    
     try {
-      await navigator.clipboard.writeText(coords);
+      // Simulate API call - replace with actual API
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setPlotData({
+        id: plotId,
+        name: "Pepper Patch",
+        crop: "Bell Peppers",
+        area: "25 m²",
+        plantingDate: "2024-03-15",
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+        moisture: 42,
+        temperature: 75,
+        sunlight: "Good",
+        soilType: "Loam",
+        nextWatering: "Now",
+        status: "attention",
+        weeklySchedule: [
+          { day: "Mon", liters: 5.2, weather: "sunny" },
+          { day: "Tue", liters: 4.8, weather: "cloudy" },
+          { day: "Wed", liters: 6.1, weather: "sunny" },
+          { day: "Thu", liters: 0, weather: "rainy" },
+          { day: "Fri", liters: 5.5, weather: "sunny" },
+          { day: "Sat", liters: 4.9, weather: "partly-cloudy" },
+          { day: "Sun", liters: 5.8, weather: "sunny" }
+        ]
+      });
     } catch (err) {
-      console.error('Failed to copy coordinates:', err);
+      setError("Failed to load plot details. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const openInMaps = () => {
-    const url = `https://maps.google.com/?q=${latitude},${longitude}`;
-    window.open(url, '_blank');
+  const handleRetry = () => {
+    fetchPlotDetails();
   };
 
-  const handleViewDay = (day: string) => {
-    const dayNumber = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].indexOf(day) + 15; // Mock day number
-    navigate(`/plot/${id}/day/${dayNumber}?lat=${latitude}&lon=${longitude}`);
+  const handleEditSettings = () => {
+    navigate(`/plot/${plotId}/settings`);
   };
+
+  const handleDayClick = (day) => {
+    navigate(`/plot/${plotId}/day/${day.day.toLowerCase()}`);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+          <div className="px-6 py-4">
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <div className="h-6 bg-gray-200 rounded w-32 animate-pulse"></div>
+            </div>
+          </div>
+        </header>
+        
+        <div className="px-6 py-6 space-y-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-24 bg-gray-200 rounded-lg animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <Card className="w-full max-w-md text-center">
+          <CardContent className="p-6">
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Button onClick={handleRetry} className="w-full">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!plotData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <Card className="w-full max-w-md text-center">
+          <CardContent className="p-6">
+            <p className="text-gray-600 mb-4">Plot not found</p>
+            <Button onClick={() => navigate("/app")} className="w-full">
+              Back to Home
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
-        <div className="px-6 py-4">
+    <div className="min-h-screen bg-gray-50">
+      {/* Fixed Header */}
+      <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-40 shadow-sm">
+        <div className="px-4 py-3">
           <div className="flex items-center justify-between">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate(-1)}
-              className="p-2"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div className="text-center">
-              <h1 className="text-lg font-semibold text-gray-900">{plotData.name}</h1>
-              <p className="text-sm text-gray-500">{plotData.crop}</p>
+            <div className="flex items-center space-x-3">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="p-2">
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <div>
+                <h1 className="text-lg font-bold text-gray-900">{plotData.name}</h1>
+                <p className="text-xs text-gray-600">{plotData.crop}</p>
+              </div>
             </div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate(`/plot/${id}/settings`)}
-              className="p-2"
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleEditSettings}
             >
-              <Settings className="w-5 h-5" />
+              <Settings className="w-4 h-4 mr-1" />
+              Edit
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="px-6 py-6 space-y-6">
-        {/* Status Overview */}
-        <Card className="border-0 shadow-lg bg-gradient-to-r from-green-500 to-blue-600 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <div className="flex items-center space-x-2 mb-2">
-                  <CheckCircle className="w-5 h-5" />
-                  <span className="font-semibold">Healthy & Thriving</span>
+      {/* Scrollable Content */}
+      <ScrollArea className="h-screen">
+        <div className="pt-20 pb-24 px-4">
+          {/* Status Banner */}
+          <Card className={`border-0 shadow-md mb-6 ${
+            plotData.status === 'attention' ? 'bg-red-50 border-red-200' :
+            plotData.status === 'optimal' ? 'bg-green-50 border-green-200' :
+            'bg-yellow-50 border-yellow-200'
+          }`}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Badge className={
+                    plotData.status === 'attention' ? 'bg-red-100 text-red-700' :
+                    plotData.status === 'optimal' ? 'bg-green-100 text-green-700' :
+                    'bg-yellow-100 text-yellow-700'
+                  }>
+                    {plotData.status === 'attention' ? 'Needs Attention' :
+                     plotData.status === 'optimal' ? 'Optimal' : 'Good'}
+                  </Badge>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Next watering: {plotData.nextWatering}
+                  </p>
                 </div>
-                <p className="text-sm opacity-90">Health Score: {plotData.healthScore}%</p>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                  Water Now
+                </Button>
               </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold">{plotData.daysActive}</div>
-                <div className="text-sm opacity-90">days active</div>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-4 text-sm">
-              <div>
-                <p className="opacity-90">Next Watering</p>
-                <p className="font-medium">{plotData.nextWatering}</p>
-              </div>
-              <div>
-                <p className="opacity-90">Water Used</p>
-                <p className="font-medium">{plotData.totalWaterUsed}L total</p>
-              </div>
-              <div>
-                <p className="opacity-90">Last Watered</p>
-                <p className="font-medium">{plotData.lastWatered}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Location Card */}
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center">
-              <MapPin className="w-5 h-5 mr-2 text-blue-600" />
-              Location & Details
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600">Coordinates</p>
-                <div className="flex items-center space-x-2">
-                  <p className="font-medium">{latitude.toFixed(6)}, {longitude.toFixed(6)}</p>
-                  <Button variant="ghost" size="sm" onClick={copyCoordinates} className="p-1">
-                    <Copy className="w-3 h-3" />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={openInMaps} className="p-1">
-                    <ExternalLink className="w-3 h-3" />
-                  </Button>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Area</p>
-                <p className="font-medium">{plotData.area} {plotData.areaUnit}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Variety</p>
-                <p className="font-medium">{plotData.variety}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Planted</p>
-                <p className="font-medium">{new Date(plotData.plantingDate).toLocaleDateString()}</p>
-              </div>
-            </div>
-            
-            <MiniMap 
-              latitude={latitude}
-              longitude={longitude}
-              plotName={plotData.name}
-              className="h-32"
-            />
-          </CardContent>
-        </Card>
-
-        {/* Main Content Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="schedule">Schedule</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="details" className="space-y-6 mt-6">
-            {/* Current Metrics */}
-            <div className="grid grid-cols-2 gap-4">
-              {metrics.map((metric, index) => {
-                const Icon = metric.icon;
-                const TrendIcon = metric.trend === 'up' ? TrendingUp : metric.trend === 'down' ? TrendingDown : Activity;
-                
-                return (
-                  <Card key={index} className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className={`w-10 h-10 ${metric.bgColor} rounded-xl flex items-center justify-center`}>
-                          <Icon className={`w-5 h-5 ${metric.color}`} />
-                        </div>
-                        <div className={`flex items-center space-x-1 ${
-                          metric.trend === 'up' ? 'text-green-600' : 
-                          metric.trend === 'down' ? 'text-red-600' : 'text-gray-600'
-                        }`}>
-                          <TrendIcon className="w-4 h-4" />
-                          <span className="text-xs font-medium">{metric.change}</span>
-                        </div>
-                      </div>
-                      <div className="text-2xl font-bold text-gray-900 mb-1">
-                        {metric.value}{metric.unit}
-                      </div>
-                      <div className="text-xs text-gray-600 mb-2">{metric.label}</div>
-                      {metric.label === 'Soil Moisture' && (
-                        <Progress 
-                          value={metric.value} 
-                          className="h-2" 
-                        />
-                      )}
+          {/* Sticky Tabs */}
+          <div className="sticky top-16 z-30 bg-white/95 backdrop-blur-sm border-b border-gray-100 -mx-4 px-4 py-2 mb-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="details">Details</TabsTrigger>
+                <TabsTrigger value="schedule">Schedule</TabsTrigger>
+                <TabsTrigger value="insights">AI Insights</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="details" className="mt-6 space-y-4">
+                {/* Current Conditions */}
+                <div className="grid grid-cols-3 gap-3">
+                  <Card className="border-0 shadow-md">
+                    <CardContent className="p-4 text-center">
+                      <Droplets className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+                      <div className="text-xl font-bold text-blue-900">{plotData.moisture}%</div>
+                      <div className="text-xs text-blue-700">Moisture</div>
                     </CardContent>
                   </Card>
-                );
-              })}
-            </div>
-
-            {/* Quick Actions */}
-            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button className="h-12 bg-blue-600 hover:bg-blue-700 text-white">
-                    <Droplets className="w-4 h-4 mr-2" />
-                    Water Now
-                  </Button>
-                  <Button variant="outline" className="h-12">
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit Settings
-                  </Button>
-                  <Button variant="outline" className="h-12">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    View History
-                  </Button>
-                  <Button variant="outline" className="h-12">
-                    <Activity className="w-4 h-4 mr-2" />
-                    Analytics
-                  </Button>
+                  
+                  <Card className="border-0 shadow-md">
+                    <CardContent className="p-4 text-center">
+                      <Thermometer className="w-6 h-6 text-orange-600 mx-auto mb-2" />
+                      <div className="text-xl font-bold text-orange-900">{plotData.temperature}°F</div>
+                      <div className="text-xs text-orange-700">Temperature</div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="border-0 shadow-md">
+                    <CardContent className="p-4 text-center">
+                      <Sun className="w-6 h-6 text-green-600 mx-auto mb-2" />
+                      <div className="text-xl font-bold text-green-900">{plotData.sunlight}</div>
+                      <div className="text-xs text-green-700">Sunlight</div>
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
 
-          <TabsContent value="schedule" className="space-y-6 mt-6">
-            {/* Schedule Toggle */}
-            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Schedule Type</h3>
-                    <p className="text-sm text-gray-600">
-                      {scheduleView === 'ai' ? 'AI-optimized for weather & efficiency' : 'Your original fixed schedule'}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
-                    <Button
-                      variant={scheduleView === 'original' ? 'default' : 'ghost'}
-                      size="sm"
-                      onClick={() => setScheduleView('original')}
-                      className="text-xs px-3"
-                    >
-                      Original
-                    </Button>
-                    <Button
-                      variant={scheduleView === 'ai' ? 'default' : 'ghost'}
-                      size="sm"
-                      onClick={() => setScheduleView('ai')}
-                      className="text-xs px-3"
-                    >
-                      AI Optimized
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                {/* Plot Information */}
+                <Card className="border-0 shadow-md">
+                  <CardHeader>
+                    <CardTitle className="text-base">Plot Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Area:</span>
+                      <span className="font-medium">{plotData.area}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Planted:</span>
+                      <span className="font-medium">{plotData.plantingDate}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Soil Type:</span>
+                      <span className="font-medium">{plotData.soilType}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Location:</span>
+                      <button className="font-medium text-blue-600 hover:underline flex items-center">
+                        <MapPin className="w-3 h-3 mr-1" />
+                        {plotData.latitude.toFixed(4)}, {plotData.longitude.toFixed(4)}
+                      </button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-            {/* Weekly Schedule */}
-            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">This Week's Schedule</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {weeklySchedule[scheduleView].map((day, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-                    onClick={() => handleViewDay(day.day)}
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 text-center">
-                        <div className="font-semibold text-gray-900">{day.day}</div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        {getStatusIcon(day.status)}
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            {day.time} {day.duration > 0 && `(${day.duration}min)`}
-                          </p>
-                          {scheduleView === 'ai' && day.reason && (
-                            <p className="text-xs text-gray-600">{day.reason}</p>
-                          )}
+              <TabsContent value="schedule" className="mt-6 space-y-4">
+                <Card className="border-0 shadow-md">
+                  <CardHeader>
+                    <CardTitle className="text-base">7-Day Schedule</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {plotData.weeklySchedule.map((day, index) => (
+                        <div
+                          key={index}
+                          onClick={() => handleDayClick(day)}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="text-sm font-medium w-8">{day.day}</div>
+                            <div className="text-xs text-gray-500">
+                              {day.weather === 'sunny' ? '☀️' :
+                               day.weather === 'cloudy' ? '☁️' :
+                               day.weather === 'rainy' ? '🌧️' :
+                               day.weather === 'partly-cloudy' ? '⛅' : ''}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-bold text-blue-600">
+                              {day.liters > 0 ? `${day.liters}L` : 'Skip'}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {day.weather === 'rainy' ? 'Rain expected' : 'Scheduled'}
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      ))}
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium text-blue-600">{day.volume}</p>
-                      <Badge variant="outline" className={`text-xs ${
-                        day.status === 'completed' ? 'bg-green-100 text-green-700' :
-                        day.status === 'scheduled' ? 'bg-blue-100 text-blue-700' :
-                        'bg-gray-100 text-gray-600'
-                      }`}>
-                        {day.status}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-            {/* Schedule Stats */}
-            {scheduleView === 'ai' && (
-              <Card className="border-0 shadow-lg bg-green-50 border-green-200">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-semibold text-green-900">AI Optimization Benefits</h4>
-                      <p className="text-sm text-green-700">This week vs original schedule</p>
+              <TabsContent value="insights" className="mt-6 space-y-4">
+                <Card className="border-0 shadow-md">
+                  <CardHeader>
+                    <CardTitle className="text-base">AI Recommendations</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="p-4 bg-blue-50 rounded-lg">
+                      <h4 className="font-medium text-blue-900 mb-2">Water Schedule Optimization</h4>
+                      <p className="text-sm text-blue-800">
+                        Your peppers are showing signs of water stress. Consider increasing 
+                        watering frequency by 20% during the next week's hot spell.
+                      </p>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-green-600">18%</div>
-                      <div className="text-xs text-green-600">water saved</div>
+                    
+                    <div className="p-4 bg-green-50 rounded-lg">
+                      <h4 className="font-medium text-green-900 mb-2">Growth Stage</h4>
+                      <p className="text-sm text-green-800">
+                        Your bell peppers are in flowering stage. This is a critical time 
+                        for consistent moisture levels.
+                      </p>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
-                    <div className="text-center">
-                      <div className="font-bold text-green-700">2</div>
-                      <div className="text-green-600">days skipped</div>
+                    
+                    <div className="p-4 bg-amber-50 rounded-lg">
+                      <h4 className="font-medium text-amber-900 mb-2">Weather Alert</h4>
+                      <p className="text-sm text-amber-800">
+                        Rain expected Thursday. Automatic watering will be skipped 
+                        to prevent overwatering.
+                      </p>
                     </div>
-                    <div className="text-center">
-                      <div className="font-bold text-green-700">3.2L</div>
-                      <div className="text-green-600">water saved</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="font-bold text-green-700">100%</div>
-                      <div className="text-green-600">health maintained</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      {/* Bottom safe area */}
-      <div className="h-20"></div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+      </ScrollArea>
     </div>
   );
 };

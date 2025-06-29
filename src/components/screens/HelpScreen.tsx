@@ -1,345 +1,331 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { 
-  ArrowLeft, 
-  Search, 
-  ChevronDown, 
-  MessageSquare, 
-  Mail, 
-  Phone,
-  Book,
-  HelpCircle,
-  Send,
-  ExternalLink
-} from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { ArrowLeft, Search, ChevronDown, ChevronRight, ExternalLink, HelpCircle, Book, MessageCircle, Bug } from "lucide-react";
 
 const HelpScreen = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [contactForm, setContactForm] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: ""
-  });
-  const [openFAQ, setOpenFAQ] = useState<string | null>(null);
+  const [expandedFaq, setExpandedFaq] = useState(null);
+  const [faqs, setFaqs] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const faqCategories = [
+  const categories = [
     {
       id: "getting-started",
       title: "Getting Started",
       icon: Book,
-      questions: [
-        {
-          id: "setup",
-          question: "How do I set up my first plot?",
-          answer: "To set up your first plot, tap the '+' button on the home screen and follow the step-by-step wizard. You'll need to provide your plot name, location (ZIP code), crop type, planting date, and area details."
-        },
-        {
-          id: "location",
-          question: "Why do you need my location?",
-          answer: "We use your location to provide accurate weather data, local growing conditions, and optimal watering schedules based on your climate zone."
-        },
-        {
-          id: "crops",
-          question: "What crops are supported?",
-          answer: "Miraqua supports a wide variety of crops including tomatoes, herbs, lettuce, peppers, carrots, cucumbers, and many more. We're constantly adding new crop types based on user requests."
-        }
-      ]
-    },
-    {
-      id: "watering",
-      title: "Watering & Schedules",
-      icon: MessageSquare,
-      questions: [
-        {
-          id: "schedule",
-          question: "How are watering schedules created?",
-          answer: "Our AI analyzes your crop type, local weather, soil conditions, and plant growth stage to create personalized watering schedules that optimize water usage and plant health."
-        },
-        {
-          id: "modify",
-          question: "Can I modify the watering schedule?",
-          answer: "Yes! You can manually adjust schedules, skip waterings, or add extra watering sessions. Use the 'Water Now' feature for immediate watering needs."
-        },
-        {
-          id: "flexibility",
-          question: "What is schedule flexibility?",
-          answer: "Schedule flexibility allows you to choose how adaptable your watering times can be. Daily flexibility adjusts times within the same day, while weekly flexibility can move watering days within the week."
-        }
-      ]
-    },
-    {
-      id: "monitoring",
-      title: "Monitoring & Data",
-      icon: HelpCircle,
-      questions: [
-        {
-          id: "sensors",
-          question: "Do I need special sensors?",
-          answer: "No sensors are required to get started. Miraqua uses weather data and plant science to create schedules. However, you can connect compatible IoT sensors for even more precise monitoring."
-        },
-        {
-          id: "data",
-          question: "What data does Miraqua track?",
-          answer: "We track moisture levels, temperature, sunlight exposure, watering history, plant growth stages, and weather patterns to provide comprehensive garden insights."
-        },
-        {
-          id: "accuracy",
-          question: "How accurate are the recommendations?",
-          answer: "Our recommendations are based on agricultural science and real-time data, with 95%+ accuracy in optimal growing conditions. User feedback helps us continuously improve."
-        }
-      ]
+      description: "Setup and onboarding help"
     },
     {
       id: "troubleshooting",
       title: "Troubleshooting",
+      icon: Bug,
+      description: "Fix common issues"
+    },
+    {
+      id: "features",
+      title: "Features",
       icon: HelpCircle,
-      questions: [
-        {
-          id: "notifications",
-          question: "I'm not receiving notifications",
-          answer: "Check your device notification settings and ensure Miraqua has permission to send notifications. You can also adjust notification preferences in the Account settings."
-        },
-        {
-          id: "sync",
-          question: "My data isn't syncing",
-          answer: "Ensure you have a stable internet connection. If the problem persists, try signing out and back in. Contact support if issues continue."
-        },
-        {
-          id: "performance",
-          question: "The app is running slowly",
-          answer: "Try closing and reopening the app. If performance issues persist, ensure you have the latest version installed and sufficient storage space on your device."
-        }
-      ]
+      description: "How to use app features"
+    },
+    {
+      id: "support",
+      title: "Contact Support",
+      icon: MessageCircle,
+      description: "Get personalized help"
     }
   ];
 
-  const contactOptions = [
+  const faqData = [
     {
-      title: "Email Support",
-      description: "Get help via email within 24 hours",
-      icon: Mail,
-      contact: "support@miraqua.com",
-      action: "Send Email"
+      id: 1,
+      category: "getting-started",
+      question: "How do I add my first garden plot?",
+      answer: "To add your first plot, tap the '+' button on the home screen and follow the setup wizard. You'll need to provide your plot name, crop type, and location for optimal watering schedules."
     },
     {
-      title: "Phone Support",
-      description: "Speak with our team directly",
-      icon: Phone,
-      contact: "1-800-MIRAQUA",
-      action: "Call Now"
+      id: 2,
+      category: "getting-started",
+      question: "What crops are supported?",
+      answer: "Miraqua supports over 50 common crops including vegetables, herbs, fruits, and flowers. Each crop has optimized watering schedules based on growth stage and weather conditions."
     },
     {
-      title: "Live Chat",
-      description: "Chat with our AI assistant",
-      icon: MessageSquare,
-      contact: "Available 24/7",
-      action: "Start Chat"
+      id: 3,
+      category: "troubleshooting",
+      question: "Why isn't my schedule updating?",
+      answer: "Schedule updates depend on weather data and AI optimization. If your schedule hasn't updated in 24 hours, check your internet connection and try refreshing the app."
+    },
+    {
+      id: 4,
+      category: "troubleshooting",
+      question: "My sensors aren't connecting",
+      answer: "Ensure your sensors are within Bluetooth range and have sufficient battery. Try resetting the sensor by holding the pairing button for 10 seconds."
+    },
+    {
+      id: 5,
+      category: "features",
+      question: "How does AI optimization work?",
+      answer: "Our AI analyzes weather forecasts, soil conditions, crop growth stages, and historical data to optimize watering schedules. It learns from your garden's performance over time."
+    },
+    {
+      id: 6,
+      category: "features",
+      question: "Can I manually override the schedule?",
+      answer: "Yes! You can water manually anytime using the 'Water Now' button. You can also adjust duration and skip scheduled waterings as needed."
     }
   ];
 
-  const handleFAQToggle = (questionId: string) => {
-    setOpenFAQ(openFAQ === questionId ? null : questionId);
+  useEffect(() => {
+    loadFaqs();
+  }, []);
+
+  const loadFaqs = async () => {
+    setIsLoading(true);
+    setError("");
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setFaqs(faqData);
+    } catch (err) {
+      setError("Failed to load help content. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleContactSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In real app, this would submit to support system
-    console.log('Contact form submitted:', contactForm);
-    // Reset form
-    setContactForm({ name: "", email: "", subject: "", message: "" });
+  const filteredFaqs = faqs.filter(faq =>
+    faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleFaqToggle = (faqId) => {
+    setExpandedFaq(expandedFaq === faqId ? null : faqId);
   };
 
-  const filteredFAQs = faqCategories.map(category => ({
-    ...category,
-    questions: category.questions.filter(q => 
-      searchQuery === "" || 
-      q.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      q.answer.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  })).filter(category => category.questions.length > 0);
+  const handleCategoryClick = (categoryId) => {
+    if (categoryId === "support") {
+      // Navigate to contact form or external support
+      window.open("mailto:support@miraqua.com", "_blank");
+    } else {
+      // Filter FAQs by category
+      const categoryFaq = faqs.find(faq => faq.category === categoryId);
+      if (categoryFaq) {
+        setExpandedFaq(categoryFaq.id);
+        // Scroll to FAQ section
+        setTimeout(() => {
+          const element = document.getElementById(`faq-${categoryFaq.id}`);
+          element?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+          <div className="px-6 py-4">
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <h1 className="text-xl font-bold text-gray-900">Help & Support</h1>
+            </div>
+          </div>
+        </header>
+        
+        <div className="px-6 py-6 space-y-6">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-16 bg-gray-200 rounded-lg animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate(-1)}
-              className="p-2"
-            >
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h1 className="text-lg font-semibold text-gray-900">Help & Support</h1>
-            <div className="w-9"></div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">Help & Support</h1>
+              <p className="text-sm text-gray-600">Find answers and get help</p>
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="px-6 py-6 space-y-8">
-        {/* Search */}
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-          <CardContent className="p-4">
+      <ScrollArea className="h-screen">
+        <div className="px-6 py-6 pb-24 space-y-6">
+          {/* Search Bar */}
+          <div className="sticky top-0 z-30 bg-gray-50 pb-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <Input
                 placeholder="Search help topics..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-12"
+                className="pl-10 h-12 bg-white"
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Quick Links */}
-        <div className="grid grid-cols-3 gap-4">
-          {contactOptions.map((option, index) => {
-            const Icon = option.icon;
-            return (
-              <Card key={index} className="border-0 shadow-lg bg-white/80 backdrop-blur-sm cursor-pointer hover:shadow-xl transition-shadow">
-                <CardContent className="p-4 text-center">
-                  <Icon className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                  <h3 className="font-semibold text-gray-900 text-sm mb-1">{option.title}</h3>
-                  <p className="text-xs text-gray-600">{option.description}</p>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+          {/* Quick Help Categories */}
+          {!searchQuery && (
+            <div className="grid grid-cols-2 gap-4">
+              {categories.map((category) => {
+                const Icon = category.icon;
+                return (
+                  <Card 
+                    key={category.id}
+                    className="border-0 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => handleCategoryClick(category.id)}
+                  >
+                    <CardContent className="p-4 text-center">
+                      <Icon className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                      <h3 className="font-semibold text-gray-900 mb-1">{category.title}</h3>
+                      <p className="text-xs text-gray-600">{category.description}</p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
 
-        {/* FAQ Sections */}
-        <div className="space-y-6">
-          <h2 className="text-xl font-bold text-gray-900">Frequently Asked Questions</h2>
-          
-          {filteredFAQs.map((category) => {
-            const Icon = category.icon;
-            return (
-              <Card key={category.id} className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center">
-                    <Icon className="w-5 h-5 mr-2 text-blue-600" />
-                    {category.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {category.questions.map((faq) => (
-                    <Collapsible key={faq.id}>
-                      <CollapsibleTrigger 
-                        className="flex items-center justify-between w-full p-4 text-left bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
-                        onClick={() => handleFAQToggle(faq.id)}
+          {/* FAQ Section */}
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-lg">
+                {searchQuery ? `Search Results (${filteredFaqs.length})` : 'Frequently Asked Questions'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {error ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-600 mb-4">{error}</p>
+                  <Button onClick={loadFaqs} variant="outline">
+                    Try Again
+                  </Button>
+                </div>
+              ) : filteredFaqs.length === 0 ? (
+                <div className="text-center py-8">
+                  <HelpCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 mb-4">
+                    {searchQuery ? 'No results found' : 'No FAQs available'}
+                  </p>
+                  {searchQuery && (
+                    <Button 
+                      onClick={() => setSearchQuery("")}
+                      variant="outline"
+                    >
+                      Clear Search
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {filteredFaqs.map((faq) => (
+                    <div
+                      key={faq.id}
+                      id={`faq-${faq.id}`}
+                      className="border border-gray-200 rounded-lg"
+                    >
+                      <button
+                        onClick={() => handleFaqToggle(faq.id)}
+                        className="w-full p-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
                       >
-                        <span className="font-medium text-gray-900">{faq.question}</span>
-                        <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${
-                          openFAQ === faq.id ? 'rotate-180' : ''
-                        }`} />
-                      </CollapsibleTrigger>
-                      <CollapsibleContent className="px-4 py-3 text-gray-700 text-sm leading-relaxed">
-                        {faq.answer}
-                      </CollapsibleContent>
-                    </Collapsible>
+                        <span className="font-medium text-gray-900 pr-4">
+                          {faq.question}
+                        </span>
+                        {expandedFaq === faq.id ? (
+                          <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                        ) : (
+                          <ChevronRight className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                        )}
+                      </button>
+                      {expandedFaq === faq.id && (
+                        <div className="px-4 pb-4 text-gray-600 leading-relaxed">
+                          {faq.answer}
+                        </div>
+                      )}
+                    </div>
                   ))}
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-        {/* Contact Form */}
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-lg">Contact Support</CardTitle>
-            <p className="text-sm text-gray-600">Can't find what you're looking for? Send us a message.</p>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleContactSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    value={contactForm.name}
-                    onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
-                    required
-                  />
+          {/* External Links */}
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-lg">More Resources</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <button className="flex items-center justify-between w-full p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div className="flex items-center space-x-3">
+                  <Book className="w-5 h-5 text-blue-600" />
+                  <div className="text-left">
+                    <p className="font-medium text-gray-900">User Guide</p>
+                    <p className="text-sm text-gray-600">Complete documentation</p>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={contactForm.email}
-                    onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
-                    required
-                  />
+                <ExternalLink className="w-4 h-4 text-gray-400" />
+              </button>
+              
+              <button className="flex items-center justify-between w-full p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div className="flex items-center space-x-3">
+                  <MessageCircle className="w-5 h-5 text-green-600" />
+                  <div className="text-left">
+                    <p className="font-medium text-gray-900">Community Forum</p>
+                    <p className="text-sm text-gray-600">Connect with other gardeners</p>
+                  </div>
                 </div>
-              </div>
+                <ExternalLink className="w-4 h-4 text-gray-400" />
+              </button>
               
-              <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
-                <Input
-                  id="subject"
-                  value={contactForm.subject}
-                  onChange={(e) => setContactForm(prev => ({ ...prev, subject: e.target.value }))}
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="message">Message</Label>
-                <Textarea
-                  id="message"
-                  value={contactForm.message}
-                  onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
-                  className="min-h-[100px]"
-                  required
-                />
-              </div>
-              
-              <Button type="submit" className="w-full h-12 bg-blue-600 hover:bg-blue-700">
-                <Send className="w-4 h-4 mr-2" />
-                Send Message
+              <button className="flex items-center justify-between w-full p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div className="flex items-center space-x-3">
+                  <Bug className="w-5 h-5 text-red-600" />
+                  <div className="text-left">
+                    <p className="font-medium text-gray-900">Report Bug</p>
+                    <p className="text-sm text-gray-600">Help us improve the app</p>
+                  </div>
+                </div>
+                <ExternalLink className="w-4 h-4 text-gray-400" />
+              </button>
+            </CardContent>
+          </Card>
+
+          {/* Contact Support */}
+          <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+            <CardContent className="p-6 text-center">
+              <MessageCircle className="w-8 h-8 mx-auto mb-3" />
+              <h3 className="text-lg font-semibold mb-2">Still Need Help?</h3>
+              <p className="text-blue-100 mb-4">
+                Our support team is here to help you get the most out of Miraqua
+              </p>
+              <Button 
+                className="bg-white text-blue-600 hover:bg-gray-100"
+                onClick={() => window.open("mailto:support@miraqua.com", "_blank")}
+              >
+                Contact Support
               </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* App Info */}
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-          <CardContent className="p-6 text-center space-y-4">
-            <div className="text-center">
-              <h3 className="font-semibold text-gray-900 mb-2">Miraqua v1.0.0</h3>
-              <p className="text-sm text-gray-600 mb-4">Smart irrigation for everyone</p>
-            </div>
-            
-            <div className="flex justify-center space-x-6 text-sm">
-              <button className="text-blue-600 hover:underline flex items-center">
-                Privacy Policy
-                <ExternalLink className="w-3 h-3 ml-1" />
-              </button>
-              <button className="text-blue-600 hover:underline flex items-center">
-                Terms of Service
-                <ExternalLink className="w-3 h-3 ml-1" />
-              </button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Bottom safe area */}
-      <div className="h-20"></div>
+            </CardContent>
+          </Card>
+        </div>
+      </ScrollArea>
     </div>
   );
 };

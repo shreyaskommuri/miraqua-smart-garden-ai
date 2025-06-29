@@ -1,474 +1,431 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  ArrowLeft, 
-  Users, 
-  UserPlus, 
-  MessageSquare,
-  Settings,
-  Crown,
-  Eye,
-  Edit,
-  Trash2,
-  Send,
-  Plus,
-  Shield,
-  Mail
-} from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ArrowLeft, Plus, Send, UserPlus, MessageCircle, Settings, Crown, User, Shield } from "lucide-react";
 
 const CollaborationScreen = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'members' | 'comments'>('members');
-  const [newMemberEmail, setNewMemberEmail] = useState('');
-  const [newMemberRole, setNewMemberRole] = useState<'viewer' | 'editor' | 'admin'>('viewer');
-  const [newComment, setNewComment] = useState('');
-  const [selectedPlot, setSelectedPlot] = useState('all');
+  const [users, setUsers] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isInviting, setIsInviting] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [error, setError] = useState("");
 
-  const teamMembers = [
-    {
-      id: '1',
-      name: 'Sarah Johnson',
-      email: 'sarah@example.com',
-      role: 'admin',
-      avatar: '',
-      joinedAt: '2024-01-01',
-      lastActive: '2 hours ago',
-      isOwner: true
-    },
-    {
-      id: '2',
-      name: 'Mike Chen',
-      email: 'mike@example.com',
-      role: 'editor',
-      avatar: '',
-      joinedAt: '2024-01-10',
-      lastActive: '1 day ago',
-      isOwner: false
-    },
-    {
-      id: '3',
-      name: 'Emily Davis',
-      email: 'emily@example.com',
-      role: 'viewer',
-      avatar: '',
-      joinedAt: '2024-01-15',
-      lastActive: '3 days ago',
-      isOwner: false
-    }
-  ];
+  useEffect(() => {
+    fetchCollaborationData();
+  }, []);
 
-  const comments = [
-    {
-      id: '1',
-      author: 'Mike Chen',
-      message: 'The tomato garden moisture levels seem consistently high. Should we adjust the watering schedule?',
-      plotId: '1',
-      plotName: 'Tomato Garden',
-      timestamp: '2 hours ago',
-      replies: [
+  const fetchCollaborationData = async () => {
+    setIsLoading(true);
+    setError("");
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setUsers([
         {
-          id: '1-1',
-          author: 'Sarah Johnson',
-          message: 'Good observation! I\'ll reduce the duration by 10% and monitor for a few days.',
-          timestamp: '1 hour ago'
+          id: 1,
+          name: "Sarah Johnson",
+          email: "sarah@example.com",
+          role: "admin",
+          initials: "SJ",
+          lastActive: "2 hours ago",
+          status: "online"
+        },
+        {
+          id: 2,
+          name: "Mike Chen",
+          email: "mike@example.com",
+          role: "editor",
+          initials: "MC",
+          lastActive: "1 day ago",
+          status: "offline"
+        },
+        {
+          id: 3,
+          name: "Emma Davis",
+          email: "emma@example.com",
+          role: "viewer",
+          initials: "ED",
+          lastActive: "3 hours ago",
+          status: "online"
         }
-      ]
-    },
-    {
-      id: '2',
-      author: 'Emily Davis',
-      message: 'Rain is expected this weekend. The system should automatically skip watering, right?',
-      plotId: 'all',
-      plotName: 'All Plots',
-      timestamp: '1 day ago',
-      replies: []
-    },
-    {
-      id: '3',
-      author: 'Sarah Johnson',
-      message: 'Added new herbs to the corner plot. Updated the crop type and planting date.',
-      plotId: '2',
-      plotName: 'Herb Corner',
-      timestamp: '2 days ago',
-      replies: []
-    }
-  ];
-
-  const plots = [
-    { id: 'all', name: 'All Plots' },
-    { id: '1', name: 'Tomato Garden' },
-    { id: '2', name: 'Herb Corner' },
-    { id: '3', name: 'Pepper Patch' }
-  ];
-
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'admin': return Crown;
-      case 'editor': return Edit;
-      case 'viewer': return Eye;
-      default: return Shield;
+      ]);
+      
+      setComments([
+        {
+          id: 1,
+          user: "Sarah Johnson",
+          avatar: "SJ",
+          content: "The tomato plot is looking great! Moisture levels are perfect.",
+          timestamp: "2 hours ago",
+          plotId: 1
+        },
+        {
+          id: 2,
+          user: "Mike Chen",
+          avatar: "MC",
+          content: "Should we increase watering for the pepper patch? It's been quite hot.",
+          timestamp: "1 day ago",
+          plotId: 3
+        },
+        {
+          id: 3,
+          user: "Emma Davis",
+          avatar: "ED",
+          content: "I noticed the herb corner needs attention. The basil leaves are wilting.",
+          timestamp: "3 hours ago",
+          plotId: 2
+        }
+      ]);
+    } catch (err) {
+      setError("Failed to load collaboration data. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'admin': return 'bg-purple-100 text-purple-700';
-      case 'editor': return 'bg-blue-100 text-blue-700';
-      case 'viewer': return 'bg-gray-100 text-gray-700';
-      default: return 'bg-gray-100 text-gray-700';
+  const handleInviteUser = async () => {
+    if (!inviteEmail || !/\S+@\S+\.\S+/.test(inviteEmail)) {
+      return;
+    }
+
+    setIsInviting(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Add new user to the list
+      const newUser = {
+        id: users.length + 1,
+        name: inviteEmail.split('@')[0],
+        email: inviteEmail,
+        role: "viewer",
+        initials: inviteEmail.substring(0, 2).toUpperCase(),
+        lastActive: "Just invited",
+        status: "pending"
+      };
+      
+      setUsers([...users, newUser]);
+      setInviteEmail("");
+      setShowInviteModal(false);
+    } catch (err) {
+      setError("Failed to send invite. Please try again.");
+    } finally {
+      setIsInviting(false);
     }
   };
 
-  const handleInviteMember = () => {
-    if (!newMemberEmail) return;
-    
-    console.log('Inviting member:', { email: newMemberEmail, role: newMemberRole });
-    
-    // In production, this would send an invitation
-    setNewMemberEmail('');
-    setNewMemberRole('viewer');
-    
-    // Show success message
-    alert('Invitation sent successfully!');
-  };
-
-  const handleRemoveMember = (memberId: string) => {
-    console.log('Removing member:', memberId);
-    // In production, this would remove the member
-    alert('Member removed successfully!');
-  };
-
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (!newComment.trim()) return;
-    
-    console.log('Adding comment:', { 
-      message: newComment, 
-      plotId: selectedPlot,
-      author: 'Sarah Johnson' // Current user
-    });
-    
-    setNewComment('');
-    
-    // In production, this would add the comment to the database
-    alert('Comment added successfully!');
+
+    const comment = {
+      id: comments.length + 1,
+      user: "You",
+      avatar: "YO",
+      content: newComment,
+      timestamp: "now",
+      plotId: null
+    };
+
+    setComments([comment, ...comments]);
+    setNewComment("");
   };
+
+  const getRoleIcon = (role) => {
+    switch (role) {
+      case 'admin':
+        return <Crown className="w-4 h-4 text-yellow-600" />;
+      case 'editor':
+        return <Settings className="w-4 h-4 text-blue-600" />;
+      case 'viewer':
+        return <User className="w-4 h-4 text-gray-600" />;
+      default:
+        return <Shield className="w-4 h-4 text-gray-400" />;
+    }
+  };
+
+  const getRoleBadgeColor = (role) => {
+    switch (role) {
+      case 'admin':
+        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'editor':
+        return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'viewer':
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+          <div className="px-6 py-4">
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <h1 className="text-xl font-bold text-gray-900">Team & Sharing</h1>
+            </div>
+          </div>
+        </header>
+        
+        <div className="px-6 py-6 space-y-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-20 bg-gray-200 rounded-lg animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error && users.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <Card className="w-full max-w-md text-center">
+          <CardContent className="p-6">
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Button onClick={fetchCollaborationData} className="w-full">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate(-1)}
-              className="p-2"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div className="text-center">
-              <h1 className="text-lg font-semibold text-gray-900">Team Collaboration</h1>
-              <p className="text-sm text-gray-500">Manage team & discussions</p>
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">Team & Sharing</h1>
+                <p className="text-sm text-gray-600">{users.length} members</p>
+              </div>
             </div>
             <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate('/app')}
-              className="p-2"
+              onClick={() => setShowInviteModal(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              <Settings className="w-5 h-5" />
+              <UserPlus className="w-4 h-4 mr-2" />
+              Invite
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="px-6 py-6 space-y-6">
-        {/* Tab Navigation */}
-        <div className="flex items-center justify-center">
-          <div className="flex items-center space-x-1 bg-white/50 rounded-lg p-1">
-            <Button
-              variant={activeTab === 'members' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveTab('members')}
-              className="px-4"
-            >
-              <Users className="w-4 h-4 mr-2" />
-              Team Members
-            </Button>
-            <Button
-              variant={activeTab === 'comments' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveTab('comments')}
-              className="px-4"
-            >
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Comments
-            </Button>
-          </div>
-        </div>
-
-        {/* Team Members Tab */}
-        {activeTab === 'members' && (
-          <div className="space-y-6">
-            {/* Invite New Member */}
-            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center">
-                  <UserPlus className="w-5 h-5 mr-2 text-green-600" />
-                  Invite Team Member
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="md:col-span-2 space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="colleague@example.com"
-                      value={newMemberEmail}
-                      onChange={(e) => setNewMemberEmail(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Role</Label>
-                    <Select value={newMemberRole} onValueChange={(value) => setNewMemberRole(value as any)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="viewer">Viewer</SelectItem>
-                        <SelectItem value="editor">Editor</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <Button 
-                  onClick={handleInviteMember}
-                  disabled={!newMemberEmail}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
-                >
-                  <Mail className="w-4 h-4 mr-2" />
-                  Send Invitation
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Current Team Members */}
-            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Users className="w-5 h-5 mr-2 text-blue-600" />
-                    Team Members
-                  </div>
-                  <Badge variant="outline">{teamMembers.length} members</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {teamMembers.map((member) => {
-                  const RoleIcon = getRoleIcon(member.role);
-                  return (
-                    <div key={member.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <Avatar className="w-12 h-12">
-                          <AvatarImage src={member.avatar} />
-                          <AvatarFallback className="bg-blue-100 text-blue-600">
-                            {member.name.split(' ').map(n => n[0]).join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <h4 className="font-semibold text-gray-900">{member.name}</h4>
-                            {member.isOwner && (
-                              <Badge className="text-xs bg-gold-100 text-gold-700">Owner</Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-600">{member.email}</p>
-                          <p className="text-xs text-gray-500">
-                            Joined {new Date(member.joinedAt).toLocaleDateString()} • 
-                            Last active {member.lastActive}
-                          </p>
+      <ScrollArea className="h-screen">
+        <div className="px-6 py-6 pb-32 space-y-6">
+          {/* Team Members */}
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-lg">Team Members</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {users.map((user) => (
+                  <div key={user.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <Avatar className="w-10 h-10">
+                        <AvatarFallback className="bg-blue-100 text-blue-700">
+                          {user.initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <p className="font-medium text-gray-900">{user.name}</p>
+                          <div className={`w-2 h-2 rounded-full ${
+                            user.status === 'online' ? 'bg-green-500' :
+                            user.status === 'pending' ? 'bg-yellow-500' : 'bg-gray-400'
+                          }`}></div>
                         </div>
+                        <p className="text-sm text-gray-600">{user.email}</p>
+                        <p className="text-xs text-gray-500">Last active: {user.lastActive}</p>
                       </div>
-                      <div className="flex items-center space-x-3">
-                        <Badge className={`text-xs ${getRoleColor(member.role)}`}>
-                          <RoleIcon className="w-3 h-3 mr-1" />
-                          {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
-                        </Badge>
-                        {!member.isOwner && (
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      {getRoleIcon(user.role)}
+                      <Badge className={getRoleBadgeColor(user.role)}>
+                        {user.role}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Comments */}
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center">
+                <MessageCircle className="w-5 h-5 mr-2" />
+                Recent Comments
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {comments.length === 0 ? (
+                <div className="text-center py-8">
+                  <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 mb-4">No comments yet</p>
+                  <p className="text-sm text-gray-500">Start a conversation with your team!</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {comments.map((comment) => (
+                    <div key={comment.id} className="flex space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <Avatar className="w-8 h-8 flex-shrink-0">
+                        <AvatarFallback className="bg-green-100 text-green-700 text-xs">
+                          {comment.avatar}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <p className="font-medium text-gray-900 text-sm">{comment.user}</p>
+                          <p className="text-xs text-gray-500">{comment.timestamp}</p>
+                        </div>
+                        <p className="text-sm text-gray-700">{comment.content}</p>
+                        {comment.plotId && (
                           <Button
-                            variant="ghost"
+                            variant="link"
                             size="sm"
-                            onClick={() => handleRemoveMember(member.id)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            className="p-0 h-auto text-xs text-blue-600"
+                            onClick={() => navigate(`/plot/${comment.plotId}`)}
                           >
-                            <Trash2 className="w-4 h-4" />
+                            View Plot →
                           </Button>
                         )}
                       </div>
                     </div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-
-            {/* Role Permissions */}
-            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">Role Permissions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-3 gap-4 text-sm">
-                    <div></div>
-                    <div className="text-center font-medium">Viewer</div>
-                    <div className="text-center font-medium">Editor</div>
-                    <div className="text-center font-medium">Admin</div>
-                  </div>
-                  {[
-                    'View plots & data',
-                    'Add comments',
-                    'Edit plot settings',
-                    'Create new plots',
-                    'Manage watering',
-                    'Invite members',
-                    'Remove members'
-                  ].map((permission, index) => (
-                    <div key={index} className="grid grid-cols-4 gap-4 py-2 border-b border-gray-100 text-sm">
-                      <div className="font-medium text-gray-700">{permission}</div>
-                      <div className="text-center">
-                        {index < 2 ? '✅' : '❌'}
-                      </div>
-                      <div className="text-center">
-                        {index < 5 ? '✅' : '❌'}
-                      </div>
-                      <div className="text-center">✅</div>
-                    </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+              )}
+            </CardContent>
+          </Card>
 
-        {/* Comments Tab */}
-        {activeTab === 'comments' && (
-          <div className="space-y-6">
-            {/* Add New Comment */}
-            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center">
-                  <Plus className="w-5 h-5 mr-2 text-green-600" />
-                  Add Comment
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Plot</Label>
-                  <Select value={selectedPlot} onValueChange={setSelectedPlot}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {plots.map((plot) => (
-                        <SelectItem key={plot.id} value={plot.id}>
-                          {plot.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="comment">Message</Label>
-                  <Textarea
-                    id="comment"
-                    placeholder="Share your thoughts, observations, or questions..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    className="min-h-[100px]"
+          {/* Sharing Settings */}
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-lg">Sharing Settings</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <h4 className="font-medium text-blue-900 mb-2">Public Link</h4>
+                <p className="text-sm text-blue-800 mb-3">
+                  Share a read-only view of your garden with anyone
+                </p>
+                <div className="flex items-center space-x-2">
+                  <Input
+                    value="https://miraqua.app/shared/garden-abc123"
+                    readOnly
+                    className="text-xs bg-white"
                   />
+                  <Button size="sm" variant="outline">
+                    Copy
+                  </Button>
                 </div>
-                <Button 
-                  onClick={handleAddComment}
-                  disabled={!newComment.trim()}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
-                >
-                  <Send className="w-4 h-4 mr-2" />
-                  Post Comment
-                </Button>
-              </CardContent>
-            </Card>
+              </div>
+              
+              <div className="p-4 bg-green-50 rounded-lg">
+                <h4 className="font-medium text-green-900 mb-2">Team Features</h4>
+                <ul className="text-sm text-green-800 space-y-1">
+                  <li>• Real-time notifications for all team members</li>
+                  <li>• Shared watering schedules and adjustments</li>
+                  <li>• Collaborative plot monitoring and comments</li>
+                  <li>• Role-based permissions (Admin, Editor, Viewer)</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </ScrollArea>
 
-            {/* Comments Feed */}
-            <div className="space-y-4">
-              {comments.map((comment) => (
-                <Card key={comment.id} className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <Avatar className="w-10 h-10">
-                        <AvatarFallback className="bg-blue-100 text-blue-600">
-                          {comment.author.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <h4 className="font-semibold text-gray-900">{comment.author}</h4>
-                          <Badge variant="outline" className="text-xs">
-                            {comment.plotName}
-                          </Badge>
-                          <span className="text-xs text-gray-500">{comment.timestamp}</span>
-                        </div>
-                        <p className="text-gray-700 mb-3">{comment.message}</p>
-                        
-                        {/* Replies */}
-                        {comment.replies.length > 0 && (
-                          <div className="space-y-3 pl-4 border-l-2 border-gray-200">
-                            {comment.replies.map((reply) => (
-                              <div key={reply.id} className="flex items-start space-x-3">
-                                <Avatar className="w-8 h-8">
-                                  <AvatarFallback className="bg-gray-100 text-gray-600 text-xs">
-                                    {reply.author.split(' ').map(n => n[0]).join('')}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <div className="flex items-center space-x-2 mb-1">
-                                    <h5 className="font-medium text-sm text-gray-900">{reply.author}</h5>
-                                    <span className="text-xs text-gray-500">{reply.timestamp}</span>
-                                  </div>
-                                  <p className="text-sm text-gray-700">{reply.message}</p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                        
-                        <Button variant="ghost" size="sm" className="mt-2 text-blue-600 hover:text-blue-700">
-                          Reply
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
+      {/* Comment Input */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 p-4">
+        <div className="flex items-center space-x-3">
+          <Avatar className="w-8 h-8">
+            <AvatarFallback className="bg-purple-100 text-purple-700 text-xs">
+              YO
+            </AvatarFallback>
+          </Avatar>
+          <Input
+            placeholder="Add a comment..."
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
+            className="flex-1"
+          />
+          <Button 
+            onClick={handleAddComment}
+            disabled={!newComment.trim()}
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <Send className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
 
-      {/* Bottom safe area */}
-      <div className="h-20"></div>
+      {/* Invite Modal */}
+      {showInviteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="text-lg">Invite Team Member</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Email Address</label>
+                <Input
+                  type="email"
+                  placeholder="colleague@example.com"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  className="h-12"
+                />
+              </div>
+              
+              <div className="flex space-x-3">
+                <Button
+                  onClick={() => setShowInviteModal(false)}
+                  variant="outline"
+                  className="flex-1"
+                  disabled={isInviting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleInviteUser}
+                  disabled={isInviting || !inviteEmail}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {isInviting ? "Sending..." : "Send Invite"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

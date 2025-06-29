@@ -1,387 +1,341 @@
 
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  ArrowLeft, 
-  Cloud, 
-  Sun, 
-  CloudRain, 
-  Wind, 
-  Thermometer,
-  Droplets,
-  Eye,
-  Navigation,
-  TrendingUp,
-  TrendingDown,
-  Calendar
-} from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { ArrowLeft, Cloud, Sun, CloudRain, Droplets, Thermometer, Wind, Eye } from "lucide-react";
 
 const WeatherForecastScreen = () => {
   const navigate = useNavigate();
-  const [activeView, setActiveView] = useState<'chart' | 'table'>('chart');
+  const [searchParams] = useSearchParams();
+  const [forecastData, setForecastData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Mock weather data - in production this would come from API
-  const weatherData = [
-    {
-      day: 'Today',
-      date: '2024-01-15',
-      high: 75,
-      low: 58,
-      humidity: 65,
-      wind: 8,
-      precipitation: 0,
-      condition: 'sunny',
-      icon: Sun,
-      rainSkip: false,
-      et0: 4.2
-    },
-    {
-      day: 'Tomorrow',
-      date: '2024-01-16',
-      high: 68,
-      low: 52,
-      humidity: 85,
-      wind: 12,
-      precipitation: 80,
-      condition: 'rain',
-      icon: CloudRain,
-      rainSkip: true,
-      et0: 2.1
-    },
-    {
-      day: 'Wed',
-      date: '2024-01-17',
-      high: 72,
-      low: 55,
-      humidity: 70,
-      wind: 6,
-      precipitation: 10,
-      condition: 'cloudy',
-      icon: Cloud,
-      rainSkip: false,
-      et0: 3.8
-    },
-    {
-      day: 'Thu',
-      date: '2024-01-18',
-      high: 78,
-      low: 62,
-      humidity: 60,
-      wind: 5,
-      precipitation: 0,
-      condition: 'sunny',
-      icon: Sun,
-      rainSkip: false,
-      et0: 4.5
-    },
-    {
-      day: 'Fri',
-      date: '2024-01-19',
-      high: 74,
-      low: 59,
-      humidity: 68,
-      wind: 7,
-      precipitation: 20,
-      condition: 'partly-cloudy',
-      icon: Cloud,
-      rainSkip: false,
-      et0: 3.9
-    },
-    {
-      day: 'Sat',
-      date: '2024-01-20',
-      high: 76,
-      low: 61,
-      humidity: 62,
-      wind: 9,
-      precipitation: 0,
-      condition: 'sunny',
-      icon: Sun,
-      rainSkip: false,
-      et0: 4.3
-    },
-    {
-      day: 'Sun',
-      date: '2024-01-21',
-      high: 73,
-      low: 57,
-      humidity: 75,
-      wind: 11,
-      precipitation: 40,
-      condition: 'cloudy',
-      icon: Cloud,
-      rainSkip: false,
-      et0: 3.2
+  const plotId = searchParams.get('plotId');
+  const latitude = searchParams.get('lat') || 37.7749;
+  const longitude = searchParams.get('lon') || -122.4194;
+
+  useEffect(() => {
+    fetchWeatherForecast();
+  }, [latitude, longitude]);
+
+  const fetchWeatherForecast = async () => {
+    setIsLoading(true);
+    setError("");
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setForecastData({
+        location: `${parseFloat(latitude).toFixed(4)}, ${parseFloat(longitude).toFixed(4)}`,
+        current: {
+          temperature: 72,
+          condition: "sunny",
+          humidity: 65,
+          windSpeed: 8,
+          visibility: 10
+        },
+        forecast: [
+          {
+            day: "Today",
+            date: "2024-01-15",
+            high: 75,
+            low: 58,
+            condition: "sunny",
+            humidity: 60,
+            windSpeed: 12,
+            rainChance: 5,
+            rainAmount: 0
+          },
+          {
+            day: "Tomorrow",
+            date: "2024-01-16",
+            high: 73,
+            low: 56,
+            condition: "partly-cloudy",
+            humidity: 70,
+            windSpeed: 15,
+            rainChance: 20,
+            rainAmount: 0
+          },
+          {
+            day: "Wednesday",
+            date: "2024-01-17",
+            high: 68,
+            low: 52,
+            condition: "cloudy",
+            humidity: 85,
+            windSpeed: 18,
+            rainChance: 60,
+            rainAmount: 0.2
+          },
+          {
+            day: "Thursday",
+            date: "2024-01-18",
+            high: 65,
+            low: 48,
+            condition: "rainy",
+            humidity: 90,
+            windSpeed: 22,
+            rainChance: 85,
+            rainAmount: 1.2
+          },
+          {
+            day: "Friday",
+            date: "2024-01-19",
+            high: 70,
+            low: 54,
+            condition: "partly-cloudy",
+            humidity: 75,
+            windSpeed: 14,
+            rainChance: 30,
+            rainAmount: 0
+          },
+          {
+            day: "Saturday",
+            date: "2024-01-20",
+            high: 74,
+            low: 58,
+            condition: "sunny",
+            humidity: 65,
+            windSpeed: 10,
+            rainChance: 10,
+            rainAmount: 0
+          },
+          {
+            day: "Sunday",
+            date: "2024-01-21",
+            high: 76,
+            low: 60,
+            condition: "sunny",
+            humidity: 60,
+            windSpeed: 8,
+            rainChance: 5,
+            rainAmount: 0
+          }
+        ]
+      });
+    } catch (err) {
+      setError("Failed to load weather forecast. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-  ];
-
-  const handleDayClick = (date: string) => {
-    navigate(`/plot/1/day/${date}?weather=true`);
   };
 
+  const getWeatherIcon = (condition, size = "w-6 h-6") => {
+    switch (condition) {
+      case 'sunny':
+        return <Sun className={`${size} text-yellow-500`} />;
+      case 'partly-cloudy':
+        return <Cloud className={`${size} text-gray-500`} />;
+      case 'cloudy':
+        return <Cloud className={`${size} text-gray-600`} />;
+      case 'rainy':
+        return <CloudRain className={`${size} text-blue-500`} />;
+      default:
+        return <Sun className={`${size} text-yellow-500`} />;
+    }
+  };
+
+  const getRainColor = (chance) => {
+    if (chance >= 70) return "text-blue-600 font-semibold";
+    if (chance >= 40) return "text-blue-500";
+    return "text-gray-600";
+  };
+
+  const handleDayClick = (day) => {
+    if (plotId) {
+      navigate(`/plot/${plotId}/day/${day.day.toLowerCase()}?date=${day.date}`);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+          <div className="px-6 py-4">
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <div className="h-6 bg-gray-200 rounded w-32 animate-pulse"></div>
+            </div>
+          </div>
+        </header>
+        
+        <div className="px-6 py-6 space-y-4">
+          {Array.from({ length: 7 }).map((_, i) => (
+            <div key={i} className="h-20 bg-gray-200 rounded-lg animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <Card className="w-full max-w-md text-center">
+          <CardContent className="p-6">
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Button onClick={fetchWeatherForecast} className="w-full">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate(-1)}
-              className="p-2"
-            >
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <div className="text-center">
-              <h1 className="text-lg font-semibold text-gray-900">Weather Forecast</h1>
-              <p className="text-sm text-gray-500">7-Day Outlook</p>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">Weather Forecast</h1>
+              <p className="text-sm text-gray-600">{forecastData.location}</p>
             </div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate('/app')}
-              className="p-2"
-            >
-              <Navigation className="w-5 h-5" />
-            </Button>
           </div>
         </div>
       </header>
 
-      <div className="px-6 py-6 space-y-6">
-        {/* Current Conditions */}
-        <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-2xl font-bold">75°F</h2>
-                <p className="text-sm opacity-90">Feels like 73°F</p>
-                <p className="text-sm opacity-75">San Francisco, CA</p>
+      <ScrollArea className="h-screen">
+        <div className="px-6 py-6 pb-24 space-y-6">
+          {/* Current Weather */}
+          <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-2xl font-bold mb-1">
+                    {forecastData.current.temperature}°F
+                  </h2>
+                  <p className="text-blue-100 capitalize">
+                    {forecastData.current.condition}
+                  </p>
+                </div>
+                {getWeatherIcon(forecastData.current.condition, "w-12 h-12")}
               </div>
-              <div className="text-center">
-                <Sun className="w-12 h-12 mb-2" />
-                <p className="text-sm">Sunny</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-4 gap-4 text-sm">
-              <div className="text-center">
-                <Droplets className="w-4 h-4 mx-auto mb-1" />
-                <p className="opacity-90">65%</p>
-                <p className="opacity-75 text-xs">Humidity</p>
-              </div>
-              <div className="text-center">
-                <Wind className="w-4 h-4 mx-auto mb-1" />
-                <p className="opacity-90">8 mph</p>
-                <p className="opacity-75 text-xs">Wind</p>
-              </div>
-              <div className="text-center">
-                <Eye className="w-4 h-4 mx-auto mb-1" />
-                <p className="opacity-90">10 mi</p>
-                <p className="opacity-75 text-xs">Visibility</p>
-              </div>
-              <div className="text-center">
-                <TrendingUp className="w-4 h-4 mx-auto mb-1" />
-                <p className="opacity-90">4.2</p>
-                <p className="opacity-75 text-xs">ET₀</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* View Toggle */}
-        <div className="flex items-center justify-center">
-          <div className="flex items-center space-x-1 bg-white/50 rounded-lg p-1">
-            <Button
-              variant={activeView === 'chart' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveView('chart')}
-              className="px-4"
-            >
-              Chart View
-            </Button>
-            <Button
-              variant={activeView === 'table' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveView('table')}
-              className="px-4"
-            >
-              Table View
-            </Button>
-          </div>
-        </div>
-
-        {/* 7-Day Forecast */}
-        {activeView === 'chart' ? (
-          <div className="space-y-3">
-            {weatherData.map((day, index) => {
-              const Icon = day.icon;
-              return (
-                <Card 
-                  key={index}
-                  className={`border-0 shadow-md bg-white/80 backdrop-blur-sm cursor-pointer hover:shadow-lg transition-all duration-300 ${
-                    day.rainSkip ? 'border-l-4 border-blue-500' : ''
-                  }`}
-                  onClick={() => handleDayClick(day.date)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="text-center min-w-[60px]">
-                          <p className="font-semibold text-gray-900">{day.day}</p>
-                          <p className="text-sm text-gray-500">{new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <Icon className="w-8 h-8 text-blue-600" />
-                          <div>
-                            <div className="flex items-center space-x-2">
-                              <span className="text-lg font-bold text-gray-900">{day.high}°</span>
-                              <span className="text-sm text-gray-500">{day.low}°</span>
-                            </div>
-                            <p className="text-sm text-gray-600 capitalize">{day.condition}</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right space-y-1">
-                        <div className="flex items-center space-x-2">
-                          <Droplets className="w-3 h-3 text-blue-500" />
-                          <span className="text-xs text-gray-600">{day.precipitation}%</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Wind className="w-3 h-3 text-gray-500" />
-                          <span className="text-xs text-gray-600">{day.wind} mph</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <TrendingUp className="w-3 h-3 text-green-500" />
-                          <span className="text-xs text-gray-600">{day.et0}</span>
-                        </div>
-                        {day.rainSkip && (
-                          <Badge variant="outline" className="text-xs bg-blue-100 text-blue-700">
-                            Skip Watering
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        ) : (
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-lg">Detailed Forecast Data</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-2">Day</th>
-                      <th className="text-center py-2">High/Low</th>
-                      <th className="text-center py-2">Rain</th>
-                      <th className="text-center py-2">Humidity</th>
-                      <th className="text-center py-2">Wind</th>
-                      <th className="text-center py-2">ET₀</th>
-                      <th className="text-center py-2">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {weatherData.map((day, index) => (
-                      <tr 
-                        key={index} 
-                        className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
-                        onClick={() => handleDayClick(day.date)}
-                      >
-                        <td className="py-3">
-                          <div>
-                            <p className="font-medium">{day.day}</p>
-                            <p className="text-xs text-gray-500">{new Date(day.date).toLocaleDateString()}</p>
-                          </div>
-                        </td>
-                        <td className="text-center py-3">
-                          <span className="font-semibold text-gray-900">{day.high}°</span>
-                          <span className="text-gray-500">/{day.low}°</span>
-                        </td>
-                        <td className="text-center py-3">{day.precipitation}%</td>
-                        <td className="text-center py-3">{day.humidity}%</td>
-                        <td className="text-center py-3">{day.wind} mph</td>
-                        <td className="text-center py-3">{day.et0}</td>
-                        <td className="text-center py-3">
-                          {day.rainSkip ? (
-                            <Badge variant="outline" className="text-xs bg-blue-100 text-blue-700">
-                              Skip
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline" className="text-xs bg-green-100 text-green-700">
-                              Water
-                            </Badge>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className="flex items-center space-x-2">
+                  <Droplets className="w-4 h-4 text-blue-200" />
+                  <span>{forecastData.current.humidity}% humidity</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Wind className="w-4 h-4 text-blue-200" />
+                  <span>{forecastData.current.windSpeed} mph</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Eye className="w-4 h-4 text-blue-200" />
+                  <span>{forecastData.current.visibility} mi</span>
+                </div>
               </div>
             </CardContent>
           </Card>
-        )}
 
-        {/* Weather Insights */}
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center">
-              <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
-              Smart Insights
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <div className="flex items-start space-x-3">
-                <CloudRain className="w-5 h-5 text-blue-600 mt-1" />
-                <div>
-                  <h4 className="font-semibold text-blue-900">Rain Expected Tomorrow</h4>
-                  <p className="text-sm text-blue-700">
-                    We'll automatically skip watering for all plots due to 80% chance of rain.
-                    This will save approximately 15 gallons of water.
-                  </p>
-                </div>
+          {/* 7-Day Forecast */}
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-lg">7-Day Forecast</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {forecastData.forecast.map((day, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleDayClick(day)}
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center space-x-4 flex-1">
+                      <div className="w-16 text-sm font-medium text-gray-900">
+                        {day.day}
+                      </div>
+                      {getWeatherIcon(day.condition)}
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-4">
+                          <span className="text-lg font-bold text-gray-900">
+                            {day.high}°
+                          </span>
+                          <span className="text-gray-600">
+                            {day.low}°
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-right">
+                      <div className={`text-sm ${getRainColor(day.rainChance)}`}>
+                        {day.rainChance}% rain
+                      </div>
+                      {day.rainAmount > 0 && (
+                        <div className="text-xs text-blue-600">
+                          {day.rainAmount}" expected
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
-            <div className="p-4 bg-green-50 rounded-lg">
-              <div className="flex items-start space-x-3">
-                <Sun className="w-5 h-5 text-green-600 mt-1" />
-                <div>
-                  <h4 className="font-semibold text-green-900">Optimal Watering Window</h4>
-                  <p className="text-sm text-green-700">
-                    Thursday shows perfect conditions - low wind, moderate humidity, and high ET₀.
-                    Consider extending watering duration by 20% for maximum efficiency.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="p-4 bg-orange-50 rounded-lg">
-              <div className="flex items-start space-x-3">
-                <Wind className="w-5 h-5 text-orange-600 mt-1" />
-                <div>
-                  <h4 className="font-semibold text-orange-900">Wind Advisory</h4>
-                  <p className="text-sm text-orange-700">
-                    Higher winds expected Tuesday and Sunday. Consider adjusting spray patterns
-                    or watering earlier in the morning to reduce evaporation loss.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
 
-      {/* Bottom safe area */}
-      <div className="h-20"></div>
+          {/* Weather Impact on Watering */}
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-lg">Watering Impact</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <h4 className="font-medium text-blue-900 mb-2">Rain Expected</h4>
+                <p className="text-sm text-blue-800">
+                  Thursday's forecast shows 85% chance of rain with 1.2" expected. 
+                  Automatic watering will be skipped to prevent overwatering.
+                </p>
+              </div>
+              
+              <div className="p-4 bg-yellow-50 rounded-lg">
+                <h4 className="font-medium text-yellow-900 mb-2">Hot Weather Alert</h4>
+                <p className="text-sm text-yellow-800">
+                  Temperatures will be above 75°F this weekend. 
+                  Consider increasing watering frequency by 15-20%.
+                </p>
+              </div>
+              
+              <div className="p-4 bg-green-50 rounded-lg">
+                <h4 className="font-medium text-green-900 mb-2">Optimal Conditions</h4>
+                <p className="text-sm text-green-800">
+                  Friday through Sunday show ideal growing conditions with 
+                  moderate temperatures and good humidity levels.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Weather Chart Placeholder */}
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-lg">Temperature & Rainfall Chart</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-40 bg-gradient-to-r from-blue-100 to-green-100 rounded-lg flex items-center justify-center">
+                <div className="text-center">
+                  <Thermometer className="w-12 h-12 text-blue-600 mx-auto mb-2" />
+                  <p className="text-gray-600">Interactive weather chart</p>
+                  <p className="text-sm text-gray-500">Tap any day above for details</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </ScrollArea>
     </div>
   );
 };

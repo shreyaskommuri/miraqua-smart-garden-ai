@@ -1,72 +1,164 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Bell, Mail, MessageSquare, AlertTriangle } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { ArrowLeft, Bell, Mail, MessageSquare, Smartphone, Droplets, CloudRain, AlertTriangle, Users } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const NotificationSettingsScreen = () => {
   const navigate = useNavigate();
-  const [settings, setSettings] = useState({
-    push: {
-      enabled: true,
-      watering: true,
-      alerts: true,
-      weather: false,
-      maintenance: true
-    },
-    email: {
-      enabled: true,
-      daily: false,
-      weekly: true,
-      alerts: true,
-      reports: true
-    },
-    sms: {
-      enabled: false,
-      emergencyOnly: true,
-      alerts: false
-    }
-  });
+  const { toast } = useToast();
+  const [settings, setSettings] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  const updateSetting = (category, key, value) => {
+  const notificationGroups = [
+    {
+      id: "watering",
+      title: "Watering Alerts",
+      icon: Droplets,
+      description: "Get notified about watering schedules and events",
+      settings: [
+        { key: "watering_started", label: "Watering Started", description: "When automatic watering begins" },
+        { key: "watering_completed", label: "Watering Completed", description: "When watering cycle finishes" },
+        { key: "watering_skipped", label: "Watering Skipped", description: "When scheduled watering is skipped" },
+        { key: "low_moisture", label: "Low Moisture Alert", description: "When soil moisture drops below threshold" },
+      ]
+    },
+    {
+      id: "weather",
+      title: "Weather Alerts",
+      icon: CloudRain,
+      description: "Weather-related notifications and updates",
+      settings: [
+        { key: "rain_detected", label: "Rain Detected", description: "When rain is detected by sensors" },
+        { key: "weather_changes", label: "Weather Changes", description: "Significant weather pattern changes" },
+        { key: "frost_warning", label: "Frost Warning", description: "When frost conditions are expected" },
+        { key: "heat_warning", label: "Heat Warning", description: "During extreme heat conditions" },
+      ]
+    },
+    {
+      id: "system",
+      title: "System & Device Alerts",
+      icon: AlertTriangle,
+      description: "Device status and system maintenance alerts",
+      settings: [
+        { key: "device_offline", label: "Device Offline", description: "When sensors or pumps go offline" },
+        { key: "low_battery", label: "Low Battery", description: "When device batteries are low" },
+        { key: "system_maintenance", label: "System Maintenance", description: "Scheduled maintenance notifications" },
+        { key: "connectivity_issues", label: "Connectivity Issues", description: "Network or connection problems" },
+      ]
+    },
+    {
+      id: "collaboration",
+      title: "Team & Sharing",
+      icon: Users,
+      description: "Collaboration and sharing notifications",
+      settings: [
+        { key: "team_comments", label: "Team Comments", description: "When team members add comments" },
+        { key: "shared_actions", label: "Shared Actions", description: "When team members make changes" },
+        { key: "new_invites", label: "New Invites", description: "When you're invited to join a garden" },
+        { key: "permission_changes", label: "Permission Changes", description: "When your access level changes" },
+      ]
+    }
+  ];
+
+  const deliveryMethods = [
+    { key: "push", label: "Push Notifications", icon: Smartphone, description: "Mobile app notifications" },
+    { key: "email", label: "Email", icon: Mail, description: "Email notifications" },
+    { key: "sms", label: "SMS", icon: MessageSquare, description: "Text message alerts" },
+  ];
+
+  useEffect(() => {
+    loadNotificationSettings();
+  }, []);
+
+  const loadNotificationSettings = async () => {
+    setIsLoading(true);
+    setError("");
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Load default settings
+      const defaultSettings = {};
+      
+      // Set default delivery methods
+      deliveryMethods.forEach(method => {
+        defaultSettings[method.key] = method.key === 'push'; // Only push enabled by default
+      });
+      
+      // Set default notification preferences
+      notificationGroups.forEach(group => {
+        group.settings.forEach(setting => {
+          defaultSettings[setting.key] = true; // All notifications enabled by default
+        });
+      });
+      
+      setSettings(defaultSettings);
+    } catch (err) {
+      setError("Failed to load notification settings. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSettingChange = (key, value) => {
     setSettings(prev => ({
       ...prev,
-      [category]: {
-        ...prev[category],
-        [key]: value
-      }
+      [key]: value
     }));
   };
 
-  const notificationTypes = [
-    {
-      id: 'watering',
-      title: 'Watering Notifications',
-      description: 'Get notified when watering starts, completes, or is skipped',
-      icon: '💧'
-    },
-    {
-      id: 'alerts',
-      title: 'System Alerts',
-      description: 'Critical alerts about device issues, low moisture, or sensor problems',
-      icon: '⚠️'
-    },
-    {
-      id: 'weather',
-      title: 'Weather Updates',
-      description: 'Rain forecasts, temperature changes, and weather-based schedule changes',
-      icon: '🌤️'
-    },
-    {
-      id: 'maintenance',
-      title: 'Maintenance Reminders',
-      description: 'Device maintenance, sensor calibration, and system health checks',
-      icon: '🔧'
+  const handleSave = async () => {
+    setIsSaving(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast({
+        title: "Settings Saved",
+        description: "Your notification preferences have been updated.",
+      });
+    } catch (err) {
+      toast({
+        title: "Save Failed",
+        description: "Unable to save settings. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
     }
-  ];
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+          <div className="px-6 py-4">
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <h1 className="text-xl font-bold text-gray-900">Notifications</h1>
+            </div>
+          </div>
+        </header>
+        
+        <div className="px-6 py-6 space-y-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -85,225 +177,151 @@ const NotificationSettingsScreen = () => {
         </div>
       </header>
 
-      <div className="px-6 py-6 space-y-6">
-        {/* Push Notifications */}
-        <Card className="border-0 shadow-md">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center">
-              <Bell className="w-5 h-5 mr-2" />
-              Push Notifications
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-              <div>
-                <h4 className="font-medium text-blue-900">Enable Push Notifications</h4>
-                <p className="text-sm text-blue-700">Receive notifications on this device</p>
-              </div>
-              <Switch
-                checked={settings.push.enabled}
-                onCheckedChange={(checked) => updateSetting('push', 'enabled', checked)}
-              />
+      <ScrollArea className="h-screen">
+        <div className="px-6 py-6 pb-32 space-y-6">
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600">{error}</p>
+              <Button 
+                onClick={loadNotificationSettings}
+                variant="outline"
+                size="sm"
+                className="mt-2"
+              >
+                Retry
+              </Button>
             </div>
-            
-            {settings.push.enabled && (
-              <div className="space-y-3 pl-4 border-l-2 border-blue-200">
-                {notificationTypes.map((type) => (
-                  <div key={type.id} className="flex items-start justify-between">
-                    <div className="flex items-start space-x-3">
-                      <span className="text-lg">{type.icon}</span>
+          )}
+
+          {/* Delivery Methods */}
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center">
+                <Bell className="w-5 h-5 mr-2" />
+                Delivery Methods
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {deliveryMethods.map((method) => {
+                const Icon = method.icon;
+                return (
+                  <div key={method.key} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <Icon className="w-5 h-5 text-gray-600" />
                       <div>
-                        <h5 className="font-medium text-gray-900">{type.title}</h5>
-                        <p className="text-sm text-gray-600">{type.description}</p>
+                        <p className="font-medium text-gray-900">{method.label}</p>
+                        <p className="text-sm text-gray-600">{method.description}</p>
                       </div>
                     </div>
                     <Switch
-                      checked={settings.push[type.id]}
-                      onCheckedChange={(checked) => updateSetting('push', type.id, checked)}
+                      checked={settings[method.key] || false}
+                      onCheckedChange={(checked) => handleSettingChange(method.key, checked)}
                     />
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                );
+              })}
+            </CardContent>
+          </Card>
 
-        {/* Email Notifications */}
-        <Card className="border-0 shadow-md">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center">
-              <Mail className="w-5 h-5 mr-2" />
-              Email Notifications
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-              <div>
-                <h4 className="font-medium text-green-900">Enable Email Notifications</h4>
-                <p className="text-sm text-green-700">Receive notifications via email</p>
-              </div>
-              <Switch
-                checked={settings.email.enabled}
-                onCheckedChange={(checked) => updateSetting('email', 'enabled', checked)}
-              />
-            </div>
-            
-            {settings.email.enabled && (
-              <div className="space-y-3 pl-4 border-l-2 border-green-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h5 className="font-medium text-gray-900">Daily Summary</h5>
-                    <p className="text-sm text-gray-600">Daily watering and system status report</p>
-                  </div>
-                  <Switch
-                    checked={settings.email.daily}
-                    onCheckedChange={(checked) => updateSetting('email', 'daily', checked)}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h5 className="font-medium text-gray-900">Weekly Report</h5>
-                    <p className="text-sm text-gray-600">Comprehensive weekly analytics and insights</p>
-                  </div>
-                  <Switch
-                    checked={settings.email.weekly}
-                    onCheckedChange={(checked) => updateSetting('email', 'weekly', checked)}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h5 className="font-medium text-gray-900">Critical Alerts</h5>
-                    <p className="text-sm text-gray-600">System failures and urgent issues</p>
-                  </div>
-                  <Switch
-                    checked={settings.email.alerts}
-                    onCheckedChange={(checked) => updateSetting('email', 'alerts', checked)}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h5 className="font-medium text-gray-900">Data Reports</h5>
-                    <p className="text-sm text-gray-600">Automated data exports and reports</p>
-                  </div>
-                  <Switch
-                    checked={settings.email.reports}
-                    onCheckedChange={(checked) => updateSetting('email', 'reports', checked)}
-                  />
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          {/* Notification Groups */}
+          {notificationGroups.map((group) => {
+            const GroupIcon = group.icon;
+            return (
+              <Card key={group.id} className="border-0 shadow-md">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center">
+                    <GroupIcon className="w-5 h-5 mr-2" />
+                    {group.title}
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">{group.description}</p>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {group.settings.map((setting) => (
+                    <div key={setting.key} className="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex-1 pr-4">
+                        <p className="font-medium text-gray-900">{setting.label}</p>
+                        <p className="text-sm text-gray-600">{setting.description}</p>
+                      </div>
+                      <Switch
+                        checked={settings[setting.key] || false}
+                        onCheckedChange={(checked) => handleSettingChange(setting.key, checked)}
+                      />
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            );
+          })}
 
-        {/* SMS Notifications */}
-        <Card className="border-0 shadow-md">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center">
-              <MessageSquare className="w-5 h-5 mr-2" />
-              SMS Notifications
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-              <div>
-                <h4 className="font-medium text-purple-900">Enable SMS Notifications</h4>
-                <p className="text-sm text-purple-700">Receive notifications via text message</p>
-              </div>
-              <Switch
-                checked={settings.sms.enabled}
-                onCheckedChange={(checked) => updateSetting('sms', 'enabled', checked)}
-              />
-            </div>
-            
-            {settings.sms.enabled && (
-              <div className="space-y-3 pl-4 border-l-2 border-purple-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h5 className="font-medium text-gray-900">Emergency Only</h5>
-                    <p className="text-sm text-gray-600">Only critical system failures</p>
-                  </div>
-                  <Switch
-                    checked={settings.sms.emergencyOnly}
-                    onCheckedChange={(checked) => updateSetting('sms', 'emergencyOnly', checked)}
-                  />
+          {/* Quiet Hours */}
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle className="text-lg">Quiet Hours</CardTitle>
+              <p className="text-sm text-gray-600">Disable non-urgent notifications during these hours</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-gray-900">Enable Quiet Hours</p>
+                  <p className="text-sm text-gray-600">Pause non-critical notifications</p>
                 </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h5 className="font-medium text-gray-900">All Alerts</h5>
-                    <p className="text-sm text-gray-600">All system alerts and warnings</p>
-                  </div>
-                  <Switch
-                    checked={settings.sms.alerts}
-                    onCheckedChange={(checked) => updateSetting('sms', 'alerts', checked)}
-                  />
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Quiet Hours */}
-        <Card className="border-0 shadow-md">
-          <CardHeader>
-            <CardTitle className="text-lg">Quiet Hours</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-gray-600">Set hours when non-critical notifications should be silenced</p>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Start Time</label>
-                <Select defaultValue="22:00">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="20:00">8:00 PM</SelectItem>
-                    <SelectItem value="21:00">9:00 PM</SelectItem>
-                    <SelectItem value="22:00">10:00 PM</SelectItem>
-                    <SelectItem value="23:00">11:00 PM</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Switch
+                  checked={settings.quiet_hours_enabled || false}
+                  onCheckedChange={(checked) => handleSettingChange("quiet_hours_enabled", checked)}
+                />
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">End Time</label>
-                <Select defaultValue="07:00">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="06:00">6:00 AM</SelectItem>
-                    <SelectItem value="07:00">7:00 AM</SelectItem>
-                    <SelectItem value="08:00">8:00 AM</SelectItem>
-                    <SelectItem value="09:00">9:00 AM</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
-              <AlertTriangle className="w-5 h-5 text-gray-600" />
-              <div className="text-sm text-gray-700">
-                Critical alerts will still be delivered during quiet hours
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              {settings.quiet_hours_enabled && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Start Time</label>
+                    <select className="w-full p-2 border border-gray-300 rounded-lg">
+                      <option>10:00 PM</option>
+                      <option>11:00 PM</option>
+                      <option>12:00 AM</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">End Time</label>
+                    <select className="w-full p-2 border border-gray-300 rounded-lg">
+                      <option>6:00 AM</option>
+                      <option>7:00 AM</option>
+                      <option>8:00 AM</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-        {/* Save Button */}
-        <Button 
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12"
-          onClick={() => {
-            console.log('Saving notification settings:', settings);
-            navigate(-1);
-          }}
+          {/* Emergency Notifications */}
+          <Card className="border-0 shadow-lg bg-red-50 border-red-200">
+            <CardHeader>
+              <CardTitle className="text-lg text-red-900">Emergency Notifications</CardTitle>
+              <p className="text-sm text-red-700">
+                Critical alerts that will always be delivered regardless of other settings
+              </p>
+            </CardHeader>
+            <CardContent>
+              <ul className="text-sm text-red-800 space-y-1">
+                <li>• System failures or pump malfunctions</li>
+                <li>• Severe weather warnings</li>
+                <li>• Water leak detection</li>
+                <li>• Security alerts</li>
+              </ul>
+            </CardContent>
+          </Card>
+        </div>
+      </ScrollArea>
+
+      {/* Sticky Save Button */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 p-6">
+        <Button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
         >
-          Save Settings
+          {isSaving ? "Saving..." : "Save Settings"}
         </Button>
       </div>
     </div>
