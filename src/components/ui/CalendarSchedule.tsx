@@ -26,88 +26,99 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
   className
 }) => {
   const getTimeSlotColor = (slot: { time: string; duration: number; volume: number }) => {
-    if (slot.volume >= 20) return 'bg-blue-600';
-    if (slot.volume >= 10) return 'bg-blue-400';
-    return 'bg-blue-200';
+    if (slot.volume >= 20) return 'bg-gradient-to-r from-blue-500 to-blue-600';
+    if (slot.volume >= 10) return 'bg-gradient-to-r from-blue-400 to-blue-500';
+    return 'bg-gradient-to-r from-blue-300 to-blue-400';
+  };
+
+  const getDayColor = (day: ScheduleDay) => {
+    if (day.isToday) return 'ring-2 ring-emerald-400 bg-white shadow-lg';
+    if (day.hasWatering) return 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200';
+    return 'bg-gray-50 border-gray-200';
   };
 
   return (
-    <div className={cn("space-y-2", className)}>
-      {/* Header */}
-      <div className="grid grid-cols-8 gap-1 text-xs font-medium text-gray-500 px-2">
-        <div></div>
-        <div className="text-center">Mon</div>
-        <div className="text-center">Tue</div>
-        <div className="text-center">Wed</div>
-        <div className="text-center">Thu</div>
-        <div className="text-center">Fri</div>
-        <div className="text-center">Sat</div>
-        <div className="text-center">Sun</div>
-      </div>
+    <div className={cn("space-y-6", className)}>
+      {/* Modern Calendar Grid */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white px-6 py-4">
+          <h3 className="text-lg font-semibold">Weekly Schedule</h3>
+          <p className="text-emerald-100 text-sm">Tap any day to view details</p>
+        </div>
 
-      {/* Schedule Grid */}
-      <div className="space-y-1">
-        {['Morning', 'Afternoon', 'Evening'].map((timeSlot, slotIndex) => (
-          <div key={timeSlot} className="grid grid-cols-8 gap-1">
-            {/* Time Slot Label */}
-            <div className="text-xs font-medium text-gray-600 py-3 px-2">
-              {timeSlot}
-            </div>
-            
-            {/* Days */}
-            {schedule.slice(0, 7).map((day, dayIndex) => {
-              const slot = timeSlot === 'Morning' ? day.morning : 
-                          timeSlot === 'Afternoon' ? day.afternoon : 
-                          day.evening;
-              
-              return (
-                <Card
-                  key={`${timeSlot}-${day.date}`}
-                  className={cn(
-                    "h-12 cursor-pointer transition-all duration-200 hover:shadow-md border",
-                    day.isToday ? "ring-2 ring-emerald-500 ring-offset-1" : "",
-                    slot ? "border-blue-200 bg-blue-50" : "border-gray-200 bg-gray-50"
-                  )}
-                  onClick={() => onDayClick?.(day)}
-                >
-                  <CardContent className="p-1 h-full flex flex-col justify-center items-center">
-                    {slot ? (
-                      <>
-                        <div className="text-[10px] font-medium text-blue-800">
-                          {slot.time}
-                        </div>
-                        <div className={cn(
-                          "w-full h-1.5 rounded-full mt-0.5",
-                          getTimeSlotColor(slot)
-                        )} />
-                        <div className="text-[9px] text-blue-600 mt-0.5">
-                          {slot.volume}L
-                        </div>
-                      </>
-                    ) : (
-                      <div className="text-[10px] text-gray-400">—</div>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })}
+        {/* Days Grid */}
+        <div className="p-6">
+          <div className="grid grid-cols-7 gap-3 mb-4">
+            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+              <div key={day} className="text-center">
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{day}</span>
+              </div>
+            ))}
           </div>
-        ))}
+
+          <div className="grid grid-cols-7 gap-3">
+            {schedule.slice(0, 7).map((day, index) => (
+              <div
+                key={day.date}
+                className={cn(
+                  "aspect-square rounded-xl border-2 transition-all duration-200 cursor-pointer hover:scale-105 hover:shadow-md",
+                  getDayColor(day)
+                )}
+                onClick={() => onDayClick?.(day)}
+              >
+                <div className="h-full p-2 flex flex-col justify-between">
+                  <div className="text-center">
+                    <div className={cn(
+                      "text-sm font-semibold",
+                      day.isToday ? "text-emerald-600" : "text-gray-700"
+                    )}>
+                      {new Date(day.date).getDate()}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    {[day.morning, day.afternoon, day.evening].map((slot, slotIndex) => (
+                      slot ? (
+                        <div key={slotIndex} className="space-y-1">
+                          <div className={cn(
+                            "h-1.5 rounded-full",
+                            getTimeSlotColor(slot)
+                          )} />
+                        </div>
+                      ) : (
+                        <div key={slotIndex} className="h-1.5 bg-gray-200 rounded-full opacity-30" />
+                      )
+                    ))}
+                  </div>
+
+                  {day.hasWatering && (
+                    <div className="text-center">
+                      <span className="text-xs font-medium text-blue-600">
+                        {(day.morning?.volume || 0) + (day.afternoon?.volume || 0) + (day.evening?.volume || 0)}L
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Legend */}
-      <div className="flex items-center justify-center space-x-4 text-xs text-gray-600 pt-2">
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-1.5 bg-blue-200 rounded-full" />
-          <span>Light (5-10L)</span>
+      {/* Modern Legend */}
+      <div className="flex items-center justify-center space-x-6 text-sm">
+        <div className="flex items-center space-x-2">
+          <div className="w-4 h-2 bg-gradient-to-r from-blue-300 to-blue-400 rounded-full" />
+          <span className="text-gray-600">Light (5-10L)</span>
         </div>
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-1.5 bg-blue-400 rounded-full" />
-          <span>Medium (10-20L)</span>
+        <div className="flex items-center space-x-2">
+          <div className="w-4 h-2 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full" />
+          <span className="text-gray-600">Medium (10-20L)</span>
         </div>
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-1.5 bg-blue-600 rounded-full" />
-          <span>Heavy (20L+)</span>
+        <div className="flex items-center space-x-2">
+          <div className="w-4 h-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full" />
+          <span className="text-gray-600">Heavy (20L+)</span>
         </div>
       </div>
     </div>
