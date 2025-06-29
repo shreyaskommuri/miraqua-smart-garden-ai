@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowLeft, Bell, Smartphone, Mail, Clock, Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface NotificationSettings {
   quiet_hours_enabled: boolean;
@@ -38,10 +38,7 @@ const NotificationSettingsScreen = () => {
     sms_notifications: false
   });
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    fetchSettings();
-  }, []);
+  const { toast } = useToast();
 
   const fetchSettings = async () => {
     setIsLoading(true);
@@ -65,9 +62,20 @@ const NotificationSettingsScreen = () => {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Settings saved",
+        description: "Your notification preferences have been updated.",
+      });
+      
       navigate(-1);
     } catch (err) {
       setError("Failed to save settings");
+      toast({
+        title: "Error",
+        description: "Failed to save settings. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsSaving(false);
     }
@@ -76,6 +84,10 @@ const NotificationSettingsScreen = () => {
   const updateSetting = (key: keyof NotificationSettings, value: boolean | string) => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
 
   if (isLoading) {
     return (
@@ -95,6 +107,34 @@ const NotificationSettingsScreen = () => {
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-16 bg-gray-200 rounded-lg animate-pulse"></div>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+          <div className="px-4 py-4">
+            <div className="flex items-center space-x-3">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <h1 className="text-lg font-bold">Notification Settings</h1>
+            </div>
+          </div>
+        </header>
+        
+        <div className="p-4">
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="p-4">
+              <p className="text-red-600">{error}</p>
+              <Button variant="outline" size="sm" onClick={fetchSettings} className="mt-2">
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );

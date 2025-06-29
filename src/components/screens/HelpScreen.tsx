@@ -5,146 +5,161 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, Search, ChevronDown, ChevronRight, ExternalLink, HelpCircle, Book, MessageCircle, Bug } from "lucide-react";
+import { 
+  ArrowLeft, 
+  Search, 
+  HelpCircle, 
+  ChevronDown, 
+  ChevronRight,
+  ExternalLink,
+  MessageCircle,
+  Mail,
+  AlertTriangle,
+  Loader2
+} from "lucide-react";
+
+interface FAQ {
+  id: number;
+  question: string;
+  answer: string;
+  category: string;
+}
 
 const HelpScreen = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [expandedFaq, setExpandedFaq] = useState(null);
-  const [faqs, setFaqs] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const categories = [
-    {
-      id: "getting-started",
-      title: "Getting Started",
-      icon: Book,
-      description: "Setup and onboarding help"
-    },
-    {
-      id: "troubleshooting",
-      title: "Troubleshooting",
-      icon: Bug,
-      description: "Fix common issues"
-    },
-    {
-      id: "features",
-      title: "Features",
-      icon: HelpCircle,
-      description: "How to use app features"
-    },
-    {
-      id: "support",
-      title: "Contact Support",
-      icon: MessageCircle,
-      description: "Get personalized help"
-    }
-  ];
-
-  const faqData = [
-    {
-      id: 1,
-      category: "getting-started",
-      question: "How do I add my first garden plot?",
-      answer: "To add your first plot, tap the '+' button on the home screen and follow the setup wizard. You'll need to provide your plot name, crop type, and location for optimal watering schedules."
-    },
-    {
-      id: 2,
-      category: "getting-started",
-      question: "What crops are supported?",
-      answer: "Miraqua supports over 50 common crops including vegetables, herbs, fruits, and flowers. Each crop has optimized watering schedules based on growth stage and weather conditions."
-    },
-    {
-      id: 3,
-      category: "troubleshooting",
-      question: "Why isn't my schedule updating?",
-      answer: "Schedule updates depend on weather data and AI optimization. If your schedule hasn't updated in 24 hours, check your internet connection and try refreshing the app."
-    },
-    {
-      id: 4,
-      category: "troubleshooting",
-      question: "My sensors aren't connecting",
-      answer: "Ensure your sensors are within Bluetooth range and have sufficient battery. Try resetting the sensor by holding the pairing button for 10 seconds."
-    },
-    {
-      id: 5,
-      category: "features",
-      question: "How does AI optimization work?",
-      answer: "Our AI analyzes weather forecasts, soil conditions, crop growth stages, and historical data to optimize watering schedules. It learns from your garden's performance over time."
-    },
-    {
-      id: 6,
-      category: "features",
-      question: "Can I manually override the schedule?",
-      answer: "Yes! You can water manually anytime using the 'Water Now' button. You can also adjust duration and skip scheduled waterings as needed."
-    }
-  ];
-
-  useEffect(() => {
-    loadFaqs();
-  }, []);
-
-  const loadFaqs = async () => {
-    setIsLoading(true);
+  const fetchFAQs = async () => {
+    setLoading(true);
     setError("");
     
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setFaqs(faqData);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setFaqs([
+        {
+          id: 1,
+          question: "How does the AI watering system work?",
+          answer: "Our AI system analyzes weather data, soil moisture, plant type, and growth stage to create optimal watering schedules. It automatically adjusts based on rainfall, temperature, and humidity.",
+          category: "AI & Automation"
+        },
+        {
+          id: 2,
+          question: "Can I manually override the watering schedule?",
+          answer: "Yes! You can manually water your plants anytime using the 'Water Now' button. You can also adjust the AI schedule or create custom schedules in the plot settings.",
+          category: "Controls"
+        },
+        {
+          id: 3,
+          question: "What sensors are compatible with Miraqua?",
+          answer: "Miraqua works with most soil moisture sensors, temperature sensors, and weather stations. We support popular brands like Arduino, Raspberry Pi sensors, and commercial agricultural sensors.",
+          category: "Hardware"
+        },
+        {
+          id: 4,
+          question: "How accurate is the weather forecasting?",
+          answer: "We use multiple weather data sources and machine learning to provide highly accurate 7-day forecasts. Our system automatically adjusts watering schedules when rain is predicted.",
+          category: "Weather"
+        },
+        {
+          id: 5,
+          question: "Can I manage multiple garden plots?",
+          answer: "Absolutely! You can add unlimited plots, each with its own crops, settings, and watering schedules. Perfect for managing different areas of your garden or multiple properties.",
+          category: "Plot Management"
+        }
+      ]);
     } catch (err) {
-      setError("Failed to load help content. Please try again.");
+      setError("Help content unavailable");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const filteredFaqs = faqs.filter(faq =>
+  const filteredFAQs = faqs.filter(faq =>
     faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+    faq.answer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    faq.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleFaqToggle = (faqId) => {
-    setExpandedFaq(expandedFaq === faqId ? null : faqId);
+  const toggleFAQ = (id: number) => {
+    setExpandedFAQ(expandedFAQ === id ? null : id);
   };
 
-  const handleCategoryClick = (categoryId) => {
-    if (categoryId === "support") {
-      // Navigate to contact form or external support
-      window.open("mailto:support@miraqua.com", "_blank");
-    } else {
-      // Filter FAQs by category
-      const categoryFaq = faqs.find(faq => faq.category === categoryId);
-      if (categoryFaq) {
-        setExpandedFaq(categoryFaq.id);
-        // Scroll to FAQ section
-        setTimeout(() => {
-          const element = document.getElementById(`faq-${categoryFaq.id}`);
-          element?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
-      }
-    }
+  const handleContactSupport = () => {
+    // In a real app, this would open a support chat or email
+    window.open('mailto:support@miraqua.com', '_blank');
   };
 
-  if (isLoading) {
+  useEffect(() => {
+    fetchFAQs();
+  }, []);
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-          <div className="px-6 py-4">
-            <div className="flex items-center space-x-4">
+          <div className="px-4 py-4">
+            <div className="flex items-center space-x-3">
               <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4" />
               </Button>
-              <h1 className="text-xl font-bold text-gray-900">Help & Support</h1>
+              <h1 className="text-lg font-bold">Help & Support</h1>
             </div>
           </div>
         </header>
         
-        <div className="px-6 py-6 space-y-6">
+        <div className="p-4 space-y-4">
+          <div className="h-12 bg-gray-200 rounded-lg animate-pulse"></div>
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="h-16 bg-gray-200 rounded-lg animate-pulse"></div>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+          <div className="px-4 py-4">
+            <div className="flex items-center space-x-3">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <h1 className="text-lg font-bold">Help & Support</h1>
+            </div>
+          </div>
+        </header>
+        
+        <div className="p-4">
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="p-6 text-center">
+              <AlertTriangle className="w-8 h-8 text-red-600 mx-auto mb-3" />
+              <p className="text-red-600 mb-4">{error}</p>
+              <div className="space-y-2">
+                <Button variant="outline" onClick={fetchFAQs}>
+                  Try Again
+                </Button>
+                <div className="text-sm text-gray-600">
+                  <p>You can also visit our external docs:</p>
+                  <a 
+                    href="https://docs.miraqua.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline inline-flex items-center"
+                  >
+                    Documentation <ExternalLink className="w-3 h-3 ml-1" />
+                  </a>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -154,109 +169,102 @@ const HelpScreen = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="px-6 py-4">
-          <div className="flex items-center space-x-4">
+        <div className="px-4 py-4">
+          <div className="flex items-center space-x-3">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4" />
             </Button>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Help & Support</h1>
-              <p className="text-sm text-gray-600">Find answers and get help</p>
+              <h1 className="text-lg font-bold text-gray-900">Help & Support</h1>
+              <p className="text-sm text-gray-600">Find answers to common questions</p>
             </div>
           </div>
         </div>
       </header>
 
-      <ScrollArea className="h-screen">
-        <div className="px-6 py-6 pb-24 space-y-6">
+      <ScrollArea className="h-[calc(100vh-80px)]">
+        <div className="px-4 py-4 space-y-6">
           {/* Search Bar */}
-          <div className="sticky top-0 z-30 bg-gray-50 pb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <Input
-                placeholder="Search help topics..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-12 bg-white"
-              />
-            </div>
-          </div>
+          <Card className="border-0 shadow-md">
+            <CardContent className="p-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Input
+                  placeholder="Search help articles..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 h-12"
+                />
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Quick Help Categories */}
-          {!searchQuery && (
-            <div className="grid grid-cols-2 gap-4">
-              {categories.map((category) => {
-                const Icon = category.icon;
-                return (
-                  <Card 
-                    key={category.id}
-                    className="border-0 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
-                    onClick={() => handleCategoryClick(category.id)}
-                  >
-                    <CardContent className="p-4 text-center">
-                      <Icon className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                      <h3 className="font-semibold text-gray-900 mb-1">{category.title}</h3>
-                      <p className="text-xs text-gray-600">{category.description}</p>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
+          {/* Quick Actions */}
+          <div className="grid grid-cols-2 gap-4">
+            <Card 
+              className="border-0 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={handleContactSupport}
+            >
+              <CardContent className="p-4 text-center">
+                <MessageCircle className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                <h3 className="font-semibold text-gray-900 mb-1">Contact Support</h3>
+                <p className="text-sm text-gray-600">Get help from our team</p>
+              </CardContent>
+            </Card>
+            
+            <Card 
+              className="border-0 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => window.open('https://docs.miraqua.com', '_blank')}
+            >
+              <CardContent className="p-4 text-center">
+                <ExternalLink className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                <h3 className="font-semibold text-gray-900 mb-1">Documentation</h3>
+                <p className="text-sm text-gray-600">Read our full guides</p>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* FAQ Section */}
           <Card className="border-0 shadow-md">
             <CardHeader>
-              <CardTitle className="text-lg">
-                {searchQuery ? `Search Results (${filteredFaqs.length})` : 'Frequently Asked Questions'}
+              <CardTitle className="flex items-center space-x-2">
+                <HelpCircle className="w-5 h-5" />
+                <span>Frequently Asked Questions</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              {error ? (
+            <CardContent className="p-4">
+              {filteredFAQs.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-600 mb-4">{error}</p>
-                  <Button onClick={loadFaqs} variant="outline">
-                    Try Again
+                  <Search className="w-8 h-8 text-gray-400 mx-auto mb-3" />
+                  <p className="text-gray-600">No results found for "{searchQuery}"</p>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setSearchQuery("")}
+                    className="mt-2"
+                  >
+                    Clear Search
                   </Button>
                 </div>
-              ) : filteredFaqs.length === 0 ? (
-                <div className="text-center py-8">
-                  <HelpCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-4">
-                    {searchQuery ? 'No results found' : 'No FAQs available'}
-                  </p>
-                  {searchQuery && (
-                    <Button 
-                      onClick={() => setSearchQuery("")}
-                      variant="outline"
-                    >
-                      Clear Search
-                    </Button>
-                  )}
-                </div>
               ) : (
-                <div className="space-y-2">
-                  {filteredFaqs.map((faq) => (
-                    <div
-                      key={faq.id}
-                      id={`faq-${faq.id}`}
-                      className="border border-gray-200 rounded-lg"
-                    >
+                <div className="space-y-3">
+                  {filteredFAQs.map((faq) => (
+                    <div key={faq.id} className="border border-gray-200 rounded-lg">
                       <button
-                        onClick={() => handleFaqToggle(faq.id)}
-                        className="w-full p-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        onClick={() => toggleFAQ(faq.id)}
+                        className="w-full p-4 text-left hover:bg-gray-50 transition-colors flex items-center justify-between"
                       >
-                        <span className="font-medium text-gray-900 pr-4">
-                          {faq.question}
-                        </span>
-                        {expandedFaq === faq.id ? (
-                          <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                        <div>
+                          <h4 className="font-medium text-gray-900">{faq.question}</h4>
+                          <p className="text-sm text-blue-600 mt-1">{faq.category}</p>
+                        </div>
+                        {expandedFAQ === faq.id ? (
+                          <ChevronDown className="w-5 h-5 text-gray-400" />
                         ) : (
-                          <ChevronRight className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                          <ChevronRight className="w-5 h-5 text-gray-400" />
                         )}
                       </button>
-                      {expandedFaq === faq.id && (
-                        <div className="px-4 pb-4 text-gray-600 leading-relaxed">
+                      {expandedFAQ === faq.id && (
+                        <div className="px-4 pb-4 text-gray-600 text-sm leading-relaxed">
                           {faq.answer}
                         </div>
                       )}
@@ -267,61 +275,28 @@ const HelpScreen = () => {
             </CardContent>
           </Card>
 
-          {/* External Links */}
-          <Card className="border-0 shadow-md">
-            <CardHeader>
-              <CardTitle className="text-lg">More Resources</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <button className="flex items-center justify-between w-full p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-center space-x-3">
-                  <Book className="w-5 h-5 text-blue-600" />
-                  <div className="text-left">
-                    <p className="font-medium text-gray-900">User Guide</p>
-                    <p className="text-sm text-gray-600">Complete documentation</p>
-                  </div>
-                </div>
-                <ExternalLink className="w-4 h-4 text-gray-400" />
-              </button>
-              
-              <button className="flex items-center justify-between w-full p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-center space-x-3">
-                  <MessageCircle className="w-5 h-5 text-green-600" />
-                  <div className="text-left">
-                    <p className="font-medium text-gray-900">Community Forum</p>
-                    <p className="text-sm text-gray-600">Connect with other gardeners</p>
-                  </div>
-                </div>
-                <ExternalLink className="w-4 h-4 text-gray-400" />
-              </button>
-              
-              <button className="flex items-center justify-between w-full p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-center space-x-3">
-                  <Bug className="w-5 h-5 text-red-600" />
-                  <div className="text-left">
-                    <p className="font-medium text-gray-900">Report Bug</p>
-                    <p className="text-sm text-gray-600">Help us improve the app</p>
-                  </div>
-                </div>
-                <ExternalLink className="w-4 h-4 text-gray-400" />
-              </button>
-            </CardContent>
-          </Card>
-
-          {/* Contact Support */}
-          <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-            <CardContent className="p-6 text-center">
-              <MessageCircle className="w-8 h-8 mx-auto mb-3" />
-              <h3 className="text-lg font-semibold mb-2">Still Need Help?</h3>
-              <p className="text-blue-100 mb-4">
-                Our support team is here to help you get the most out of Miraqua
-              </p>
-              <Button 
-                className="bg-white text-blue-600 hover:bg-gray-100"
-                onClick={() => window.open("mailto:support@miraqua.com", "_blank")}
-              >
-                Contact Support
-              </Button>
+          {/* Contact Information */}
+          <Card className="border-0 shadow-md bg-blue-50">
+            <CardContent className="p-4">
+              <h3 className="font-semibold text-gray-900 mb-3">Still need help?</h3>
+              <div className="space-y-2">
+                <a 
+                  href="mailto:support@miraqua.com"
+                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-700"
+                >
+                  <Mail className="w-4 h-4" />
+                  <span>support@miraqua.com</span>
+                </a>
+                <a 
+                  href="https://docs.miraqua.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-700"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>Documentation</span>
+                </a>
+              </div>
             </CardContent>
           </Card>
         </div>

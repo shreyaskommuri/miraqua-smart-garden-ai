@@ -1,89 +1,75 @@
 
-import React, { useState, useEffect } from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { CommandPalette } from "./components/ui/CommandPalette";
-import { VoiceCommand } from "./components/ui/VoiceCommand";
-import { NotificationPermission, PushNotificationManager } from "./components/ui/PushNotifications";
-import { RealTimeProvider, RealTimeIndicator } from "./components/ui/RealTimeUpdates";
-import MainTabs from "./components/navigation/MainTabs";
-import Index from "./pages/Index";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from '@/components/ui/toaster';
 
-const queryClient = new QueryClient();
+// Import all screens
+import WelcomeScreen from '@/components/screens/WelcomeScreen';
+import OnboardingCropScreen from '@/components/screens/OnboardingCropScreen';
+import OnboardingLocationScreen from '@/components/screens/OnboardingLocationScreen';
+import OnboardingAdvancedSettingsScreen from '@/components/screens/OnboardingAdvancedSettingsScreen';
+import OnboardingCompleteScreen from '@/components/screens/OnboardingCompleteScreen';
+import SignInScreen from '@/components/screens/SignInScreen';
+import SignUpScreen from '@/components/screens/SignUpScreen';
+import ForgotPasswordScreen from '@/components/screens/ForgotPasswordScreen';
+import HomeScreen from '@/components/screens/HomeScreen';
+import AnalyticsScreen from '@/components/screens/AnalyticsScreen';
+import MapOverviewScreen from '@/components/screens/MapOverviewScreen';
+import PlotDetailsScreen from '@/components/screens/PlotDetailsScreen';
+import SpecificDayScreen from '@/components/screens/SpecificDayScreen';
+import AddPlotScreen from '@/components/screens/AddPlotScreen';
+import FarmerChatScreen from '@/components/screens/FarmerChatScreen';
+import WeatherForecastScreen from '@/components/screens/WeatherForecastScreen';
+import AccountScreen from '@/components/screens/AccountScreen';
+import UserProfileScreen from '@/components/screens/UserProfileScreen';
+import NotificationSettingsScreen from '@/components/screens/NotificationSettingsScreen';
+import HelpScreen from '@/components/screens/HelpScreen';
 
-const App: React.FC = () => {
-  const [showCommandPalette, setShowCommandPalette] = useState(false);
-  const [isVoiceListening, setIsVoiceListening] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-
-  // Command palette keyboard shortcut
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setShowCommandPalette(true);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  // Check existing notification permission
-  useEffect(() => {
-    if ('Notification' in window) {
-      setNotificationsEnabled(Notification.permission === 'granted');
-    }
-  }, []);
-
+function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <RealTimeProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <div className="w-full relative">
-              {/* Real-time connection indicator */}
-              <div className="fixed top-4 right-4 z-50">
-                <RealTimeIndicator />
-              </div>
-
-              {/* Main app routes */}
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/app/*" element={<MainTabs />} />
-              </Routes>
-
-              {/* Command Palette */}
-              <CommandPalette
-                isOpen={showCommandPalette}
-                onClose={() => setShowCommandPalette(false)}
-              />
-
-              {/* Voice Commands */}
-              <VoiceCommand
-                isListening={isVoiceListening}
-                onToggleListening={() => setIsVoiceListening(!isVoiceListening)}
-              />
-
-              {/* Push Notifications */}
-              <div className="fixed top-20 left-4 right-4 z-40">
-                <NotificationPermission
-                  onPermissionGranted={setNotificationsEnabled}
-                />
-              </div>
-              
-              <PushNotificationManager isEnabled={notificationsEnabled} />
-            </div>
-          </BrowserRouter>
-        </TooltipProvider>
-      </RealTimeProvider>
-    </QueryClientProvider>
+    <Router>
+      <div className="App">
+        <Routes>
+          {/* Welcome & Auth */}
+          <Route path="/" element={<Navigate to="/welcome" replace />} />
+          <Route path="/welcome" element={<WelcomeScreen />} />
+          <Route path="/signin" element={<SignInScreen />} />
+          <Route path="/signup" element={<SignUpScreen />} />
+          <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
+          
+          {/* Onboarding Flow */}
+          <Route path="/onboarding/crop" element={<OnboardingCropScreen />} />
+          <Route path="/onboarding/location" element={<OnboardingLocationScreen />} />
+          <Route path="/onboarding/advanced-settings" element={<OnboardingAdvancedSettingsScreen />} />
+          <Route path="/onboarding/complete" element={<OnboardingCompleteScreen />} />
+          
+          {/* Main App */}
+          <Route path="/home" element={<HomeScreen />} />
+          <Route path="/analytics" element={<AnalyticsScreen />} />
+          <Route path="/map" element={<MapOverviewScreen />} />
+          <Route path="/add-plot" element={<AddPlotScreen />} />
+          
+          {/* Plot Management */}
+          <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
+          <Route path="/plot/:plotId/day/:day" element={<SpecificDayScreen />} />
+          
+          {/* Features */}
+          <Route path="/chat" element={<FarmerChatScreen />} />
+          <Route path="/weather" element={<WeatherForecastScreen />} />
+          
+          {/* Account & Settings */}
+          <Route path="/account" element={<AccountScreen />} />
+          <Route path="/profile" element={<UserProfileScreen />} />
+          <Route path="/notifications" element={<NotificationSettingsScreen />} />
+          <Route path="/help" element={<HelpScreen />} />
+          
+          {/* Catch all */}
+          <Route path="*" element={<Navigate to="/welcome" replace />} />
+        </Routes>
+        <Toaster />
+      </div>
+    </Router>
   );
-};
+}
 
 export default App;

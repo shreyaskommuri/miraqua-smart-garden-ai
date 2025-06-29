@@ -1,128 +1,144 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, Droplets, Clock, MapPin, Sun, CloudRain, Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { 
+  ArrowLeft, 
+  Play, 
+  Cloud, 
+  Sun, 
+  CloudRain, 
+  MapPin,
+  Clock,
+  Droplets,
+  Loader2,
+  AlertTriangle
+} from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+
+interface DayData {
+  plotId: number;
+  date: string;
+  hourlyWeather: Array<{
+    hour: string;
+    temp: number;
+    icon: string;
+    description: string;
+  }>;
+  scheduledWatering: {
+    time: string;
+    duration: number;
+    volume: number;
+  };
+}
 
 const SpecificDayScreen = () => {
   const navigate = useNavigate();
   const { plotId, day } = useParams();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
-  const [dayData, setDayData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isWatering, setIsWatering] = useState(false);
-  const [duration, setDuration] = useState(5);
+  
+  const [dayData, setDayData] = useState<DayData | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [duration, setDuration] = useState([5]);
+  const [watering, setWatering] = useState(false);
 
-  useEffect(() => {
-    fetchDayData();
-  }, [plotId, day]);
+  const latitude = parseFloat(searchParams.get('lat') || '37.7749');
+  const longitude = parseFloat(searchParams.get('lon') || '-122.4194');
+  const date = searchParams.get('date') || day;
 
   const fetchDayData = async () => {
-    setIsLoading(true);
+    setLoading(true);
     setError("");
     
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       setDayData({
-        date: day,
-        plotName: "Pepper Patch",
-        weather: {
-          high: 78,
-          low: 62,
-          condition: "sunny",
-          humidity: 65,
-          windSpeed: 8
-        },
-        hourlySchedule: [
-          { hour: 6, scheduled: 1.2, actual: 1.2, weather: "clear" },
-          { hour: 12, scheduled: 0, actual: 0, weather: "sunny" },
-          { hour: 18, scheduled: 0.8, actual: 0.8, weather: "clear" },
+        plotId: parseInt(plotId || '1'),
+        date: date || 'Today',
+        hourlyWeather: [
+          { hour: '6 AM', temp: 65, icon: 'sun', description: 'Sunny' },
+          { hour: '9 AM', temp: 70, icon: 'sun', description: 'Sunny' },
+          { hour: '12 PM', temp: 75, icon: 'cloud', description: 'Partly Cloudy' },
+          { hour: '3 PM', temp: 78, icon: 'cloud', description: 'Cloudy' },
+          { hour: '6 PM', temp: 72, icon: 'rain', description: 'Light Rain' },
+          { hour: '9 PM', temp: 68, icon: 'cloud', description: 'Cloudy' }
         ],
-        totalScheduled: 2.0,
-        totalActual: 2.0,
-        soilMoisture: [
-          { time: "06:00", level: 45 },
-          { time: "09:00", level: 52 },
-          { time: "12:00", level: 48 },
-          { time: "15:00", level: 43 },
-          { time: "18:00", level: 51 },
-          { time: "21:00", level: 49 }
-        ],
-        location: { lat: 37.7747, lon: -122.4192 }
+        scheduledWatering: {
+          time: '7:00 AM',
+          duration: 5,
+          volume: 15
+        }
       });
     } catch (err) {
-      setError("Failed to load day details. Please try again.");
+      setError("Couldn't load day details");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   const handleWaterNow = async () => {
-    if (duration < 1 || duration > 60) {
-      toast({
-        title: "Invalid Duration",
-        description: "Duration must be between 1 and 60 minutes.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsWatering(true);
-    
+    setWatering(true);
     try {
-      // Simulate watering API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
       toast({
-        title: "Watering Started",
-        description: `Watering ${dayData.plotName} for ${duration} minutes.`,
+        title: "Watering started",
+        description: `Watering for ${duration[0]} minutes`,
       });
       
-      // Refresh data after watering
-      await fetchDayData();
+      // Refresh data
+      fetchDayData();
     } catch (err) {
       toast({
-        title: "Watering Failed",
-        description: "Unable to start watering. Please try again.",
+        title: "Error",
+        description: "Failed to start watering. Please try again.",
         variant: "destructive"
       });
     } finally {
-      setIsWatering(false);
+      setWatering(false);
     }
   };
 
-  const handleMapClick = () => {
-    if (dayData?.location) {
-      navigate(`/map?lat=${dayData.location.lat}&lon=${dayData.location.lon}&zoom=15`);
+  const getWeatherIcon = (icon: string) => {
+    switch (icon) {
+      case 'sun': return <Sun className="w-6 h-6 text-yellow-500" />;
+      case 'cloud': return <Cloud className="w-6 h-6 text-gray-500" />;
+      case 'rain': return <CloudRain className="w-6 h-6 text-blue-500" />;
+      default: return <Cloud className="w-6 h-6 text-gray-500" />;
     }
   };
 
-  if (isLoading) {
+  useEffect(() => {
+    fetchDayData();
+  }, [plotId, date]);
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-          <div className="px-6 py-4">
-            <div className="flex items-center space-x-4">
+          <div className="px-4 py-4">
+            <div className="flex items-center space-x-3">
               <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4" />
               </Button>
-              <div className="h-6 bg-gray-200 rounded w-32 animate-pulse"></div>
+              <h1 className="text-lg font-bold">Day Details</h1>
             </div>
           </div>
         </header>
         
-        <div className="px-6 py-6 space-y-6">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse"></div>
-          ))}
+        <div className="p-4 space-y-4">
+          <div className="h-32 bg-gray-200 rounded-lg animate-pulse"></div>
+          <div className="h-48 bg-gray-200 rounded-lg animate-pulse"></div>
+          <div className="h-24 bg-gray-200 rounded-lg animate-pulse"></div>
         </div>
       </div>
     );
@@ -130,216 +146,164 @@ const SpecificDayScreen = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-        <Card className="w-full max-w-md text-center">
-          <CardContent className="p-6">
-            <p className="text-gray-600 mb-4">{error}</p>
-            <Button onClick={fetchDayData} className="w-full">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+          <div className="px-4 py-4">
+            <div className="flex items-center space-x-3">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <h1 className="text-lg font-bold">Day Details</h1>
+            </div>
+          </div>
+        </header>
+        
+        <div className="p-4">
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="p-6 text-center">
+              <AlertTriangle className="w-8 h-8 text-red-600 mx-auto mb-3" />
+              <p className="text-red-600 mb-4">{error}</p>
+              <Button variant="outline" onClick={fetchDayData}>
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   if (!dayData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-        <Card className="w-full max-w-md text-center">
-          <CardContent className="p-6">
-            <p className="text-gray-600 mb-4">Day data not found</p>
-            <Button onClick={() => navigate(-1)} className="w-full">
-              Go Back
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+          <div className="px-4 py-4">
+            <div className="flex items-center space-x-3">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <h1 className="text-lg font-bold">Day Details</h1>
+            </div>
+          </div>
+        </header>
+        
+        <div className="p-4">
+          <Card className="border-0 shadow-lg">
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-gray-400" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">No data</h2>
+              <p className="text-gray-600">No watering scheduled for this day.</p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
-
-  const getWeatherIcon = (condition) => {
-    switch (condition) {
-      case 'sunny': return <Sun className="w-5 h-5 text-yellow-500" />;
-      case 'cloudy': return <CloudRain className="w-5 h-5 text-gray-500" />;
-      case 'rainy': return <CloudRain className="w-5 h-5 text-blue-500" />;
-      default: return <Sun className="w-5 h-5 text-yellow-500" />;
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="px-6 py-4">
-          <div className="flex items-center space-x-4">
+        <div className="px-4 py-4">
+          <div className="flex items-center space-x-3">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4" />
             </Button>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">{dayData.plotName}</h1>
-              <p className="text-sm text-gray-600 capitalize">{day}</p>
+              <h1 className="text-lg font-bold text-gray-900">{dayData.date}</h1>
+              <p className="text-sm text-gray-600">Plot {plotId} Schedule</p>
             </div>
           </div>
         </div>
       </header>
 
-      <ScrollArea className="h-screen">
-        <div className="px-6 py-6 pb-32 space-y-6">
-          {/* Weather Overview */}
-          <Card className="border-0 shadow-md">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  {getWeatherIcon(dayData.weather.condition)}
-                  <div>
-                    <h3 className="font-semibold text-gray-900 capitalize">{dayData.weather.condition}</h3>
-                    <p className="text-sm text-gray-600">
-                      {dayData.weather.high}°F / {dayData.weather.low}°F
-                    </p>
+      <ScrollArea className="h-[calc(100vh-160px)]">
+        <div className="px-4 py-4 space-y-6 pb-32">
+          {/* Scheduled Watering */}
+          <Card className="border-0 shadow-md bg-blue-50">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Clock className="w-5 h-5 text-blue-600" />
+                <span>Scheduled Watering</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-blue-900">{dayData.scheduledWatering.time}</div>
+                  <div className="text-sm text-blue-700">
+                    {dayData.scheduledWatering.duration} min • {dayData.scheduledWatering.volume}L
                   </div>
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-600">Humidity:</span>
-                  <span className="ml-2 font-medium">{dayData.weather.humidity}%</span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Wind:</span>
-                  <span className="ml-2 font-medium">{dayData.weather.windSpeed} mph</span>
-                </div>
+                <Droplets className="w-8 h-8 text-blue-600" />
               </div>
             </CardContent>
           </Card>
 
-          {/* Hourly Schedule */}
+          {/* Hourly Weather */}
           <Card className="border-0 shadow-md">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center">
-                <Clock className="w-5 h-5 mr-2" />
-                Hourly Schedule
-              </CardTitle>
+              <CardTitle>Hourly Weather</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {dayData.hourlySchedule.map((hour, index) => (
+                {dayData.hourlyWeather.map((hour, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <span className="text-sm font-medium w-12">
-                        {hour.hour}:00
-                      </span>
-                      {getWeatherIcon(hour.weather)}
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-bold text-blue-600">
-                        {hour.scheduled > 0 ? `${hour.scheduled}L` : 'Skip'}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {hour.actual > 0 ? `✓ ${hour.actual}L delivered` : 'Not scheduled'}
+                      <div className="text-sm font-medium w-16">{hour.hour}</div>
+                      {getWeatherIcon(hour.icon)}
+                      <div>
+                        <div className="text-sm font-medium">{hour.description}</div>
+                        <div className="text-xs text-gray-500">{hour.temp}°F</div>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-              
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Total scheduled:</span>
-                  <span className="font-bold text-blue-600">{dayData.totalScheduled}L</span>
-                </div>
-                <div className="flex justify-between text-sm mt-1">
-                  <span className="text-gray-600">Total delivered:</span>
-                  <span className="font-bold text-green-600">{dayData.totalActual}L</span>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
-          {/* Manual Watering */}
+          {/* Duration Picker */}
           <Card className="border-0 shadow-md">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center">
-                <Droplets className="w-5 h-5 mr-2" />
-                Manual Watering
-              </CardTitle>
+              <CardTitle>Manual Watering</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="duration">Duration (minutes)</Label>
-                <Input
-                  id="duration"
-                  type="number"
-                  min="1"
-                  max="60"
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <Label className="text-gray-700">Duration (minutes)</Label>
+                  <span className="text-lg font-bold text-blue-600">{duration[0]} min</span>
+                </div>
+                <Slider
                   value={duration}
-                  onChange={(e) => setDuration(parseInt(e.target.value) || 5)}
-                  className="h-12"
+                  onValueChange={setDuration}
+                  max={30}
+                  min={1}
+                  step={1}
+                  className="w-full"
                 />
-                <p className="text-xs text-gray-500">
-                  Duration must be between 1 and 60 minutes
-                </p>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>1 min</span>
+                  <span>30 min</span>
+                </div>
               </div>
-              
-              <Button
-                onClick={handleWaterNow}
-                disabled={isWatering}
-                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                {isWatering ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Starting...
-                  </>
-                ) : (
-                  <>
-                    <Droplets className="w-4 h-4 mr-2" />
-                    Water Now ({duration} min)
-                  </>
-                )}
-              </Button>
             </CardContent>
           </Card>
 
-          {/* Soil Moisture Chart */}
+          {/* Mini Map Preview */}
           <Card className="border-0 shadow-md">
             <CardHeader>
-              <CardTitle className="text-lg">Soil Moisture Levels</CardTitle>
+              <CardTitle>Location</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {dayData.soilMoisture.map((reading, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">{reading.time}</span>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-24 bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-blue-500 h-2 rounded-full" 
-                          style={{ width: `${reading.level}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-sm font-medium w-10">{reading.level}%</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Location Map Thumbnail */}
-          <Card className="border-0 shadow-md">
-            <CardContent className="p-0">
-              <div 
-                onClick={handleMapClick}
-                className="relative w-full h-32 bg-gradient-to-br from-blue-100 to-green-100 rounded-lg cursor-pointer hover:from-blue-200 hover:to-green-200 transition-colors"
-              >
+              <div className="relative w-full h-32 bg-gradient-to-br from-blue-100 to-green-100 rounded-lg">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
-                    <MapPin className="w-8 h-8 text-blue-600 mx-auto mb-1" />
-                    <p className="text-sm text-gray-600">Tap to view full map</p>
-                    <p className="text-xs text-gray-500">
-                      {dayData.location.lat.toFixed(4)}, {dayData.location.lon.toFixed(4)}
+                    <MapPin className="w-6 h-6 text-blue-600 mx-auto mb-1" />
+                    <p className="text-xs text-gray-600">
+                      {latitude.toFixed(4)}, {longitude.toFixed(4)}
                     </p>
                   </div>
                 </div>
@@ -348,6 +312,27 @@ const SpecificDayScreen = () => {
           </Card>
         </div>
       </ScrollArea>
+
+      {/* Sticky Water Now Button */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+        <Button
+          onClick={handleWaterNow}
+          disabled={watering}
+          className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+        >
+          {watering ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Watering...
+            </>
+          ) : (
+            <>
+              <Play className="w-4 h-4 mr-2" />
+              Water Now ({duration[0]} min)
+            </>
+          )}
+        </Button>
+      </div>
     </div>
   );
 };
