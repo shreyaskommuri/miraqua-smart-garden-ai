@@ -26,6 +26,7 @@ import AccountScreen from "@/components/screens/AccountScreen";
 import UserProfileScreen from "@/components/screens/UserProfileScreen";
 import NotificationSettingsScreen from "@/components/screens/NotificationSettingsScreen";
 import HelpScreen from "@/components/screens/HelpScreen";
+import AnalyticsScreen from "@/components/screens/AnalyticsScreen";
 
 const AppNavigator = () => {
   return (
@@ -53,12 +54,14 @@ const AppNavigator = () => {
         <Route path="/plot/:plotId/day/:day" element={<SpecificDayScreen />} />
 
         {/* Features */}
+        <Route path="/analytics" element={<AnalyticsScreen />} />
         <Route path="/map" element={<MapOverviewScreen />} />
         <Route path="/reports" element={<ReportsScreen />} />
         <Route path="/sensors" element={<SensorManagementScreen />} />
         <Route path="/devices" element={<DeviceControlScreen />} />
         <Route path="/chat" element={<FarmerChatScreen />} />
         <Route path="/weather" element={<WeatherForecastScreen />} />
+        <Route path="/weather/:plotId" element={<WeatherForecastScreen />} />
         <Route path="/collaboration" element={<CollaborationScreen />} />
 
         {/* Settings & Profile */}

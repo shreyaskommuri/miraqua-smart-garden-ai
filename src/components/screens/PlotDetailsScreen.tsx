@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,8 +16,8 @@ const PlotDetailsScreen = () => {
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("details");
 
-  const latitude = searchParams.get('lat') || 37.7749;
-  const longitude = searchParams.get('lon') || -122.4194;
+  const latitude = parseFloat(searchParams.get('lat') || '37.7749');
+  const longitude = parseFloat(searchParams.get('lon') || '-122.4194');
 
   useEffect(() => {
     fetchPlotDetails();

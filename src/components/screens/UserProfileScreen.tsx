@@ -5,123 +5,100 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, User, Mail, Lock, Shield, Eye, EyeOff, Camera, Check } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, User, Shield, Camera, Loader2, LogOut } from "lucide-react";
+
+interface UserProfile {
+  firstName: string;
+  lastName: string;
+  email: string;
+  memberSince: string;
+  totalPlots: number;
+  waterSaved: number;
+  twoFactorEnabled: boolean;
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
 
 const UserProfileScreen = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [userData, setUserData] = useState({});
-  const [formData, setFormData] = useState({
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [profile, setProfile] = useState<UserProfile>({
     firstName: "",
     lastName: "",
     email: "",
+    memberSince: "",
+    totalPlots: 0,
+    waterSaved: 0,
+    twoFactorEnabled: false,
     currentPassword: "",
     newPassword: "",
     confirmPassword: ""
   });
-  const [showPasswords, setShowPasswords] = useState({
-    current: false,
-    new: false,
-    confirm: false
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    loadUserProfile();
+    fetchProfile();
   }, []);
 
-  useEffect(() => {
-    calculatePasswordStrength(formData.newPassword);
-  }, [formData.newPassword]);
-
-  const loadUserProfile = async () => {
+  const fetchProfile = async () => {
     setIsLoading(true);
+    setError("");
     
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const user = {
+      setProfile({
         firstName: "Sarah",
         lastName: "Johnson",
-        email: "sarah.j@email.com",
-        avatar: null,
+        email: "sarah.johnson@example.com",
         memberSince: "March 2024",
-        totalPlots: 5,
-        waterSaved: "142L",
-        twoFactorEnabled: false
-      };
-      
-      setUserData(user);
-      setFormData({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
+        totalPlots: 3,
+        waterSaved: 152,
+        twoFactorEnabled: false,
         currentPassword: "",
         newPassword: "",
         confirmPassword: ""
       });
     } catch (err) {
-      toast({
-        title: "Loading Failed",
-        description: "Unable to load profile data. Please try again.",
-        variant: "destructive"
-      });
+      setError("Failed to load profile");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const calculatePasswordStrength = (password) => {
-    if (!password) {
-      setPasswordStrength(0);
-      return;
-    }
-
-    let strength = 0;
-    if (password.length >= 8) strength += 25;
-    if (/[a-z]/.test(password)) strength += 25;
-    if (/[A-Z]/.test(password)) strength += 25;
-    if (/[0-9]/.test(password)) strength += 25;
-    if (/[^A-Za-z0-9]/.test(password)) strength += 25;
-    
-    setPasswordStrength(Math.min(strength, 100));
-  };
-
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: Record<string, string> = {};
 
-    if (!formData.firstName.trim()) {
+    if (!profile.firstName.trim()) {
       newErrors.firstName = "First name is required";
     }
 
-    if (!formData.lastName.trim()) {
+    if (!profile.lastName.trim()) {
       newErrors.lastName = "Last name is required";
     }
 
-    if (!formData.email.trim()) {
+    if (!profile.email.trim()) {
       newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(profile.email)) {
       newErrors.email = "Please enter a valid email";
     }
 
-    if (formData.newPassword) {
-      if (formData.newPassword.length < 8) {
-        newErrors.newPassword = "Password must be at least 8 characters";
+    if (profile.newPassword) {
+      if (!profile.currentPassword) {
+        newErrors.currentPassword = "Current password is required to change password";
       }
-      
-      if (formData.newPassword !== formData.confirmPassword) {
+      if (profile.newPassword.length < 8) {
+        newErrors.newPassword = "New password must be at least 8 characters";
+      }
+      if (profile.newPassword !== profile.confirmPassword) {
         newErrors.confirmPassword = "Passwords do not match";
-      }
-      
-      if (!formData.currentPassword) {
-        newErrors.currentPassword = "Current password is required to set new password";
       }
     }
 
@@ -129,69 +106,44 @@ const UserProfileScreen = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Clear error for this field
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: "" }));
-    }
-  };
-
   const handleSave = async () => {
     if (!validateForm()) return;
 
     setIsSaving(true);
+    setError("");
     
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      toast({
-        title: "Profile Updated",
-        description: "Your profile has been saved successfully.",
-      });
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      navigate(-1);
     } catch (err) {
-      toast({
-        title: "Save Failed",
-        description: "Unable to save profile. Please try again.",
-        variant: "destructive"
-      });
+      setError("Failed to save profile");
     } finally {
       setIsSaving(false);
     }
   };
 
-  const getPasswordStrengthColor = () => {
-    if (passwordStrength < 50) return "bg-red-500";
-    if (passwordStrength < 75) return "bg-yellow-500";
-    return "bg-green-500";
-  };
-
-  const getPasswordStrengthText = () => {
-    if (passwordStrength < 25) return "Very Weak";
-    if (passwordStrength < 50) return "Weak";
-    if (passwordStrength < 75) return "Good";
-    return "Strong";
+  const handleSignOut = () => {
+    navigate("/signin");
   };
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-          <div className="px-6 py-4">
-            <div className="flex items-center space-x-4">
+          <div className="px-4 py-4">
+            <div className="flex items-center space-x-3">
               <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4" />
               </Button>
-              <h1 className="text-xl font-bold text-gray-900">Profile</h1>
+              <h1 className="text-lg font-bold">Profile</h1>
             </div>
           </div>
         </header>
         
-        <div className="px-6 py-6 space-y-6">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-24 bg-gray-200 rounded-lg animate-pulse"></div>
+        <div className="p-6 space-y-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-20 bg-gray-200 rounded-lg animate-pulse"></div>
           ))}
         </div>
       </div>
@@ -200,266 +152,194 @@ const UserProfileScreen = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="px-6 py-4">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">Profile</h1>
-              <p className="text-sm text-gray-600">Manage your account information</p>
+        <div className="px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <h1 className="text-lg font-bold">Profile</h1>
             </div>
+            <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-red-600">
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </Button>
           </div>
         </div>
       </header>
 
-      <ScrollArea className="h-screen">
-        <div className="px-6 py-6 pb-32 space-y-6">
-          {/* Profile Picture & Basic Info */}
-          <Card className="border-0 shadow-md">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="relative">
-                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
-                    <User className="w-10 h-10 text-blue-600" />
-                  </div>
-                  <button className="absolute -bottom-1 -right-1 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700">
-                    <Camera className="w-4 h-4" />
-                  </button>
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">
-                    {userData.firstName} {userData.lastName}
-                  </h2>
-                  <p className="text-gray-600">{userData.email}</p>
-                  <p className="text-sm text-gray-500">Member since {userData.memberSince}</p>
-                </div>
-              </div>
+      <ScrollArea className="h-[calc(100vh-140px)]">
+        <div className="p-4 space-y-6">
+          {error && (
+            <Card className="border-red-200 bg-red-50">
+              <CardContent className="p-4">
+                <p className="text-red-600">{error}</p>
+                <Button variant="outline" size="sm" onClick={fetchProfile} className="mt-2">
+                  Try Again
+                </Button>
+              </CardContent>
+            </Card>
+          )}
 
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200">
-                <div className="text-center">
-                  <div className="text-xl font-bold text-blue-600">{userData.totalPlots}</div>
-                  <div className="text-xs text-gray-600">Active Plots</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl font-bold text-green-600">{userData.waterSaved}</div>
-                  <div className="text-xs text-gray-600">Water Saved</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl font-bold text-purple-600">89</div>
-                  <div className="text-xs text-gray-600">Days Active</div>
-                </div>
+          {/* Profile Header */}
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-white">
+                  {profile.firstName.charAt(0)}{profile.lastName.charAt(0)}
+                </span>
               </div>
+              <h2 className="text-xl font-bold">{profile.firstName} {profile.lastName}</h2>
+              <p className="text-gray-600">{profile.email}</p>
+              <p className="text-sm text-gray-500">Member since {profile.memberSince}</p>
             </CardContent>
           </Card>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 gap-4">
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600">{profile.totalPlots}</div>
+                <div className="text-sm text-gray-600">Active Plots</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-green-600">{profile.waterSaved}L</div>
+                <div className="text-sm text-gray-600">Water Saved</div>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Personal Information */}
-          <Card className="border-0 shadow-md">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-lg flex items-center">
-                <User className="w-5 h-5 mr-2" />
-                Personal Information
+              <CardTitle className="flex items-center space-x-2">
+                <User className="w-5 h-5" />
+                <span>Personal Information</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) => handleInputChange("firstName", e.target.value)}
-                    className={`h-12 ${errors.firstName ? 'border-red-500' : ''}`}
-                  />
-                  {errors.firstName && (
-                    <p className="text-sm text-red-600">{errors.firstName}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) => handleInputChange("lastName", e.target.value)}
-                    className={`h-12 ${errors.lastName ? 'border-red-500' : ''}`}
-                  />
-                  {errors.lastName && (
-                    <p className="text-sm text-red-600">{errors.lastName}</p>
-                  )}
-                </div>
+              <div>
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  value={profile.firstName}
+                  onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
+                  className={errors.firstName ? "border-red-500" : ""}
+                />
+                {errors.firstName && <p className="text-sm text-red-600 mt-1">{errors.firstName}</p>}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
-                    className={`pl-10 h-12 ${errors.email ? 'border-red-500' : ''}`}
-                  />
-                </div>
-                {errors.email && (
-                  <p className="text-sm text-red-600">{errors.email}</p>
-                )}
+              <div>
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  value={profile.lastName}
+                  onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
+                  className={errors.lastName ? "border-red-500" : ""}
+                />
+                {errors.lastName && <p className="text-sm text-red-600 mt-1">{errors.lastName}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={profile.email}
+                  onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                  className={errors.email ? "border-red-500" : ""}
+                />
+                {errors.email && <p className="text-sm text-red-600 mt-1">{errors.email}</p>}
               </div>
             </CardContent>
           </Card>
 
-          {/* Password Change */}
-          <Card className="border-0 shadow-md">
+          {/* Change Password */}
+          <Card>
             <CardHeader>
-              <CardTitle className="text-lg flex items-center">
-                <Lock className="w-5 h-5 mr-2" />
-                Change Password
+              <CardTitle className="flex items-center space-x-2">
+                <Shield className="w-5 h-5" />
+                <span>Change Password</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
+              <div>
                 <Label htmlFor="currentPassword">Current Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="currentPassword"
-                    type={showPasswords.current ? "text" : "password"}
-                    value={formData.currentPassword}
-                    onChange={(e) => handleInputChange("currentPassword", e.target.value)}
-                    className={`pl-10 pr-10 h-12 ${errors.currentPassword ? 'border-red-500' : ''}`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPasswords(prev => ({ ...prev, current: !prev.current }))}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  >
-                    {showPasswords.current ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {errors.currentPassword && (
-                  <p className="text-sm text-red-600">{errors.currentPassword}</p>
-                )}
+                <Input
+                  id="currentPassword"
+                  type="password"
+                  value={profile.currentPassword}
+                  onChange={(e) => setProfile({ ...profile, currentPassword: e.target.value })}
+                  className={errors.currentPassword ? "border-red-500" : ""}
+                />
+                {errors.currentPassword && <p className="text-sm text-red-600 mt-1">{errors.currentPassword}</p>}
               </div>
 
-              <div className="space-y-2">
+              <div>
                 <Label htmlFor="newPassword">New Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="newPassword"
-                    type={showPasswords.new ? "text" : "password"}
-                    value={formData.newPassword}
-                    onChange={(e) => handleInputChange("newPassword", e.target.value)}
-                    className={`pl-10 pr-10 h-12 ${errors.newPassword ? 'border-red-500' : ''}`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPasswords(prev => ({ ...prev, new: !prev.new }))}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  >
-                    {showPasswords.new ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {errors.newPassword && (
-                  <p className="text-sm text-red-600">{errors.newPassword}</p>
-                )}
-                
-                {formData.newPassword && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Password Strength:</span>
-                      <span className={`font-medium ${
-                        passwordStrength < 50 ? 'text-red-600' :
-                        passwordStrength < 75 ? 'text-yellow-600' : 'text-green-600'
-                      }`}>
-                        {getPasswordStrengthText()}
-                      </span>
-                    </div>
-                    <Progress 
-                      value={passwordStrength} 
-                      className={`h-2 ${getPasswordStrengthColor()}`}
-                    />
-                  </div>
-                )}
+                <Input
+                  id="newPassword"
+                  type="password"
+                  value={profile.newPassword}
+                  onChange={(e) => setProfile({ ...profile, newPassword: e.target.value })}
+                  className={errors.newPassword ? "border-red-500" : ""}
+                />
+                {errors.newPassword && <p className="text-sm text-red-600 mt-1">{errors.newPassword}</p>}
               </div>
 
-              <div className="space-y-2">
+              <div>
                 <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="confirmPassword"
-                    type={showPasswords.confirm ? "text" : "password"}
-                    value={formData.confirmPassword}
-                    onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-                    className={`pl-10 pr-10 h-12 ${errors.confirmPassword ? 'border-red-500' : ''}`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPasswords(prev => ({ ...prev, confirm: !prev.confirm }))}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  >
-                    {showPasswords.confirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {errors.confirmPassword && (
-                  <p className="text-sm text-red-600">{errors.confirmPassword}</p>
-                )}
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={profile.confirmPassword}
+                  onChange={(e) => setProfile({ ...profile, confirmPassword: e.target.value })}
+                  className={errors.confirmPassword ? "border-red-500" : ""}
+                />
+                {errors.confirmPassword && <p className="text-sm text-red-600 mt-1">{errors.confirmPassword}</p>}
               </div>
             </CardContent>
           </Card>
 
           {/* Security */}
-          <Card className="border-0 shadow-md">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-lg flex items-center">
-                <Shield className="w-5 h-5 mr-2" />
-                Security
-              </CardTitle>
+              <CardTitle>Security Settings</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <CardContent>
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">Two-Factor Authentication</p>
+                  <Label htmlFor="2fa">Two-Factor Authentication</Label>
                   <p className="text-sm text-gray-600">Add an extra layer of security</p>
                 </div>
-                <Button 
-                  variant={userData.twoFactorEnabled ? "destructive" : "default"}
-                  size="sm"
-                >
-                  {userData.twoFactorEnabled ? "Disable" : "Enable"}
-                </Button>
-              </div>
-              
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <div className="flex items-start space-x-2">
-                  <Check className="w-5 h-5 text-blue-600 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-blue-900">Account Security Tips</p>
-                    <ul className="text-sm text-blue-800 mt-1 space-y-1">
-                      <li>• Use a unique password for your Miraqua account</li>
-                      <li>• Enable two-factor authentication for better security</li>
-                      <li>• Regularly review your account activity</li>
-                    </ul>
-                  </div>
-                </div>
+                <Switch
+                  id="2fa"
+                  checked={profile.twoFactorEnabled}
+                  onCheckedChange={(checked) => setProfile({ ...profile, twoFactorEnabled: checked })}
+                />
               </div>
             </CardContent>
           </Card>
         </div>
       </ScrollArea>
 
-      {/* Sticky Save Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 p-6">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
         <Button
           onClick={handleSave}
           disabled={isSaving}
-          className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
+          className="w-full h-12"
         >
-          {isSaving ? "Saving Changes..." : "Save Changes"}
+          {isSaving ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            "Save Changes"
+          )}
         </Button>
       </div>
     </div>

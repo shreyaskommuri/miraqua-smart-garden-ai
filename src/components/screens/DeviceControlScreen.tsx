@@ -1,262 +1,299 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Slider } from "@/components/ui/slider";
-import { ArrowLeft, Play, Square, Settings, Droplets, Clock, AlertTriangle } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Zap, Droplets, Settings, RefreshCw, Loader2, AlertTriangle } from "lucide-react";
+
+interface Device {
+  id: string;
+  name: string;
+  type: "valve" | "pump" | "sensor";
+  status: "online" | "offline" | "error";
+  isActive: boolean;
+  battery?: number;
+  lastSync?: string;
+}
 
 const DeviceControlScreen = () => {
   const navigate = useNavigate();
-  const [duration, setDuration] = useState([5]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [error, setError] = useState("");
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [activeTab, setActiveTab] = useState("valves");
 
-  const devices = [
-    {
-      id: 1,
-      name: "Main Water Pump",
-      type: "pump",
-      status: "idle",
-      plotName: "All Plots",
-      flowRate: "0 L/min",
-      pressure: "Normal",
-      lastRun: "2 hours ago"
-    },
-    {
-      id: 2,
-      name: "Zone 1 Valve",
-      type: "valve",
-      status: "closed",
-      plotName: "Tomato Garden",
-      flowRate: "0 L/min",
-      pressure: "Normal",
-      lastRun: "3 hours ago"
-    },
-    {
-      id: 3,
-      name: "Zone 2 Valve",
-      type: "valve",
-      status: "running",
-      plotName: "Herb Corner",
-      flowRate: "2.3 L/min",
-      pressure: "Normal",
-      lastRun: "Running now",
-      remainingTime: "12 min"
-    },
-    {
-      id: 4,
-      name: "Zone 3 Valve",
-      type: "valve",
-      status: "closed",
-      plotName: "Pepper Patch",
-      flowRate: "0 L/min",
-      pressure: "Low",
-      lastRun: "1 day ago"
+  useEffect(() => {
+    fetchDevices();
+  }, []);
+
+  const fetchDevices = async () => {
+    setIsLoading(true);
+    setError("");
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setDevices([
+        {
+          id: "valve-1",
+          name: "Main Garden Valve",
+          type: "valve",
+          status: "online",
+          isActive: false,
+          lastSync: "2 minutes ago"
+        },
+        {
+          id: "valve-2",
+          name: "Herb Section Valve",
+          type: "valve",
+          status: "online",
+          isActive: true,
+          lastSync: "1 minute ago"
+        },
+        {
+          id: "pump-1",
+          name: "Water Pump",
+          type: "pump",
+          status: "online",
+          isActive: true,
+          lastSync: "30 seconds ago"
+        },
+        {
+          id: "sensor-1",
+          name: "Moisture Sensor #1",
+          type: "sensor",
+          status: "online",
+          isActive: true,
+          battery: 85,
+          lastSync: "1 minute ago"
+        }
+      ]);
+    } catch (err) {
+      setError("Failed to load devices");
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
 
-  const getStatusColor = (status) => {
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await fetchDevices();
+    setIsRefreshing(false);
+  };
+
+  const toggleDevice = async (deviceId: string) => {
+    setDevices(prev => prev.map(device => 
+      device.id === deviceId 
+        ? { ...device, isActive: !device.isActive }
+        : device
+    ));
+    
+    // Simulate API call
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (error) {
+      console.error("Failed to toggle device:", error);
+    }
+  };
+
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'running': return 'bg-green-100 text-green-700 border-green-200';
-      case 'idle': return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'closed': return 'bg-gray-100 text-gray-700 border-gray-200';
-      case 'error': return 'bg-red-100 text-red-700 border-red-200';
-      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+      case "online": return "bg-green-100 text-green-700";
+      case "offline": return "bg-gray-100 text-gray-700";
+      case "error": return "bg-red-100 text-red-700";
+      default: return "bg-gray-100 text-gray-700";
     }
   };
 
-  const getDeviceIcon = (type) => {
-    switch (type) {
-      case 'pump': return '⚙️';
-      case 'valve': return '🔧';
-      default: return '🔩';
-    }
-  };
+  const renderDevice = (device: Device) => (
+    <Card key={device.id} className="border-0 shadow-md">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              {device.type === "valve" && <Droplets className="w-5 h-5 text-blue-600" />}
+              {device.type === "pump" && <Zap className="w-5 h-5 text-blue-600" />}
+              {device.type === "sensor" && <Settings className="w-5 h-5 text-blue-600" />}
+            </div>
+            <div>
+              <h3 className="font-semibold">{device.name}</h3>
+              <p className="text-sm text-gray-600">Last sync: {device.lastSync}</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Badge className={getStatusColor(device.status)}>
+              {device.status}
+            </Badge>
+            {device.battery && (
+              <Badge variant="outline">
+                {device.battery}%
+              </Badge>
+            )}
+          </div>
+        </div>
 
-  const handleStartWatering = (deviceId) => {
-    console.log(`Starting watering for device ${deviceId} for ${duration[0]} minutes`);
-  };
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-gray-600">
+            {device.type === "valve" ? "Water Flow" : 
+             device.type === "pump" ? "Pump Status" : 
+             "Sensor Active"}
+          </span>
+          <Switch
+            checked={device.isActive}
+            onCheckedChange={() => toggleDevice(device.id)}
+            disabled={device.status === "offline"}
+          />
+        </div>
 
-  const handleStopWatering = (deviceId) => {
-    console.log(`Stopping watering for device ${deviceId}`);
-  };
+        {device.type === "valve" && device.isActive && (
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+            <Label className="text-sm">Duration (minutes)</Label>
+            <Input
+              type="number"
+              placeholder="5"
+              className="mt-1 h-8"
+              min="1"
+              max="60"
+            />
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+          <div className="px-4 py-4">
+            <div className="flex items-center space-x-3">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <h1 className="text-lg font-bold">Device Control</h1>
+            </div>
+          </div>
+        </header>
+        
+        <div className="p-6 space-y-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-20 bg-gray-200 rounded-lg animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const valves = devices.filter(d => d.type === "valve");
+  const pumps = devices.filter(d => d.type === "pump");
+  const sensors = devices.filter(d => d.type === "sensor");
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="px-6 py-4">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">Device Control</h1>
-              <p className="text-sm text-gray-600">Manage pumps and valves</p>
+        <div className="px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <div>
+                <h1 className="text-lg font-bold">Device Control</h1>
+                <p className="text-sm text-gray-600">Manage valves, pumps & sensors</p>
+              </div>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+            >
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </Button>
           </div>
         </div>
       </header>
 
-      <div className="px-6 py-6 space-y-6">
-        {/* System Status */}
-        <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-500 to-green-500 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold mb-2">System Status</h3>
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-300 rounded-full"></div>
-                    <span className="text-sm">System Online</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Droplets className="w-4 h-4" />
-                    <span className="text-sm">Water Pressure: Normal</span>
-                  </div>
+      <ScrollArea className="h-[calc(100vh-80px)]">
+        <div className="p-4 space-y-6">
+          {error && (
+            <Card className="border-red-200 bg-red-50">
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-2">
+                  <AlertTriangle className="w-4 h-4 text-red-600" />
+                  <p className="text-red-600">{error}</p>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold">
-                  {devices.filter(d => d.status === 'running').length}
-                </div>
-                <div className="text-sm opacity-90">Active Zones</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Manual Control Panel */}
-        <Card className="border-0 shadow-md">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center">
-              <Clock className="w-5 h-5 mr-2" />
-              Manual Control
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Duration: {duration[0]} minutes
-              </label>
-              <Slider
-                value={duration}
-                onValueChange={setDuration}
-                max={60}
-                min={1}
-                step={1}
-                className="w-full"
-              />
-            </div>
-            
-            <div className="flex items-center space-x-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <AlertTriangle className="w-5 h-5 text-yellow-600" />
-              <div className="text-sm text-yellow-800">
-                Manual watering will override scheduled watering. Use with caution.
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Device List */}
-        <div className="space-y-4">
-          {devices.map((device) => (
-            <Card key={device.id} className="border-0 shadow-md hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-start space-x-4">
-                    <div className="text-2xl">{getDeviceIcon(device.type)}</div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="font-semibold text-gray-900">{device.name}</h3>
-                        <Badge className={getStatusColor(device.status)}>
-                          {device.status}
-                        </Badge>
-                        {device.status === 'running' && device.remainingTime && (
-                          <Badge variant="outline" className="text-xs">
-                            {device.remainingTime} left
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600 mb-1">Zone: {device.plotName}</p>
-                      <p className="text-xs text-gray-500">Last run: {device.lastRun}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-gray-900 mb-1">{device.flowRate}</div>
-                    <div className="flex items-center space-x-2">
-                      <span className={`text-xs px-2 py-1 rounded ${
-                        device.pressure === 'Normal' ? 'bg-green-100 text-green-700' :
-                        device.pressure === 'Low' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-red-100 text-red-700'
-                      }`}>
-                        {device.pressure} Pressure
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Device Controls */}
-                <div className="flex space-x-3">
-                  {device.status === 'running' ? (
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => handleStopWatering(device.id)}
-                      className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
-                    >
-                      <Square className="w-4 h-4 mr-1" />
-                      Stop
-                    </Button>
-                  ) : (
-                    <Button 
-                      size="sm" 
-                      onClick={() => handleStartWatering(device.id)}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                      disabled={device.pressure === 'Low'}
-                    >
-                      <Play className="w-4 h-4 mr-1" />
-                      Start ({duration[0]}min)
-                    </Button>
-                  )}
-                  
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => console.log('Configure device:', device.id)}
-                  >
-                    <Settings className="w-4 h-4 mr-1" />
-                    Settings
-                  </Button>
-                </div>
-                
-                {device.pressure === 'Low' && (
-                  <div className="mt-3 flex items-center space-x-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
-                    <AlertTriangle className="w-4 h-4 text-yellow-600" />
-                    <span className="text-sm text-yellow-800">Low water pressure detected</span>
-                  </div>
-                )}
+                <Button variant="outline" size="sm" onClick={fetchDevices} className="mt-2">
+                  Try Again
+                </Button>
               </CardContent>
             </Card>
-          ))}
-        </div>
+          )}
 
-        {/* Emergency Stop */}
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="p-6 text-center">
-            <h3 className="font-semibold text-red-900 mb-2">Emergency Controls</h3>
-            <p className="text-sm text-red-700 mb-4">Immediately stop all watering operations</p>
-            <Button 
-              className="bg-red-600 hover:bg-red-700 text-white"
-              onClick={() => console.log('Emergency stop all devices')}
-            >
-              <Square className="w-4 h-4 mr-2" />
-              Stop All Devices
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <div className="sticky top-20 z-30 bg-white/95 backdrop-blur-sm -mx-4 px-4 py-2 border-b">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="valves">Valves ({valves.length})</TabsTrigger>
+                <TabsTrigger value="pumps">Pumps ({pumps.length})</TabsTrigger>
+                <TabsTrigger value="sensors">Sensors ({sensors.length})</TabsTrigger>
+              </TabsList>
+            </div>
+
+            <TabsContent value="valves" className="mt-6 space-y-4">
+              {valves.length === 0 ? (
+                <Card className="border-2 border-dashed border-gray-200 bg-gray-50">
+                  <CardContent className="p-8 text-center">
+                    <Droplets className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="font-medium text-gray-900 mb-2">No valves found</h3>
+                    <p className="text-sm text-gray-500 mb-4">Connect your irrigation valves to get started</p>
+                    <Button size="sm">Add Valve</Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                valves.map(renderDevice)
+              )}
+            </TabsContent>
+
+            <TabsContent value="pumps" className="mt-6 space-y-4">
+              {pumps.length === 0 ? (
+                <Card className="border-2 border-dashed border-gray-200 bg-gray-50">
+                  <CardContent className="p-8 text-center">
+                    <Zap className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="font-medium text-gray-900 mb-2">No pumps found</h3>
+                    <p className="text-sm text-gray-500 mb-4">Connect your water pumps to get started</p>
+                    <Button size="sm">Add Pump</Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                pumps.map(renderDevice)
+              )}
+            </TabsContent>
+
+            <TabsContent value="sensors" className="mt-6 space-y-4">
+              {sensors.length === 0 ? (
+                <Card className="border-2 border-dashed border-gray-200 bg-gray-50">
+                  <CardContent className="p-8 text-center">
+                    <Settings className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="font-medium text-gray-900 mb-2">No sensors found</h3>
+                    <p className="text-sm text-gray-500 mb-4">Connect your soil sensors to get started</p>
+                    <Button size="sm">Add Sensor</Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                sensors.map(renderDevice)
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
+      </ScrollArea>
     </div>
   );
 };

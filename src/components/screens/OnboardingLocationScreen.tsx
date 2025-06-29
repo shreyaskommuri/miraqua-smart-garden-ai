@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +14,7 @@ const OnboardingLocationScreen = () => {
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [mapError, setMapError] = useState("");
   const [addressError, setAddressError] = useState("");
+  const [locationError, setLocationError] = useState("");
   const mapRef = useRef(null);
 
   const handleUseCurrentLocation = async () => {
@@ -38,6 +38,26 @@ const OnboardingLocationScreen = () => {
       setMapError("Unable to get your location. Please enter coordinates manually.");
     } finally {
       setIsLoadingLocation(false);
+    }
+  };
+
+  const handleLocationSelect = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position: GeolocationPosition) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+          setLocationError("");
+        },
+        (error) => {
+          setLocationError("Unable to get your location. Please enter manually.");
+          console.error("Geolocation error:", error);
+        }
+      );
+    } else {
+      setLocationError("Geolocation is not supported by this browser.");
     }
   };
 
