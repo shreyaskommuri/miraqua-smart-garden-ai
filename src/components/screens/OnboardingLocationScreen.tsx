@@ -22,7 +22,7 @@ const OnboardingLocationScreen = () => {
     setMapError("");
     
     try {
-      const position = await new Promise((resolve, reject) => {
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
           enableHighAccuracy: true,
           timeout: 10000,
