@@ -18,6 +18,12 @@ import WeatherForecastScreen from "../screens/WeatherForecastScreen";
 import ExportReportsScreen from "../screens/ExportReportsScreen";
 import CollaborationScreen from "../screens/CollaborationScreen";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
+import MapOverviewScreen from "../screens/MapOverviewScreen";
+import ReportsScreen from "../screens/ReportsScreen";
+import SensorManagementScreen from "../screens/SensorManagementScreen";
+import DeviceControlScreen from "../screens/DeviceControlScreen";
+import NotificationSettingsScreen from "../screens/NotificationSettingsScreen";
+import UserProfileScreen from "../screens/UserProfileScreen";
 
 const AppNavigator = () => {
   return (
@@ -38,6 +44,12 @@ const AppNavigator = () => {
       <Route path="/weather" element={<WeatherForecastScreen />} />
       <Route path="/export" element={<ExportReportsScreen />} />
       <Route path="/collaboration" element={<CollaborationScreen />} />
+      <Route path="/map" element={<MapOverviewScreen />} />
+      <Route path="/reports" element={<ReportsScreen />} />
+      <Route path="/sensors" element={<SensorManagementScreen />} />
+      <Route path="/devices" element={<DeviceControlScreen />} />
+      <Route path="/notifications" element={<NotificationSettingsScreen />} />
+      <Route path="/profile" element={<UserProfileScreen />} />
       <Route path="/app/*" element={<MainTabs />} />
       <Route path="/*" element={<WelcomeScreen />} />
     </Routes>

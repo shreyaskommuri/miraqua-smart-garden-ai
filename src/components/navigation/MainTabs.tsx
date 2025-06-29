@@ -1,11 +1,11 @@
 
 import React from "react";
 import { Routes, Route, useLocation, Link } from "react-router-dom";
-import { Home, BarChart3, User, MessageSquare, Users } from "lucide-react";
+import { Home, BarChart3, User, MessageSquare, Map } from "lucide-react";
 import HomeScreen from "../screens/HomeScreen";
 import AnalyticsScreen from "../screens/AnalyticsScreen";
 import AccountScreen from "../screens/AccountScreen";
-import CollaborationScreen from "../screens/CollaborationScreen";
+import MapOverviewScreen from "../screens/MapOverviewScreen";
 import FarmerChatScreen from "../screens/FarmerChatScreen";
 import { cn } from "@/lib/utils";
 
@@ -15,8 +15,8 @@ const MainTabs = () => {
   const tabs = [
     { path: "/app", icon: Home, label: "Home" },
     { path: "/app/analytics", icon: BarChart3, label: "Analytics" },
+    { path: "/app/map", icon: Map, label: "Map" },
     { path: "/app/chat", icon: MessageSquare, label: "AI Chat" },
-    { path: "/app/collaboration", icon: Users, label: "Team" },
     { path: "/app/account", icon: User, label: "Account" },
   ];
 
@@ -33,8 +33,8 @@ const MainTabs = () => {
         <Routes>
           <Route path="/" element={<HomeScreen />} />
           <Route path="/analytics" element={<AnalyticsScreen />} />
+          <Route path="/map" element={<MapOverviewScreen />} />
           <Route path="/chat" element={<FarmerChatScreen />} />
-          <Route path="/collaboration" element={<CollaborationScreen />} />
           <Route path="/account" element={<AccountScreen />} />
         </Routes>
       </div>
