@@ -13,7 +13,6 @@ const OnboardingCompleteScreen = () => {
   const plotData = location.state || {};
 
   const handleGoToDashboard = () => {
-    // In a real app, you'd save the plot data to the backend here
     navigate('/home');
   };
 
@@ -32,9 +31,9 @@ const OnboardingCompleteScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      {/* Progress Header - Sticky */}
-      <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="px-6 py-4">
           <div className="text-center">
             <h1 className="text-lg font-semibold text-gray-900">Setup Complete!</h1>
@@ -54,7 +53,7 @@ const OnboardingCompleteScreen = () => {
         <div className="px-6 py-6 space-y-8 pb-32">
           {/* Success Header */}
           <div className="text-center">
-            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-20 h-20 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-10 h-10 text-white" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-3">Your plot is ready!</h2>
@@ -64,7 +63,7 @@ const OnboardingCompleteScreen = () => {
           {/* Summary Cards */}
           <div className="space-y-4">
             {/* Plot Details */}
-            <Card className="border-0 shadow-md">
+            <Card className="border-0 shadow-sm bg-white">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center space-x-2">
@@ -98,7 +97,7 @@ const OnboardingCompleteScreen = () => {
             </Card>
 
             {/* Location */}
-            <Card className="border-0 shadow-md">
+            <Card className="border-0 shadow-sm bg-white">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center space-x-2">
@@ -131,7 +130,7 @@ const OnboardingCompleteScreen = () => {
                   )}
                   
                   {/* Mini Map Preview */}
-                  <div className="relative w-full h-32 bg-gradient-to-br from-blue-100 to-green-100 rounded-lg mt-3">
+                  <div className="relative w-full h-32 bg-gradient-to-br from-blue-100 to-green-100 rounded-xl mt-3">
                     <div className="absolute inset-0 flex items-center justify-center">
                       <MapPin className="w-6 h-6 text-blue-600" />
                     </div>
@@ -141,7 +140,7 @@ const OnboardingCompleteScreen = () => {
             </Card>
 
             {/* Advanced Settings */}
-            <Card className="border-0 shadow-md">
+            <Card className="border-0 shadow-sm bg-white">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center space-x-2">
@@ -180,7 +179,7 @@ const OnboardingCompleteScreen = () => {
           </div>
 
           {/* Next Steps */}
-          <Card className="border-0 shadow-md bg-gradient-to-r from-green-50 to-blue-50">
+          <Card className="border-0 shadow-sm bg-green-50">
             <CardContent className="p-6">
               <h3 className="font-semibold text-gray-900 mb-3">What's Next?</h3>
               <ul className="space-y-2 text-sm text-gray-600">
@@ -202,11 +201,11 @@ const OnboardingCompleteScreen = () => {
         </div>
       </ScrollArea>
 
-      {/* Sticky Go to Dashboard Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-6">
+      {/* Go to Dashboard Button */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-6">
         <Button
           onClick={handleGoToDashboard}
-          className="w-full h-12 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-medium"
+          className="w-full h-12 bg-green-500 hover:bg-green-600 text-white font-medium rounded-xl"
         >
           Go to Dashboard
           <ArrowRight className="w-4 h-4 ml-2" />

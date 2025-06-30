@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, Cloud, Sun, Thermometer, Droplets, Wind, MapPin, Calendar, Loader2, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Cloud, Sun, Thermometer, Droplets, Wind, MapPin, Loader2, AlertTriangle } from "lucide-react";
 
 const WeatherForecastScreen = () => {
   const navigate = useNavigate();
@@ -25,7 +26,6 @@ const WeatherForecastScreen = () => {
     setError("");
     
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       setWeatherData({
@@ -65,7 +65,7 @@ const WeatherForecastScreen = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
           <div className="px-4 py-4">
             <div className="flex items-center space-x-3">
               <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
@@ -78,7 +78,7 @@ const WeatherForecastScreen = () => {
         
         <div className="p-6 space-y-4">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-24 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div key={i} className="h-24 bg-gray-200 rounded-xl animate-pulse"></div>
           ))}
         </div>
       </div>
@@ -87,7 +87,7 @@ const WeatherForecastScreen = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="px-4 py-4">
           <div className="flex items-center space-x-3">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
@@ -106,7 +106,7 @@ const WeatherForecastScreen = () => {
       <ScrollArea className="h-[calc(100vh-80px)]">
         <div className="p-4 space-y-6">
           {error && (
-            <Card className="border-red-200 bg-red-50">
+            <Card className="border-0 bg-red-50">
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2">
                   <AlertTriangle className="w-4 h-4 text-red-600" />
@@ -120,26 +120,26 @@ const WeatherForecastScreen = () => {
           )}
 
           {/* Current Weather */}
-          <Card className="bg-gradient-to-br from-blue-100 to-blue-50 border-0 shadow-md">
+          <Card className="border-0 shadow-sm bg-blue-500 text-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-2xl font-bold">{weatherData?.current.temperature}°F</h2>
-                  <p className="text-sm text-gray-600">{weatherData?.current.condition}</p>
+                  <h2 className="text-3xl font-bold">{weatherData?.current.temperature}°F</h2>
+                  <p className="text-blue-100">{weatherData?.current.condition}</p>
                 </div>
-                <div className="text-5xl">
+                <div className="text-white">
                   {getWeatherIcon(weatherData?.current.icon || "")}
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center space-x-2">
-                  <Droplets className="w-4 h-4 text-blue-500" />
-                  <span>{weatherData?.current.humidity}%</span>
+                  <Droplets className="w-4 h-4 text-blue-100" />
+                  <span className="text-blue-100">{weatherData?.current.humidity}%</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Wind className="w-4 h-4 text-gray-500" />
-                  <span>{weatherData?.current.windSpeed} mph</span>
+                  <Wind className="w-4 h-4 text-blue-100" />
+                  <span className="text-blue-100">{weatherData?.current.windSpeed} mph</span>
                 </div>
               </div>
             </CardContent>
@@ -147,17 +147,21 @@ const WeatherForecastScreen = () => {
 
           {/* Forecast */}
           <div className="space-y-4">
-            <h2 className="text-lg font-bold">5-Day Forecast</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <h2 className="text-lg font-bold text-gray-900">5-Day Forecast</h2>
+            <div className="space-y-3">
               {weatherData?.forecast.map((day, index) => (
-                <Card key={index} className="border-0 shadow-md">
+                <Card key={index} className="border-0 shadow-sm bg-white">
                   <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold">{day.day}</h3>
-                      {getWeatherIcon(day.icon)}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        {getWeatherIcon(day.icon)}
+                        <div>
+                          <h3 className="font-semibold text-gray-900">{day.day}</h3>
+                          <p className="text-sm text-gray-600">{day.condition}</p>
+                        </div>
+                      </div>
+                      <div className="text-xl font-bold text-gray-900">{day.temperature}°F</div>
                     </div>
-                    <div className="text-lg font-bold">{day.temperature}°F</div>
-                    <div className="text-sm text-gray-600">{day.condition}</div>
                   </CardContent>
                 </Card>
               ))}
@@ -165,12 +169,12 @@ const WeatherForecastScreen = () => {
           </div>
 
           {/* Location Info */}
-          <Card className="border-0 shadow-md">
+          <Card className="border-0 shadow-sm bg-white">
             <CardContent className="p-4">
-              <h3 className="font-semibold mb-2">Location</h3>
+              <h3 className="font-semibold mb-2 text-gray-900">Location</h3>
               <div className="flex items-center space-x-2">
                 <MapPin className="w-4 h-4 text-blue-500" />
-                <span>Latitude: {latitude.toFixed(4)}, Longitude: {longitude.toFixed(4)}</span>
+                <span className="text-gray-600">Latitude: {latitude.toFixed(4)}, Longitude: {longitude.toFixed(4)}</span>
               </div>
             </CardContent>
           </Card>

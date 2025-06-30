@@ -1,18 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { 
   ArrowLeft, 
-  Store, 
   Search,
   ShoppingCart,
   Star,
-  Filter,
   Package,
   Wifi,
   Droplets
@@ -40,7 +38,6 @@ const MarketplaceScreen = () => {
           rating: 4.5,
           reviews: 124,
           category: 'sensors',
-          image: '/placeholder.svg',
           description: 'Real-time soil moisture monitoring',
           inStock: true,
           bestseller: true
@@ -52,7 +49,6 @@ const MarketplaceScreen = () => {
           rating: 4.8,
           reviews: 89,
           category: 'irrigation',
-          image: '/placeholder.svg',
           description: 'Complete drip irrigation system',
           inStock: true,
           bestseller: false
@@ -64,7 +60,6 @@ const MarketplaceScreen = () => {
           rating: 4.3,
           reviews: 156,
           category: 'testing',
-          image: '/placeholder.svg',
           description: 'Digital soil pH meter',
           inStock: false,
           bestseller: false
@@ -76,7 +71,6 @@ const MarketplaceScreen = () => {
           rating: 4.7,
           reviews: 67,
           category: 'monitoring',
-          image: '/placeholder.svg',
           description: 'Complete weather monitoring solution',
           inStock: true,
           bestseller: true
@@ -87,7 +81,7 @@ const MarketplaceScreen = () => {
   };
 
   const categories = [
-    { id: 'all', name: 'All Products', icon: Store },
+    { id: 'all', name: 'All', icon: Package },
     { id: 'sensors', name: 'Sensors', icon: Wifi },
     { id: 'irrigation', name: 'Irrigation', icon: Droplets },
     { id: 'testing', name: 'Testing', icon: Package },
@@ -102,8 +96,8 @@ const MarketplaceScreen = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-        <header className="bg-white/90 backdrop-blur-sm border-b border-blue-200 sticky top-0 z-40">
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
           <div className="px-4 py-4">
             <div className="flex items-center space-x-3">
               <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
@@ -115,7 +109,7 @@ const MarketplaceScreen = () => {
         </header>
         <div className="p-4 space-y-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div key={i} className="h-32 bg-gray-200 rounded-xl animate-pulse"></div>
           ))}
         </div>
       </div>
@@ -123,16 +117,16 @@ const MarketplaceScreen = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      <header className="bg-white/90 backdrop-blur-sm border-b border-blue-200 sticky top-0 z-40">
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="px-4 py-4">
           <div className="flex items-center space-x-3">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div>
-              <h1 className="text-lg font-bold text-blue-900">Marketplace</h1>
-              <p className="text-sm text-blue-700">Smart garden equipment & supplies</p>
+              <h1 className="text-lg font-bold text-gray-900">Marketplace</h1>
+              <p className="text-sm text-gray-600">Smart garden equipment & supplies</p>
             </div>
           </div>
         </div>
@@ -147,7 +141,7 @@ const MarketplaceScreen = () => {
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-white/80 backdrop-blur-sm border-blue-200"
+              className="pl-10 bg-white border-gray-200 rounded-xl"
             />
           </div>
 
@@ -159,10 +153,10 @@ const MarketplaceScreen = () => {
                 variant={selectedCategory === category.id ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedCategory(category.id)}
-                className={`flex-shrink-0 ${
+                className={`flex-shrink-0 rounded-xl ${
                   selectedCategory === category.id 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-white/80 text-blue-700 border-blue-200'
+                    ? 'bg-green-500 text-white' 
+                    : 'bg-white text-gray-700 border-gray-200'
                 }`}
               >
                 <category.icon className="w-4 h-4 mr-1" />
@@ -171,19 +165,13 @@ const MarketplaceScreen = () => {
             ))}
           </div>
 
-          {/* Products Grid */}
-          <div className="grid grid-cols-1 gap-4">
+          {/* Products */}
+          <div className="space-y-4">
             {filteredProducts.map((product) => (
-              <Card key={product.id} className="border-blue-200 bg-white/80 backdrop-blur-sm hover:shadow-lg transition-shadow">
+              <Card key={product.id} className="border-0 shadow-sm bg-white">
                 <CardContent className="p-4">
                   <div className="flex space-x-4">
-                    <div className="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0">
-                      <img 
-                        src={product.image} 
-                        alt={product.name}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    </div>
+                    <div className="w-20 h-20 bg-gray-100 rounded-xl flex-shrink-0"></div>
                     
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-2">
@@ -208,7 +196,7 @@ const MarketplaceScreen = () => {
                       </div>
                       
                       <div className="flex items-center justify-between">
-                        <div className="text-lg font-bold text-blue-600">
+                        <div className="text-lg font-bold text-green-600">
                           ${product.price}
                         </div>
                         
@@ -224,10 +212,10 @@ const MarketplaceScreen = () => {
                           <Button 
                             size="sm"
                             disabled={!product.inStock}
-                            className="bg-blue-600 hover:bg-blue-700"
+                            className="bg-green-500 hover:bg-green-600 rounded-xl"
                           >
                             <ShoppingCart className="w-4 h-4 mr-1" />
-                            Add to Cart
+                            Add
                           </Button>
                         </div>
                       </div>
@@ -239,7 +227,7 @@ const MarketplaceScreen = () => {
           </div>
 
           {filteredProducts.length === 0 && (
-            <Card className="border-gray-200 bg-white/80">
+            <Card className="border-0 shadow-sm bg-white">
               <CardContent className="p-8 text-center">
                 <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No products found</h3>

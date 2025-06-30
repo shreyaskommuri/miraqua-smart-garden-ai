@@ -9,11 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import { 
   ArrowLeft, 
   TrendingUp, 
-  Calendar, 
   Leaf,
   BarChart3,
-  RefreshCw,
-  AlertCircle
+  RefreshCw
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 
@@ -21,11 +19,10 @@ const YieldForecastScreen = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [forecastData, setForecastData] = useState<any>(null);
-  const [selectedCrop, setSelectedCrop] = useState('tomatoes');
 
   useEffect(() => {
     fetchForecastData();
-  }, [selectedCrop]);
+  }, []);
 
   const fetchForecastData = async () => {
     setLoading(true);
@@ -33,7 +30,6 @@ const YieldForecastScreen = () => {
     setTimeout(() => {
       setForecastData({
         currentSeason: {
-          crop: selectedCrop,
           projectedYield: 45.2,
           harvestDate: '2024-08-15',
           confidence: 87,
@@ -44,10 +40,10 @@ const YieldForecastScreen = () => {
           }
         },
         monthlyForecast: [
-          { month: 'Jul', yield: 12.5, actual: null },
-          { month: 'Aug', yield: 18.7, actual: null },
-          { month: 'Sep', yield: 14.0, actual: null },
-          { month: 'Oct', yield: 0, actual: null }
+          { month: 'Jul', yield: 12.5 },
+          { month: 'Aug', yield: 18.7 },
+          { month: 'Sep', yield: 14.0 },
+          { month: 'Oct', yield: 0 }
         ],
         historicalComparison: [
           { year: '2022', yield: 38.5 },
@@ -66,8 +62,8 @@ const YieldForecastScreen = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50">
-        <header className="bg-white/90 backdrop-blur-sm border-b border-green-200 sticky top-0 z-40">
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
           <div className="px-4 py-4">
             <div className="flex items-center space-x-3">
               <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
@@ -79,7 +75,7 @@ const YieldForecastScreen = () => {
         </header>
         <div className="p-4 space-y-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div key={i} className="h-32 bg-gray-200 rounded-xl animate-pulse"></div>
           ))}
         </div>
       </div>
@@ -87,8 +83,8 @@ const YieldForecastScreen = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50">
-      <header className="bg-white/90 backdrop-blur-sm border-b border-green-200 sticky top-0 z-40">
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -96,11 +92,11 @@ const YieldForecastScreen = () => {
                 <ArrowLeft className="w-4 h-4" />
               </Button>
               <div>
-                <h1 className="text-lg font-bold text-green-900">Yield Forecast</h1>
-                <p className="text-sm text-green-700">AI-powered harvest predictions</p>
+                <h1 className="text-lg font-bold text-gray-900">Yield Forecast</h1>
+                <p className="text-sm text-gray-600">AI-powered harvest predictions</p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={fetchForecastData}>
+            <Button variant="outline" size="sm" onClick={fetchForecastData} className="rounded-xl">
               <RefreshCw className="w-4 h-4" />
             </Button>
           </div>
@@ -110,54 +106,51 @@ const YieldForecastScreen = () => {
       <ScrollArea className="h-[calc(100vh-80px)]">
         <div className="p-4 space-y-6">
           {/* Current Season Overview */}
-          <Card className="border-green-200 bg-gradient-to-r from-green-50 to-yellow-50">
-            <CardHeader>
+          <Card className="border-0 shadow-sm bg-green-500 text-white">
+            <CardHeader className="pb-4">
               <CardTitle className="flex items-center space-x-2">
-                <Leaf className="w-5 h-5 text-green-600" />
+                <Leaf className="w-5 h-5 text-white" />
                 <span>Current Season Forecast</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-green-800">
+                  <div className="text-3xl font-bold">
                     {forecastData.currentSeason.projectedYield} lbs
                   </div>
-                  <div className="text-sm text-green-600">Projected Yield</div>
+                  <div className="text-sm text-green-100">Projected Yield</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-semibold text-green-800">
+                  <div className="text-lg font-semibold">
                     {forecastData.currentSeason.harvestDate}
                   </div>
-                  <div className="text-sm text-green-600">Est. Harvest Date</div>
+                  <div className="text-sm text-green-100">Est. Harvest Date</div>
                 </div>
               </div>
               
-              <div className="mt-4 flex items-center justify-between">
-                <Badge className="bg-green-100 text-green-800">
+              <div className="mb-4">
+                <Badge className="bg-white/20 text-white">
                   {forecastData.currentSeason.confidence}% Confidence
                 </Badge>
-                <div className="text-sm text-gray-600 capitalize">
-                  {forecastData.currentSeason.crop}
-                </div>
               </div>
 
-              <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                <div className="p-2 bg-white rounded">
-                  <div className="text-xs text-gray-500">Weather</div>
-                  <div className="font-medium text-green-700">
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="p-2 bg-white/10 backdrop-blur-sm rounded-xl">
+                  <div className="text-xs text-green-100">Weather</div>
+                  <div className="font-medium">
                     {forecastData.currentSeason.factors.weather}
                   </div>
                 </div>
-                <div className="p-2 bg-white rounded">
-                  <div className="text-xs text-gray-500">Soil Health</div>
-                  <div className="font-medium text-green-700">
+                <div className="p-2 bg-white/10 backdrop-blur-sm rounded-xl">
+                  <div className="text-xs text-green-100">Soil Health</div>
+                  <div className="font-medium">
                     {forecastData.currentSeason.factors.soilHealth}
                   </div>
                 </div>
-                <div className="p-2 bg-white rounded">
-                  <div className="text-xs text-gray-500">Irrigation</div>
-                  <div className="font-medium text-green-700">
+                <div className="p-2 bg-white/10 backdrop-blur-sm rounded-xl">
+                  <div className="text-xs text-green-100">Irrigation</div>
+                  <div className="font-medium">
                     {forecastData.currentSeason.factors.irrigation}
                   </div>
                 </div>
@@ -167,14 +160,14 @@ const YieldForecastScreen = () => {
 
           {/* Charts */}
           <Tabs defaultValue="monthly" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="monthly">Monthly Forecast</TabsTrigger>
-              <TabsTrigger value="historical">Historical</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-white border border-gray-200 rounded-xl">
+              <TabsTrigger value="monthly" className="rounded-xl">Monthly Forecast</TabsTrigger>
+              <TabsTrigger value="historical" className="rounded-xl">Historical</TabsTrigger>
             </TabsList>
             
             <TabsContent value="monthly">
-              <Card className="border-blue-200 bg-white/80">
-                <CardHeader>
+              <Card className="border-0 shadow-sm bg-white">
+                <CardHeader className="pb-4">
                   <CardTitle className="flex items-center space-x-2">
                     <BarChart3 className="w-5 h-5 text-blue-600" />
                     <span>Monthly Yield Projection</span>
@@ -183,17 +176,17 @@ const YieldForecastScreen = () => {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={200}>
                     <BarChart data={forecastData.monthlyForecast}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />
-                      <XAxis dataKey="month" stroke="#6b7280" />
-                      <YAxis stroke="#6b7280" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis dataKey="month" stroke="#64748b" />
+                      <YAxis stroke="#64748b" />
                       <Tooltip 
                         contentStyle={{ 
                           backgroundColor: '#f8fafc',
                           border: '1px solid #e2e8f0',
-                          borderRadius: '8px'
+                          borderRadius: '12px'
                         }}
                       />
-                      <Bar dataKey="yield" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="yield" fill="#22c55e" radius={[8, 8, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -201,8 +194,8 @@ const YieldForecastScreen = () => {
             </TabsContent>
 
             <TabsContent value="historical">
-              <Card className="border-purple-200 bg-white/80">
-                <CardHeader>
+              <Card className="border-0 shadow-sm bg-white">
+                <CardHeader className="pb-4">
                   <CardTitle className="flex items-center space-x-2">
                     <TrendingUp className="w-5 h-5 text-purple-600" />
                     <span>Year-over-Year Comparison</span>
@@ -211,23 +204,17 @@ const YieldForecastScreen = () => {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={200}>
                     <LineChart data={forecastData.historicalComparison}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f3e8ff" />
-                      <XAxis dataKey="year" stroke="#6b7280" />
-                      <YAxis stroke="#6b7280" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis dataKey="year" stroke="#64748b" />
+                      <YAxis stroke="#64748b" />
                       <Tooltip 
                         contentStyle={{ 
-                          backgroundColor: '#faf5ff',
-                          border: '1px solid #e9d5ff',
-                          borderRadius: '8px'
+                          backgroundColor: '#f8fafc',
+                          border: '1px solid #e2e8f0',
+                          borderRadius: '12px'
                         }}
                       />
-                      <Line 
-                        type="monotone" 
-                        dataKey="yield" 
-                        stroke="#8b5cf6" 
-                        strokeWidth={3}
-                        dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 4 }}
-                      />
+                      <Line type="monotone" dataKey="yield" stroke="#8b5cf6" strokeWidth={3} dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 6 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -236,19 +223,16 @@ const YieldForecastScreen = () => {
           </Tabs>
 
           {/* Optimization Tips */}
-          <Card className="border-orange-200 bg-orange-50">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <AlertCircle className="w-5 h-5 text-orange-600" />
-                <span>Optimization Tips</span>
-              </CardTitle>
+          <Card className="border-0 shadow-sm bg-white">
+            <CardHeader className="pb-4">
+              <CardTitle>Optimization Tips</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-3">
                 {forecastData.optimizationTips.map((tip: string, index: number) => (
-                  <li key={index} className="flex items-start space-x-2">
-                    <div className="w-1.5 h-1.5 bg-orange-600 rounded-full mt-2 flex-shrink-0" />
-                    <span className="text-sm text-orange-800">{tip}</span>
+                  <li key={index} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-xl">
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">{tip}</span>
                   </li>
                 ))}
               </ul>

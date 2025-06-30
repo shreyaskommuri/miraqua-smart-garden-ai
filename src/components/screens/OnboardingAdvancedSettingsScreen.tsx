@@ -40,9 +40,9 @@ const OnboardingAdvancedSettingsScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <Button 
@@ -83,7 +83,7 @@ const OnboardingAdvancedSettingsScreen = () => {
 
         {/* Intro */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Settings className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Fine-tune Your Garden</h2>
@@ -91,7 +91,7 @@ const OnboardingAdvancedSettingsScreen = () => {
         </div>
 
         {/* Root Depth */}
-        <Card className="border-0 shadow-md mb-6">
+        <Card className="border-0 shadow-sm bg-white mb-6">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg flex items-center space-x-2">
               <Droplets className="w-5 h-5 text-blue-600" />
@@ -121,7 +121,7 @@ const OnboardingAdvancedSettingsScreen = () => {
         </Card>
 
         {/* Soil pH */}
-        <Card className="border-0 shadow-md mb-6">
+        <Card className="border-0 shadow-sm bg-white mb-6">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg flex items-center space-x-2">
               <Thermometer className="w-5 h-5 text-orange-600" />
@@ -152,7 +152,7 @@ const OnboardingAdvancedSettingsScreen = () => {
         </Card>
 
         {/* Soil Type */}
-        <Card className="border-0 shadow-md mb-8">
+        <Card className="border-0 shadow-sm bg-white mb-8">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg">Soil Type</CardTitle>
           </CardHeader>
@@ -161,10 +161,10 @@ const OnboardingAdvancedSettingsScreen = () => {
               {soilTypes.map((soil) => (
                 <Card
                   key={soil.id}
-                  className={`cursor-pointer transition-all duration-200 ${
+                  className={`cursor-pointer transition-all duration-200 border-0 shadow-sm ${
                     soilType === soil.id
-                      ? "border-purple-500 bg-purple-50 shadow-lg"
-                      : "border-gray-200 hover:shadow-md"
+                      ? "bg-purple-50 ring-2 ring-purple-500"
+                      : "bg-white hover:shadow-md"
                   }`}
                   onClick={() => setSoilType(soil.id)}
                 >
@@ -187,7 +187,7 @@ const OnboardingAdvancedSettingsScreen = () => {
         <div className="space-y-3">
           <Button
             onClick={handleContinue}
-            className="w-full h-12 bg-purple-600 hover:bg-purple-700 text-white font-medium"
+            className="w-full h-12 bg-purple-500 hover:bg-purple-600 text-white font-medium rounded-xl"
           >
             Complete Setup
             <ArrowRight className="w-4 h-4 ml-2" />
@@ -196,7 +196,7 @@ const OnboardingAdvancedSettingsScreen = () => {
           <Button
             onClick={handleSkip}
             variant="outline"
-            className="w-full h-10 border-gray-300 text-gray-700"
+            className="w-full h-10 border-gray-300 text-gray-700 rounded-xl"
           >
             Skip Advanced Settings
           </Button>

@@ -16,7 +16,7 @@ import {
   Bug,
   Droplets
 } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 const PlantHealthScannerScreen = () => {
   const navigate = useNavigate();
@@ -83,16 +83,16 @@ const PlantHealthScannerScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      <header className="bg-white/90 backdrop-blur-sm border-b border-green-200 sticky top-0 z-40">
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="px-4 py-4">
           <div className="flex items-center space-x-3">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div>
-              <h1 className="text-lg font-bold text-green-900">Plant Health Scanner</h1>
-              <p className="text-sm text-green-700">AI-powered plant diagnosis</p>
+              <h1 className="text-lg font-bold text-gray-900">Plant Health Scanner</h1>
+              <p className="text-sm text-gray-600">AI-powered plant diagnosis</p>
             </div>
           </div>
         </div>
@@ -101,13 +101,13 @@ const PlantHealthScannerScreen = () => {
       <ScrollArea className="h-[calc(100vh-80px)]">
         <div className="p-4 space-y-6">
           {!uploadedImage ? (
-            <Card className="border-green-200 bg-white/80 backdrop-blur-sm">
+            <Card className="border-0 shadow-sm bg-white">
               <CardContent className="p-8 text-center">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Camera className="w-10 h-10 text-green-600" />
                 </div>
-                <h2 className="text-xl font-bold text-green-900 mb-2">Scan Your Plant</h2>
-                <p className="text-green-700 mb-6">Take a clear photo of your plant's leaves for AI analysis</p>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Scan Your Plant</h2>
+                <p className="text-gray-600 mb-6">Take a clear photo of your plant's leaves for AI analysis</p>
                 
                 <input
                   type="file"
@@ -120,12 +120,12 @@ const PlantHealthScannerScreen = () => {
                 <div className="space-y-3">
                   <Button 
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="w-full bg-green-500 hover:bg-green-600 rounded-xl"
                   >
                     <Upload className="w-4 h-4 mr-2" />
                     Upload Photo
                   </Button>
-                  <Button variant="outline" className="w-full border-green-300 text-green-700">
+                  <Button variant="outline" className="w-full border-gray-200 text-gray-700 rounded-xl">
                     <Camera className="w-4 h-4 mr-2" />
                     Take Photo
                   </Button>
@@ -134,18 +134,18 @@ const PlantHealthScannerScreen = () => {
             </Card>
           ) : (
             <>
-              <Card className="border-green-200 bg-white/80">
+              <Card className="border-0 shadow-sm bg-white">
                 <CardContent className="p-4">
                   <img 
                     src={uploadedImage} 
                     alt="Uploaded plant" 
-                    className="w-full h-48 object-cover rounded-lg"
+                    className="w-full h-48 object-cover rounded-xl"
                   />
                 </CardContent>
               </Card>
 
               {isScanning && (
-                <Card className="border-blue-200 bg-blue-50">
+                <Card className="border-0 shadow-sm bg-blue-50">
                   <CardContent className="p-6 text-center">
                     <Loader2 className="w-8 h-8 text-blue-600 mx-auto mb-3 animate-spin" />
                     <p className="text-blue-800 font-medium">Analyzing plant health...</p>
@@ -156,8 +156,8 @@ const PlantHealthScannerScreen = () => {
 
               {scanResult && (
                 <div className="space-y-4">
-                  <Card className="border-green-200 bg-green-50">
-                    <CardHeader>
+                  <Card className="border-0 shadow-sm bg-green-50">
+                    <CardHeader className="pb-4">
                       <CardTitle className="flex items-center space-x-2">
                         <CheckCircle className="w-5 h-5 text-green-600" />
                         <span>Overall Health: {scanResult.overallHealth}</span>
@@ -179,8 +179,8 @@ const PlantHealthScannerScreen = () => {
                   </Card>
 
                   {scanResult.issues.length > 0 && (
-                    <Card className="border-orange-200 bg-orange-50">
-                      <CardHeader>
+                    <Card className="border-0 shadow-sm bg-orange-50">
+                      <CardHeader className="pb-4">
                         <CardTitle className="flex items-center space-x-2">
                           <AlertTriangle className="w-5 h-5 text-orange-600" />
                           <span>Issues Detected</span>
@@ -189,7 +189,7 @@ const PlantHealthScannerScreen = () => {
                       <CardContent>
                         <div className="space-y-3">
                           {scanResult.issues.map((issue: any, index: number) => (
-                            <div key={index} className="p-3 bg-white rounded-lg border border-orange-200">
+                            <div key={index} className="p-4 bg-white rounded-xl border border-orange-200">
                               <div className="flex items-start justify-between mb-2">
                                 <div className="flex items-center space-x-2">
                                   <issue.icon className="w-4 h-4 text-orange-600" />
@@ -212,8 +212,8 @@ const PlantHealthScannerScreen = () => {
                     </Card>
                   )}
 
-                  <Card className="border-blue-200 bg-blue-50">
-                    <CardHeader>
+                  <Card className="border-0 shadow-sm bg-blue-50">
+                    <CardHeader className="pb-4">
                       <CardTitle className="flex items-center space-x-2">
                         <Droplets className="w-5 h-5 text-blue-600" />
                         <span>Recommendations</span>

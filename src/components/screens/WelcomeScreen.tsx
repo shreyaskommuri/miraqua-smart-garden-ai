@@ -41,68 +41,56 @@ const WelcomeScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-purple-50 overflow-hidden relative">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-gradient-to-tr from-green-200/30 to-blue-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      </div>
-
-      {/* Scrollable Content */}
+    <div className="min-h-screen bg-gray-50">
       <ScrollArea className="h-screen">
-        <div className="relative z-10 px-6 py-12 pb-32 min-h-screen">
+        <div className="px-6 py-12 pb-32 min-h-screen">
           {/* Hero Section */}
-          <div className="text-center mb-8 mt-8">
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-500 via-green-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
-              <Droplets className="w-12 h-12 text-white" />
+          <div className="text-center mb-12 mt-8">
+            <div className="w-20 h-20 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Droplets className="w-10 h-10 text-white" />
             </div>
             
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
               Welcome to
-              <span className="block bg-gradient-to-r from-blue-600 via-green-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="block text-green-600 mt-2">
                 Miraqua
               </span>
             </h1>
             
-            <p className="text-xl text-gray-600 max-w-sm mx-auto leading-relaxed">
+            <p className="text-lg text-gray-600 max-w-sm mx-auto leading-relaxed">
               The smartest way to water your garden. Save water, grow better, live sustainably.
             </p>
           </div>
 
-          {/* Why Miraqua Benefits */}
-          <div className="flex-1 mb-8">
-            <div className="grid grid-cols-1 gap-4 max-w-md mx-auto">
-              {features.map((feature, index) => {
-                const Icon = feature.icon;
-                return (
-                  <Card 
-                    key={index} 
-                    className="border-0 shadow-xl bg-white/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
-                  >
-                    <CardContent className="p-5">
-                      <div className="flex items-start space-x-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                          <Icon className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                            {feature.title}
-                          </h3>
-                          <p className="text-gray-600 text-sm leading-relaxed">
-                            {feature.description}
-                          </p>
-                        </div>
-                        <Check className="w-5 h-5 text-green-500 mt-1" />
+          {/* Features */}
+          <div className="space-y-6 mb-12">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <Card key={index} className="border-0 shadow-sm bg-white">
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-6 h-6 text-green-600" />
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          {feature.title}
+                        </h3>
+                        <p className="text-gray-600 text-sm leading-relaxed">
+                          {feature.description}
+                        </p>
+                      </div>
+                      <Check className="w-5 h-5 text-green-500 mt-1" />
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
-          {/* Stats Preview */}
-          <Card className="border-0 shadow-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white mb-8 mx-auto max-w-md w-full">
+          {/* Stats */}
+          <Card className="border-0 bg-green-500 text-white mb-8">
             <CardContent className="p-6">
               <h3 className="text-lg font-bold mb-4 text-center">Join Thousands of Smart Gardeners</h3>
               <div className="grid grid-cols-3 gap-4 text-center">
@@ -121,20 +109,14 @@ const WelcomeScreen = () => {
               </div>
             </CardContent>
           </Card>
-
-          <div className="text-center pt-4">
-            <p className="text-xs text-gray-500">
-              No credit card required • Start in under 2 minutes • Cancel anytime
-            </p>
-          </div>
         </div>
       </ScrollArea>
 
-      {/* Sticky Get Started Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 p-6 space-y-4">
+      {/* Action Buttons */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-6 space-y-4">
         <Button
           onClick={handleGetStarted}
-          className="w-full h-14 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white text-lg font-semibold shadow-xl hover:shadow-2xl transition-all duration-300"
+          className="w-full h-12 bg-green-500 hover:bg-green-600 text-white text-lg font-medium rounded-xl"
         >
           Get Started - It's Free
           <ArrowRight className="w-5 h-5 ml-2" />
@@ -143,7 +125,7 @@ const WelcomeScreen = () => {
         <Button
           onClick={handleSignIn}
           variant="outline"
-          className="w-full h-12 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300"
+          className="w-full h-12 border-gray-300 text-gray-700 rounded-xl"
         >
           I Already Have an Account
         </Button>

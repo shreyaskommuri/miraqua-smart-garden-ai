@@ -5,9 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, ArrowRight, Leaf, HelpCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Leaf } from "lucide-react";
 
 const OnboardingCropScreen = () => {
   const navigate = useNavigate();
@@ -52,9 +51,9 @@ const OnboardingCropScreen = () => {
   const isFormValid = plotName.length >= 3 && cropType;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      {/* Progress Header - Sticky */}
-      <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <Button 
@@ -85,7 +84,7 @@ const OnboardingCropScreen = () => {
         <div className="px-6 py-6 space-y-8 pb-32">
           {/* Intro */}
           <div className="text-center">
-            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Leaf className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">Let's Create Your Garden Plot</h2>
@@ -93,9 +92,9 @@ const OnboardingCropScreen = () => {
           </div>
 
           {/* Plot Name */}
-          <Card className="border-0 shadow-md">
-            <CardHeader>
-              <CardTitle>Plot Name</CardTitle>
+          <Card className="border-0 shadow-sm bg-white">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg">Plot Name</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -108,7 +107,7 @@ const OnboardingCropScreen = () => {
                     setPlotName(e.target.value);
                     if (errors.plotName) setErrors(prev => ({ ...prev, plotName: '' }));
                   }}
-                  className={errors.plotName ? "border-red-500" : ""}
+                  className={`rounded-xl ${errors.plotName ? "border-red-500" : ""}`}
                   maxLength={50}
                 />
                 {errors.plotName && <p className="text-sm text-red-600">{errors.plotName}</p>}
@@ -118,22 +117,19 @@ const OnboardingCropScreen = () => {
           </Card>
 
           {/* Crop Type */}
-          <Card className="border-0 shadow-md">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <span>What are you growing?</span>
-                <HelpCircle className="w-4 h-4 text-gray-400" />
-              </CardTitle>
+          <Card className="border-0 shadow-sm bg-white">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg">What are you growing?</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 {crops.map((crop) => (
                   <Card
                     key={crop.id}
-                    className={`cursor-pointer transition-all duration-200 ${
+                    className={`cursor-pointer transition-all duration-200 border-0 shadow-sm ${
                       cropType === crop.id
-                        ? "border-green-500 bg-green-50 shadow-lg"
-                        : "border-gray-200 hover:shadow-md"
+                        ? "bg-green-50 ring-2 ring-green-500"
+                        : "bg-white hover:shadow-md"
                     }`}
                     onClick={() => {
                       setCropType(crop.id);
@@ -154,12 +150,12 @@ const OnboardingCropScreen = () => {
         </div>
       </ScrollArea>
 
-      {/* Sticky Next Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-6">
+      {/* Next Button */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-6">
         <Button
           onClick={handleNext}
           disabled={!isFormValid}
-          className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-medium disabled:bg-gray-300"
+          className="w-full h-12 bg-green-500 hover:bg-green-600 text-white font-medium rounded-xl disabled:bg-gray-300"
         >
           Next: Choose Location
           <ArrowRight className="w-4 h-4 ml-2" />
