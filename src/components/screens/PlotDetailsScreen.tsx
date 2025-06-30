@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,7 +25,8 @@ import {
   Activity,
   Leaf,
   Zap,
-  Calendar
+  Calendar,
+  BarChart3
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -167,10 +167,10 @@ const PlotDetailsScreen = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50 to-blue-50 pt-16 lg:pt-0 lg:pl-72">
-        <div className="p-6 space-y-6">
+      <div className="min-h-screen bg-gray-50 pt-16 lg:pt-0 lg:pl-72">
+        <div className="p-4 space-y-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-32 bg-white/60 rounded-3xl animate-pulse backdrop-blur-sm"></div>
+            <div key={i} className="h-32 bg-white rounded-xl animate-pulse shadow-sm"></div>
           ))}
         </div>
       </div>
@@ -179,21 +179,14 @@ const PlotDetailsScreen = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50 to-blue-50 pt-16 lg:pt-0 lg:pl-72">
-        <div className="p-6">
-          <Card className="border-0 shadow-xl rounded-3xl bg-gradient-to-br from-red-50 to-rose-50 border-red-100">
-            <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertTriangle className="w-8 h-8 text-red-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-red-800 mb-2">Oops! Something went wrong</h3>
-              <p className="text-red-600 mb-6">{error}</p>
-              <Button 
-                variant="outline" 
-                onClick={fetchPlotData}
-                className="bg-white hover:bg-red-50 border-red-200 text-red-700 rounded-2xl"
-              >
-                <RefreshCw className="w-4 h-4 mr-2" />
+      <div className="min-h-screen bg-gray-50 pt-16 lg:pt-0 lg:pl-72">
+        <div className="p-4">
+          <Card className="border-0 shadow-lg bg-red-50">
+            <CardContent className="p-6 text-center">
+              <AlertTriangle className="w-12 h-12 text-red-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-red-800 mb-2">Something went wrong</h3>
+              <p className="text-red-600 mb-4">{error}</p>
+              <Button variant="outline" onClick={fetchPlotData}>
                 Try Again
               </Button>
             </CardContent>
@@ -204,82 +197,114 @@ const PlotDetailsScreen = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50 to-blue-50 pt-16 lg:pt-0 lg:pl-72">
-      {/* Modern Header */}
-      <header className="bg-white/95 backdrop-blur-xl border-b border-white/20 sticky top-16 lg:top-0 z-30 shadow-sm">
-        <div className="px-6 py-6">
+    <div className="min-h-screen bg-gray-50 pt-16 lg:pt-0 lg:pl-72">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-100 sticky top-16 lg:top-0 z-30">
+        <div className="px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="rounded-2xl p-2 hover:bg-slate-100">
-                <ArrowLeft className="w-5 h-5" />
+            <div className="flex items-center space-x-3">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-4 h-4" />
               </Button>
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                <span className="text-2xl">🍅</span>
+              </div>
               <div>
-                <h1 className="text-2xl font-bold text-slate-900">
-                  {plotData?.name}
-                </h1>
-                <div className="flex items-center space-x-3 mt-1">
-                  <span className="text-slate-600">{plotData?.crop}</span>
-                  <Badge className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-full px-3">
-                    {plotData?.efficiency}% Efficient
-                  </Badge>
-                </div>
+                <h1 className="text-xl font-bold text-gray-900">{plotData?.name}</h1>
+                <p className="text-sm text-gray-500">{plotData?.crop}</p>
               </div>
             </div>
-            <div className="flex space-x-3">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => navigate(`/chat?plotId=${plotId}`)}
-                className="rounded-2xl border-blue-200 text-blue-700 hover:bg-blue-50"
-              >
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Ask AI
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" size="sm" onClick={() => navigate(`/plot/${plotId}/settings`)}>
+                <Settings className="w-4 h-4" />
               </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => navigate(`/plot/${plotId}/settings`)}
-                className="rounded-2xl border-slate-200 text-slate-700 hover:bg-slate-50"
-              >
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
+              <Button variant="ghost" size="sm">
+                <MessageSquare className="w-4 h-4" />
               </Button>
             </div>
           </div>
         </div>
       </header>
 
-      <ScrollArea className="h-[calc(100vh-200px)]">
-        <div className="px-6 py-8 space-y-8 pb-32">
-          {/* Hero Stats Card */}
-          <Card className="border-0 shadow-xl rounded-3xl bg-gradient-to-br from-emerald-500 via-emerald-600 to-blue-600 text-white overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
-            <CardContent className="p-8 relative z-10">
-              <div className="grid grid-cols-2 gap-8">
-                <div>
-                  <div className="text-sm text-emerald-100 mb-2">Plant Health Score</div>
-                  <div className="text-4xl font-bold mb-4">{plotData?.healthScore}%</div>
-                  <div className="flex items-center space-x-4 text-sm text-emerald-100">
-                    <div className="flex items-center">
-                      <Leaf className="w-4 h-4 mr-1" />
-                      {plotData?.cropAge}
-                    </div>
-                    <div className="flex items-center">
-                      <Droplets className="w-4 h-4 mr-1" />
-                      {plotData?.lastWatered}
-                    </div>
+      <ScrollArea className="h-[calc(100vh-140px)]">
+        <div className="p-4 space-y-6 pb-20">
+          {/* Ideal Conditions Card */}
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Ideal Conditions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-blue-50 rounded-xl">
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <Thermometer className="w-4 h-4 text-blue-600" />
                   </div>
+                  <div className="text-2xl font-bold text-blue-900 mb-1">{plotData?.currentTemp}°F</div>
+                  <div className="text-xs text-blue-700">Temperature</div>
                 </div>
-                <div className="text-right">
-                  <div className="text-sm text-emerald-100 mb-2">GPS Location</div>
-                  <div 
-                    className="text-lg font-mono cursor-pointer hover:text-white transition-colors"
-                    onClick={copyCoordinates}
-                  >
-                    {plotData?.location}
+                <div className="text-center p-4 bg-green-50 rounded-xl">
+                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <Sun className="w-4 h-4 text-green-600" />
                   </div>
-                  <div className="text-sm text-emerald-100 mt-2">Tap to copy</div>
+                  <div className="text-2xl font-bold text-green-900 mb-1">{plotData?.currentSunlight}%</div>
+                  <div className="text-xs text-green-700">Sunlight</div>
+                </div>
+                <div className="text-center p-4 bg-cyan-50 rounded-xl">
+                  <div className="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <Droplets className="w-4 h-4 text-cyan-600" />
+                  </div>
+                  <div className="text-2xl font-bold text-cyan-900 mb-1">{plotData?.currentMoisture}%</div>
+                  <div className="text-xs text-cyan-700">Water</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Growth Timeline */}
+          <Card className="border-0 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Growth Timeline</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="relative">
+                <div className="absolute left-4 top-8 bottom-0 w-0.5 bg-gray-200"></div>
+                <div className="space-y-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center z-10">
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">Week 1</p>
+                      <p className="text-sm text-gray-500">Germination completed</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center z-10">
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">Week 3</p>
+                      <p className="text-sm text-gray-500">First leaves appeared</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center z-10">
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">Week 6</p>
+                      <p className="text-sm text-gray-500">Currently flowering</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center z-10">
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-500">Week 10</p>
+                      <p className="text-sm text-gray-400">Expected harvest</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -287,169 +312,123 @@ const PlotDetailsScreen = () => {
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="sticky top-32 z-20 bg-white/95 backdrop-blur-xl -mx-6 px-6 py-4 border-b border-white/20">
-              <TabsList className="grid w-full grid-cols-3 bg-slate-100 rounded-2xl p-1">
-                <TabsTrigger 
-                  value="overview" 
-                  className="rounded-xl font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
-                >
-                  Overview
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="sensors" 
-                  className="rounded-xl font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
-                >
-                  Sensors
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="schedule" 
-                  className="rounded-xl font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
-                >
-                  Schedule
-                </TabsTrigger>
-              </TabsList>
-            </div>
+            <TabsList className="grid w-full grid-cols-3 bg-gray-100 rounded-xl p-1">
+              <TabsTrigger value="overview" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="activity" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                Activity Log
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                Analytics
+              </TabsTrigger>
+            </TabsList>
 
-            <TabsContent value="overview" className="mt-8 space-y-6">
-              {/* Current Conditions */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="border-0 shadow-lg rounded-3xl bg-gradient-to-br from-blue-50 to-blue-100 overflow-hidden">
-                  <CardContent className="p-8 text-center">
-                    <div className="w-16 h-16 bg-blue-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                      <Droplets className="w-8 h-8 text-white" />
-                    </div>
-                    <div className="text-3xl font-bold text-blue-900 mb-2">{plotData?.currentMoisture}%</div>
-                    <div className="text-blue-700 font-medium mb-4">Soil Moisture</div>
-                    <div className="flex items-center justify-center text-sm">
-                      <TrendingUp className="w-4 h-4 text-emerald-600 mr-1" />
-                      <span className="text-emerald-600 font-medium">+5% vs yesterday</span>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card className="border-0 shadow-lg rounded-3xl bg-gradient-to-br from-orange-50 to-orange-100 overflow-hidden">
-                  <CardContent className="p-8 text-center">
-                    <div className="w-16 h-16 bg-orange-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                      <Thermometer className="w-8 h-8 text-white" />
-                    </div>
-                    <div className="text-3xl font-bold text-orange-900 mb-2">{plotData?.currentTemp}°F</div>
-                    <div className="text-orange-700 font-medium mb-4">Temperature</div>
-                    <div className="flex items-center justify-center text-sm">
-                      <Activity className="w-4 h-4 text-blue-600 mr-1" />
-                      <span className="text-blue-600 font-medium">Optimal range</span>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card className="border-0 shadow-lg rounded-3xl bg-gradient-to-br from-yellow-50 to-yellow-100 overflow-hidden">
-                  <CardContent className="p-8 text-center">
-                    <div className="w-16 h-16 bg-yellow-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                      <Sun className="w-8 h-8 text-white" />
-                    </div>
-                    <div className="text-3xl font-bold text-yellow-900 mb-2">{plotData?.currentSunlight}%</div>
-                    <div className="text-yellow-700 font-medium mb-4">Sunlight</div>
-                    <div className="flex items-center justify-center text-sm">
-                      <TrendingUp className="w-4 h-4 text-emerald-600 mr-1" />
-                      <span className="text-emerald-600 font-medium">Perfect exposure</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Next Watering */}
-              <Card className="border-0 shadow-lg rounded-3xl bg-gradient-to-br from-emerald-50 to-emerald-100 overflow-hidden">
-                <CardContent className="p-8">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-16 h-16 bg-emerald-500 rounded-3xl flex items-center justify-center">
-                        <Calendar className="w-8 h-8 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-emerald-900 mb-1">Next Watering</h3>
-                        <p className="text-emerald-700">{plotData?.nextWatering}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-emerald-900">{plotData?.totalWaterToday}L</div>
-                      <div className="text-sm text-emerald-700">Today's usage</div>
-                    </div>
+            <TabsContent value="overview" className="mt-6 space-y-6">
+              <Card className="border-0 shadow-sm">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold">Next Watering</h3>
+                    <Button
+                      onClick={handleWaterNow}
+                      disabled={watering}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl"
+                    >
+                      {watering ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+                      {watering ? "Watering..." : "Water Now"}
+                    </Button>
                   </div>
+                  <p className="text-2xl font-bold text-gray-900 mb-2">{plotData?.nextWatering}</p>
+                  <p className="text-gray-600">Scheduled automatic watering</p>
                 </CardContent>
               </Card>
-            </TabsContent>
 
-            <TabsContent value="sensors" className="mt-8 space-y-6">
-              {/* Soil Analysis */}
-              <Card className="border-0 shadow-lg rounded-3xl bg-white/80 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Zap className="w-6 h-6 text-purple-600" />
-                    <span>Soil Analysis</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <div className="text-sm text-slate-600 mb-2">pH Level</div>
-                      <div className="text-3xl font-bold text-slate-900 mb-1">{plotData?.soilPh}</div>
-                      <div className="text-sm text-emerald-600">Optimal range</div>
-                    </div>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Nitrogen</span>
-                          <span>{plotData?.nutrients.nitrogen}%</span>
-                        </div>
-                        <div className="w-full bg-slate-200 rounded-full h-2">
-                          <div className="bg-blue-500 h-2 rounded-full" style={{width: `${plotData?.nutrients.nitrogen}%`}}></div>
-                        </div>
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Phosphorus</span>
-                          <span>{plotData?.nutrients.phosphorus}%</span>
-                        </div>
-                        <div className="w-full bg-slate-200 rounded-full h-2">
-                          <div className="bg-emerald-500 h-2 rounded-full" style={{width: `${plotData?.nutrients.phosphorus}%`}}></div>
-                        </div>
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Potassium</span>
-                          <span>{plotData?.nutrients.potassium}%</span>
-                        </div>
-                        <div className="w-full bg-slate-200 rounded-full h-2">
-                          <div className="bg-orange-500 h-2 rounded-full" style={{width: `${plotData?.nutrients.potassium}%`}}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="schedule" className="mt-8 space-y-6">
               <CalendarSchedule 
-                schedule={plotData?.schedule}
-                onDayClick={(day) => navigate(`/plot/${plotId}/day/${day.date}?lat=${latitude}&lon=${longitude}&date=${day.date}`)}
+                schedule={plotData?.schedule || []} 
+                onDayClick={handleDayClick}
               />
 
-              {/* Weekly Summary */}
-              <div className="grid grid-cols-2 gap-6">
-                <Card className="border-0 shadow-lg rounded-3xl bg-gradient-to-br from-emerald-50 to-emerald-100">
-                  <CardContent className="p-8 text-center">
-                    <div className="text-3xl font-bold text-emerald-900 mb-2">{plotData?.totalWaterToday}L</div>
-                    <div className="text-emerald-700 font-medium">Today's Water</div>
-                  </CardContent>
-                </Card>
-                
-                <Card className="border-0 shadow-lg rounded-3xl bg-gradient-to-br from-blue-50 to-blue-100">
-                  <CardContent className="p-8 text-center">
-                    <div className="text-3xl font-bold text-blue-900 mb-2">{plotData?.weeklyTotal}L</div>
-                    <div className="text-blue-700 font-medium">Weekly Total</div>
-                  </CardContent>
-                </Card>
-              </div>
+              <Card className="border-0 shadow-sm">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold">Location</h3>
+                    <Button variant="ghost" size="sm" onClick={copyCoordinates}>
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="flex items-center space-x-2 mb-4">
+                    <MapPin className="w-4 h-4 text-gray-500" />
+                    <span className="text-gray-700">{plotData?.location}</span>
+                  </div>
+                  <MiniMap latitude={latitude} longitude={longitude} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="activity" className="mt-6">
+              <Card className="border-0 shadow-sm">
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-xl">
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <Droplets className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">Watering completed</p>
+                        <p className="text-sm text-gray-500">15L water applied • 2 hours ago</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3 p-3 bg-green-50 rounded-xl">
+                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                        <TrendingUp className="w-4 h-4 text-green-600" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">Moisture level improved</p>
+                        <p className="text-sm text-gray-500">From 45% to 68% • 3 hours ago</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3 p-3 bg-orange-50 rounded-xl">
+                      <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <AlertTriangle className="w-4 h-4 text-orange-600" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">Low moisture alert</p>
+                        <p className="text-sm text-gray-500">Moisture dropped to 45% • 5 hours ago</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="analytics" className="mt-6">
+              <Card className="border-0 shadow-sm">
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">Analytics</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 bg-blue-50 rounded-xl">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <BarChart3 className="w-4 h-4 text-blue-600" />
+                        <span className="font-medium text-blue-900">Water Usage</span>
+                      </div>
+                      <p className="text-2xl font-bold text-blue-900">{plotData?.totalWaterToday}L</p>
+                      <p className="text-sm text-blue-700">Today</p>
+                    </div>
+                    
+                    <div className="p-4 bg-green-50 rounded-xl">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <TrendingUp className="w-4 h-4 text-green-600" />
+                        <span className="font-medium text-green-900">Efficiency</span>
+                      </div>
+                      <p className="text-2xl font-bold text-green-900">{plotData?.efficiency}%</p>
+                      <p className="text-sm text-green-700">This week</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>

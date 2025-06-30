@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Droplets, Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
+import { Leaf, Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
 
 const SignInScreen = () => {
   const navigate = useNavigate();
@@ -43,7 +43,6 @@ const SignInScreen = () => {
     setError("");
     
     try {
-      // Simulate API call - accept any credentials for demo
       await new Promise(resolve => setTimeout(resolve, 1500));
       navigate("/home");
     } catch (err) {
@@ -73,25 +72,25 @@ const SignInScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Droplets className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Leaf className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
-          <p className="text-gray-600 mt-2">Sign in to your Miraqua account</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+          <p className="text-gray-600">Sign in to your Miraqua account</p>
         </div>
 
-        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+        <Card className="border-0 shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="text-xl text-center text-gray-800">Sign In</CardTitle>
             <p className="text-sm text-center text-gray-600">Enter any credentials to continue</p>
           </CardHeader>
           <CardContent className="space-y-6">
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
                 <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
@@ -107,7 +106,7 @@ const SignInScreen = () => {
                     placeholder="Enter your email"
                     value={formData.email}
                     onChange={(e) => updateFormData("email", e.target.value)}
-                    className={`pl-10 h-12 border-gray-200 focus:border-blue-500 ${errors.email ? 'border-red-500' : ''}`}
+                    className={`pl-10 h-12 border-gray-200 rounded-xl focus:border-green-500 ${errors.email ? 'border-red-500' : ''}`}
                     disabled={isLoading}
                     required
                   />
@@ -125,7 +124,7 @@ const SignInScreen = () => {
                     placeholder="Enter your password"
                     value={formData.password}
                     onChange={(e) => updateFormData("password", e.target.value)}
-                    className={`pl-10 pr-10 h-12 border-gray-200 focus:border-blue-500 ${errors.password ? 'border-red-500' : ''}`}
+                    className={`pl-10 pr-10 h-12 border-gray-200 rounded-xl focus:border-green-500 ${errors.password ? 'border-red-500' : ''}`}
                     disabled={isLoading}
                     required
                   />
@@ -143,7 +142,7 @@ const SignInScreen = () => {
 
               <div className="flex items-center justify-between">
                 <div className="text-sm">
-                  <Link to="/forgot-password" className="text-blue-600 hover:text-blue-700">
+                  <Link to="/forgot-password" className="text-green-600 hover:text-green-700">
                     Forgot password?
                   </Link>
                 </div>
@@ -152,7 +151,7 @@ const SignInScreen = () => {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg disabled:bg-blue-400"
+                className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl shadow-lg disabled:bg-green-400"
               >
                 {isLoading ? (
                   <>
@@ -177,7 +176,7 @@ const SignInScreen = () => {
             <div className="grid grid-cols-2 gap-3">
               <Button 
                 variant="outline" 
-                className="h-12" 
+                className="h-12 rounded-xl border-gray-200" 
                 onClick={() => handleSocialSignIn('Google')}
                 disabled={isLoading}
               >
@@ -191,7 +190,7 @@ const SignInScreen = () => {
               </Button>
               <Button 
                 variant="outline" 
-                className="h-12" 
+                className="h-12 rounded-xl border-gray-200" 
                 onClick={() => handleSocialSignIn('Apple')}
                 disabled={isLoading}
               >
@@ -207,7 +206,7 @@ const SignInScreen = () => {
         <div className="text-center mt-6">
           <p className="text-gray-600">
             Don't have an account?{" "}
-            <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link to="/signup" className="text-green-600 hover:text-green-700 font-medium">
               Sign up
             </Link>
           </p>
