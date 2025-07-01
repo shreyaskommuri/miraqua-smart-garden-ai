@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +11,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useI18n } from "@/contexts/I18nContext";
 import { 
   User, 
   Settings, 
@@ -53,6 +54,8 @@ interface UserProfile {
 const AccountScreen = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { language, setLanguage } = useI18n();
   
   const [profile, setProfile] = useState<UserProfile>({
     name: "Sarah Johnson",
@@ -189,14 +192,15 @@ const AccountScreen = () => {
     setIsDirty(true);
   };
 
-  const handleThemeChange = (theme: 'light' | 'dark') => {
-    setProfile(prev => ({ ...prev, theme }));
+  const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
+    setTheme(newTheme);
+    setProfile(prev => ({ ...prev, theme: newTheme }));
     setIsDirty(true);
-    // In real app, would update theme context
   };
 
-  const handleLanguageChange = (language: string) => {
-    setProfile(prev => ({ ...prev, language }));
+  const handleLanguageChange = (newLanguage: string) => {
+    setLanguage(newLanguage);
+    setProfile(prev => ({ ...prev, language: newLanguage }));
     setIsDirty(true);
   };
 
@@ -258,19 +262,31 @@ const AccountScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="px-6 py-4">
-          <h1 className="text-2xl font-bold text-gray-900">Account Settings</h1>
-          <p className="text-gray-600">Manage your profile and preferences</p>
+    <div className="min-h-screen bg-background transition-colors duration-200">
+      {/* Header - Fixed with proper spacing */}
+      <header className="bg-card border-b border-border sticky top-0 z-40 shadow-sm">
+        <div className="px-4 sm:px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">Account Settings</h1>
+              <p className="text-muted-foreground text-sm sm:text-base">Manage your profile and preferences</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setTheme(resolvedTheme === 'light' ? 'dark' : 'light')}
+              className="p-2"
+            >
+              {resolvedTheme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </Button>
+          </div>
         </div>
       </header>
 
-      <ScrollArea className="h-[calc(100vh-140px)]">
-        <div className="px-6 py-6 space-y-8 pb-32">
+      <ScrollArea className="h-[calc(100vh-200px)]">
+        <div className="px-4 sm:px-6 py-6 space-y-6 sm:space-y-8 pb-32">
           {/* Profile Card */}
-          <Card className="border-0 shadow-lg">
+          <Card className="border-0 shadow-lg bg-card">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <User className="w-5 h-5" />
@@ -278,76 +294,77 @@ const AccountScreen = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Avatar Section */}
-              <div className="flex items-center space-x-4">
-                <Avatar className="w-20 h-20">
+              {/* Avatar Section - Responsive */}
+              <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-4">
+                <Avatar className="w-16 h-16 sm:w-20 sm:h-20">
                   <AvatarImage src={profile.avatar} />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-green-500 text-white text-xl font-bold">
+                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-green-500 text-white text-lg sm:text-xl font-bold">
                     {profile.name.split(' ').map(n => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
                 <Button variant="outline" onClick={handleAvatarChange} className="flex items-center space-x-2">
                   <Camera className="w-4 h-4" />
-                  <span>Change</span>
+                  <span>Change Photo</span>
                 </Button>
               </div>
 
-              {/* Name Field */}
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  value={profile.name}
-                  onChange={(e) => {
-                    setProfile(prev => ({ ...prev, name: e.target.value }));
-                    setIsDirty(true);
-                    if (errors.name) setErrors(prev => ({ ...prev, name: '' }));
-                  }}
-                  className={errors.name ? "border-red-500" : ""}
-                  maxLength={50}
-                />
-                {errors.name && <p className="text-sm text-red-600">{errors.name}</p>}
-              </div>
+              {/* Form fields with proper spacing */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    value={profile.name}
+                    onChange={(e) => {
+                      setProfile(prev => ({ ...prev, name: e.target.value }));
+                      setIsDirty(true);
+                      if (errors.name) setErrors(prev => ({ ...prev, name: '' }));
+                    }}
+                    className={errors.name ? "border-destructive" : ""}
+                    maxLength={50}
+                  />
+                  {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+                </div>
 
-              {/* Email Field */}
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={profile.email}
-                  onChange={(e) => {
-                    setProfile(prev => ({ ...prev, email: e.target.value }));
-                    setIsDirty(true);
-                    if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
-                  }}
-                  className={errors.email ? "border-red-500" : ""}
-                />
-                {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={profile.email}
+                    onChange={(e) => {
+                      setProfile(prev => ({ ...prev, email: e.target.value }));
+                      setIsDirty(true);
+                      if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
+                    }}
+                    className={errors.email ? "border-destructive" : ""}
+                  />
+                  {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+                </div>
               </div>
 
               {/* Member Since */}
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="text-sm text-gray-600">Member since</span>
-                <span className="font-medium">{profile.memberSince}</span>
+              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                <span className="text-sm text-muted-foreground">Member since</span>
+                <span className="font-medium text-foreground">{profile.memberSince}</span>
               </div>
 
-              {/* Stats */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">{profile.totalPlots}</div>
-                  <div className="text-sm text-gray-600">Active Plots</div>
+              {/* Stats - Responsive grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{profile.totalPlots}</div>
+                  <div className="text-sm text-muted-foreground">Active Plots</div>
                 </div>
-                <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">{profile.waterSaved}L</div>
-                  <div className="text-sm text-gray-600">Water Saved</div>
+                <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">{profile.waterSaved}L</div>
+                  <div className="text-sm text-muted-foreground">Water Saved</div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Security Settings */}
-          <Card className="border-0 shadow-lg">
+          <Card className="border-0 shadow-lg bg-card">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Shield className="w-5 h-5" />
@@ -356,26 +373,27 @@ const AccountScreen = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Password */}
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex items-center justify-between gap-4">
+                <div className="min-w-0 flex-1">
                   <Label>Password</Label>
-                  <p className="text-sm text-gray-600">••••••••</p>
+                  <p className="text-sm text-muted-foreground">••••••••</p>
                 </div>
                 <Button 
                   variant="outline" 
                   onClick={() => navigate('/forgot-password')}
-                  className="flex items-center space-x-2"
+                  className="flex items-center space-x-2 flex-shrink-0"
                 >
                   <Lock className="w-4 h-4" />
-                  <span>Change Password</span>
+                  <span className="hidden sm:inline">Change Password</span>
+                  <span className="sm:hidden">Change</span>
                 </Button>
               </div>
 
               {/* Two-Factor Authentication */}
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex items-center justify-between gap-4">
+                <div className="min-w-0 flex-1">
                   <Label>Two-Factor Authentication</Label>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-muted-foreground">
                     Add an extra layer of security to your account
                   </p>
                   <Badge variant={profile.twoFactorEnabled ? "default" : "secondary"} className="mt-1">
@@ -385,13 +403,14 @@ const AccountScreen = () => {
                 <Switch
                   checked={profile.twoFactorEnabled}
                   onCheckedChange={handleToggle2FA}
+                  className="flex-shrink-0"
                 />
               </div>
             </CardContent>
           </Card>
 
           {/* Preferences */}
-          <Card className="border-0 shadow-lg">
+          <Card className="border-0 shadow-lg bg-card">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Settings className="w-5 h-5" />
@@ -403,9 +422,9 @@ const AccountScreen = () => {
               <div className="space-y-3">
                 <Label>Theme</Label>
                 <RadioGroup 
-                  value={profile.theme} 
-                  onValueChange={(value: 'light' | 'dark') => handleThemeChange(value)}
-                  className="flex space-x-6"
+                  value={theme} 
+                  onValueChange={(value: 'light' | 'dark' | 'system') => handleThemeChange(value)}
+                  className="grid grid-cols-1 sm:grid-cols-3 gap-4"
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="light" id="light" />
@@ -421,6 +440,13 @@ const AccountScreen = () => {
                       <span>Dark</span>
                     </Label>
                   </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="system" id="system" />
+                    <Label htmlFor="system" className="flex items-center space-x-2 cursor-pointer">
+                      <Settings className="w-4 h-4" />
+                      <span>System</span>
+                    </Label>
+                  </div>
                 </RadioGroup>
               </div>
 
@@ -428,9 +454,9 @@ const AccountScreen = () => {
               <div className="space-y-3">
                 <Label>Language</Label>
                 <RadioGroup 
-                  value={profile.language} 
+                  value={language} 
                   onValueChange={handleLanguageChange}
-                  className="grid grid-cols-2 gap-4"
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-4"
                 >
                   {languages.map((lang) => (
                     <div key={lang.value} className="flex items-center space-x-2">
@@ -575,10 +601,10 @@ const AccountScreen = () => {
         </div>
       </ScrollArea>
 
-      {/* Sticky Action Buttons */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 space-y-3">
+      {/* Sticky Action Buttons - Fixed positioning */}
+      <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border p-4 space-y-3 z-30">
         {isDirty && (
-          <div className="flex space-x-3">
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
             <Button
               variant="outline"
               onClick={handleCancel}
@@ -606,7 +632,7 @@ const AccountScreen = () => {
         
         <Button
           variant="outline"
-          className="w-full border-red-200 text-red-600 hover:bg-red-50"
+          className="w-full border-red-200 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
           onClick={handleSignOut}
         >
           <LogOut className="w-5 h-5 mr-2" />
