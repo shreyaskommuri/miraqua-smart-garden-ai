@@ -53,7 +53,9 @@ function App() {
     document.head.appendChild(manifestLink);
 
     return () => {
-      document.head.removeChild(manifestLink);
+      if (document.head.contains(manifestLink)) {
+        document.head.removeChild(manifestLink);
+      }
     };
   }, []);
 
@@ -79,13 +81,7 @@ function App() {
             <Route path="/notifications" element={<NotificationSettingsScreen />} />
             <Route path="/help" element={<HelpScreen />} />
             
-            {/* Plot Routes - These need to be outside the app layout */}
-            <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
-            <Route path="/plot/:plotId/settings" element={<PlotSettingsScreen />} />
-            <Route path="/plot/:plotId/day/:date" element={<SpecificDayScreen />} />
-            
-            {/* Main App Routes */}
-            <Route path="/" element={<Navigate to="/welcome" replace />} />
+            {/* Main App Routes with Navigation */}
             <Route path="/app/*" element={
               <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
                 <AdvancedNavigation />
@@ -103,10 +99,18 @@ function App() {
                     <Route path="/community" element={<CommunityScreen />} />
                     <Route path="/marketplace" element={<MarketplaceScreen />} />
                     <Route path="/account" element={<AccountScreen />} />
+                    
+                    {/* Plot Routes within App Layout */}
+                    <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
+                    <Route path="/plot/:plotId/settings" element={<PlotSettingsScreen />} />
+                    <Route path="/plot/:plotId/day/:date" element={<SpecificDayScreen />} />
                   </Routes>
                 </div>
               </div>
             } />
+            
+            {/* Root redirect */}
+            <Route path="/" element={<Navigate to="/welcome" replace />} />
             
             {/* Legacy routes redirect */}
             <Route path="/home" element={<Navigate to="/app/home" replace />} />

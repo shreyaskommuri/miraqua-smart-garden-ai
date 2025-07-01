@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { CalendarSchedule } from "@/components/ui/CalendarSchedule";
 import { MiniMap } from "@/components/ui/MiniMap";
+import { Progress } from "@/components/ui/progress";
 import { 
   ArrowLeft, 
   MessageSquare, 
@@ -26,9 +28,25 @@ import {
   Leaf,
   Zap,
   Calendar,
-  BarChart3
+  BarChart3,
+  Bell,
+  Camera,
+  Share2,
+  Heart,
+  Gauge,
+  Cloud,
+  Wind,
+  Eye,
+  Clock,
+  Target,
+  Award,
+  Wifi,
+  WifiOff,
+  Battery,
+  ChevronRight,
+  Info
 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const PlotDetailsScreen = () => {
   const navigate = useNavigate();
@@ -41,6 +59,7 @@ const PlotDetailsScreen = () => {
   const [error, setError] = useState("");
   const [watering, setWatering] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const [isOnline, setIsOnline] = useState(true);
 
   const latitude = parseFloat(searchParams.get('lat') || '37.7749');
   const longitude = parseFloat(searchParams.get('lon') || '-122.4194');
@@ -50,6 +69,7 @@ const PlotDetailsScreen = () => {
     setError("");
     
     try {
+      console.log(`Plot data loaded for plot: ${plotId}`);
       await new Promise(resolve => setTimeout(resolve, 800));
       
       const mockSchedule = [
@@ -100,13 +120,19 @@ const PlotDetailsScreen = () => {
       
       setPlotData({
         id: plotId,
-        name: "Tomato Garden",
+        name: "Cherry Tomato Garden",
         crop: "Cherry Tomatoes",
+        variety: "Sweet 100",
         location: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
         currentTemp: 72,
         currentMoisture: 68,
         currentSunlight: 85,
+        humidity: 62,
+        windSpeed: 8,
+        uvIndex: 7,
         cropAge: "45 days",
+        plantingDate: "May 15, 2024",
+        expectedHarvest: "August 20, 2024",
         nextWatering: "Tomorrow 6:00 AM",
         schedule: mockSchedule,
         totalWaterToday: 15,
@@ -116,11 +142,27 @@ const PlotDetailsScreen = () => {
         healthScore: 87,
         lastWatered: "2 hours ago",
         soilPh: 6.8,
+        batteryLevel: 78,
+        signalStrength: 85,
         nutrients: {
           nitrogen: 75,
           phosphorus: 82,
           potassium: 68
-        }
+        },
+        sensors: [
+          { id: 1, name: "Soil Moisture", value: 68, unit: "%", status: "good", lastUpdate: "2 min ago" },
+          { id: 2, name: "Temperature", value: 72, unit: "°F", status: "optimal", lastUpdate: "1 min ago" },
+          { id: 3, name: "Light", value: 85, unit: "%", status: "good", lastUpdate: "3 min ago" },
+          { id: 4, name: "pH Level", value: 6.8, unit: "pH", status: "good", lastUpdate: "5 min ago" }
+        ],
+        growthStages: [
+          { stage: "Germination", date: "May 15", status: "completed", progress: 100 },
+          { stage: "Seedling", date: "May 25", status: "completed", progress: 100 },
+          { stage: "Vegetative", date: "Jun 10", status: "completed", progress: 100 },
+          { stage: "Flowering", date: "Jun 30", status: "current", progress: 75 },
+          { stage: "Fruiting", date: "Jul 20", status: "upcoming", progress: 0 },
+          { stage: "Harvest", date: "Aug 20", status: "upcoming", progress: 0 }
+        ]
       });
     } catch (err) {
       setError("Failed to load plot details");
@@ -134,7 +176,7 @@ const PlotDetailsScreen = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
       toast({
-        title: "✨ Watering started",
+        title: "💧 Watering Started",
         description: "Your garden is being watered for 5 minutes",
       });
       fetchPlotData();
@@ -150,28 +192,46 @@ const PlotDetailsScreen = () => {
   };
 
   const handleDayClick = (day: any) => {
-    navigate(`/plot/${plotId}/day/${day.date}?lat=${latitude}&lon=${longitude}&date=${day.date}`);
+    navigate(`/app/plot/${plotId}/day/${day.date}?lat=${latitude}&lon=${longitude}&date=${day.date}`);
   };
 
   const copyCoordinates = () => {
     navigator.clipboard.writeText(`${latitude}, ${longitude}`);
     toast({
-      title: "📍 Coordinates copied",
+      title: "📍 Coordinates Copied",
       description: "Location copied to clipboard"
+    });
+  };
+
+  const sharePlot = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast({
+      title: "📤 Plot Shared",
+      description: "Plot link copied to clipboard"
     });
   };
 
   useEffect(() => {
     fetchPlotData();
+    
+    // Simulate connectivity status
+    const interval = setInterval(() => {
+      setIsOnline(Math.random() > 0.1); // 90% uptime simulation
+    }, 10000);
+    
+    return () => clearInterval(interval);
   }, [plotId]);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-16 lg:pt-0 lg:pl-72">
-        <div className="p-4 space-y-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-32 bg-white rounded-xl animate-pulse shadow-sm"></div>
-          ))}
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
+        <div className="p-6 space-y-6">
+          <div className="animate-pulse">
+            <div className="h-20 bg-white dark:bg-gray-800 rounded-2xl shadow-sm mb-6"></div>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-32 bg-white dark:bg-gray-800 rounded-2xl shadow-sm mb-4"></div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -179,14 +239,15 @@ const PlotDetailsScreen = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-16 lg:pt-0 lg:pl-72">
-        <div className="p-4">
-          <Card className="border-0 shadow-lg bg-red-50">
-            <CardContent className="p-6 text-center">
-              <AlertTriangle className="w-12 h-12 text-red-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-red-800 mb-2">Something went wrong</h3>
-              <p className="text-red-600 mb-4">{error}</p>
-              <Button variant="outline" onClick={fetchPlotData}>
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 dark:from-gray-900 dark:to-gray-800">
+        <div className="p-6">
+          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-8 text-center">
+              <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-6" />
+              <h3 className="text-2xl font-bold text-red-800 dark:text-red-400 mb-4">Oops! Something went wrong</h3>
+              <p className="text-red-600 dark:text-red-300 mb-6 text-lg">{error}</p>
+              <Button onClick={fetchPlotData} size="lg" className="bg-red-600 hover:bg-red-700">
+                <RefreshCw className="w-5 h-5 mr-2" />
                 Try Again
               </Button>
             </CardContent>
@@ -197,25 +258,50 @@ const PlotDetailsScreen = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16 lg:pt-0 lg:pl-72">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-100 sticky top-16 lg:top-0 z-30">
-        <div className="px-4 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      {/* Enhanced Header */}
+      <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40 shadow-sm">
+        <div className="px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-                <ArrowLeft className="w-4 h-4" />
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="hover:bg-gray-100 dark:hover:bg-gray-800">
+                <ArrowLeft className="w-5 h-5" />
               </Button>
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">🍅</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">{plotData?.name}</h1>
-                <p className="text-sm text-gray-500">{plotData?.crop}</p>
+              
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
+                    <span className="text-3xl">🍅</span>
+                  </div>
+                  {isOnline ? (
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+                      <Wifi className="w-3 h-3 text-white" />
+                    </div>
+                  ) : (
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
+                      <WifiOff className="w-3 h-3 text-white" />
+                    </div>
+                  )}
+                </div>
+                
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{plotData?.name}</h1>
+                  <div className="flex items-center space-x-3 mt-1">
+                    <p className="text-gray-600 dark:text-gray-300">{plotData?.crop} • {plotData?.variety}</p>
+                    <Badge variant="outline" className="text-xs">
+                      <Heart className="w-3 h-3 mr-1 text-red-500" />
+                      Health: {plotData?.healthScore}%
+                    </Badge>
+                  </div>
+                </div>
               </div>
             </div>
+            
             <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm" onClick={() => navigate(`/plot/${plotId}/settings`)}>
+              <Button variant="ghost" size="sm" onClick={shareplot} className="hover:bg-gray-100 dark:hover:bg-gray-800">
+                <Share2 className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate(`/app/plot/${plotId}/settings`)}>
                 <Settings className="w-4 h-4" />
               </Button>
               <Button variant="ghost" size="sm">
@@ -226,205 +312,273 @@ const PlotDetailsScreen = () => {
         </div>
       </header>
 
-      <ScrollArea className="h-[calc(100vh-140px)]">
-        <div className="p-4 space-y-6 pb-20">
-          {/* Ideal Conditions Card */}
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Ideal Conditions</CardTitle>
+      <ScrollArea className="h-[calc(100vh-100px)]">
+        <div className="p-6 space-y-8 pb-24">
+          {/* Status Cards Grid */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {plotData?.sensors.map((sensor: any) => (
+              <Card key={sensor.id} className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                      sensor.name === 'Soil Moisture' ? 'bg-blue-100 dark:bg-blue-900/30' :
+                      sensor.name === 'Temperature' ? 'bg-orange-100 dark:bg-orange-900/30' :
+                      sensor.name === 'Light' ? 'bg-yellow-100 dark:bg-yellow-900/30' :
+                      'bg-green-100 dark:bg-green-900/30'
+                    }`}>
+                      {sensor.name === 'Soil Moisture' && <Droplets className="w-5 h-5 text-blue-600" />}
+                      {sensor.name === 'Temperature' && <Thermometer className="w-5 h-5 text-orange-600" />}
+                      {sensor.name === 'Light' && <Sun className="w-5 h-5 text-yellow-600" />}
+                      {sensor.name === 'pH Level' && <Activity className="w-5 h-5 text-green-600" />}
+                    </div>
+                    <Badge variant={sensor.status === 'optimal' ? 'default' : 'secondary'} className="text-xs">
+                      {sensor.status}
+                    </Badge>
+                  </div>
+                  <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                    {sensor.value}{sensor.unit}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                    <Clock className="w-3 h-3 mr-1" />
+                    {sensor.lastUpdate}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Growth Progress */}
+          <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Target className="w-5 h-5 text-green-600" />
+                <span>Growth Progress</span>
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-blue-50 rounded-xl">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <Thermometer className="w-4 h-4 text-blue-600" />
+              <div className="space-y-4">
+                {plotData?.growthStages.map((stage: any, index: number) => (
+                  <div key={index} className="flex items-center space-x-4">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                      stage.status === 'completed' ? 'bg-green-500 text-white' :
+                      stage.status === 'current' ? 'bg-blue-500 text-white' :
+                      'bg-gray-200 dark:bg-gray-700 text-gray-500'
+                    }`}>
+                      {stage.status === 'completed' && <Award className="w-5 h-5" />}
+                      {stage.status === 'current' && <Activity className="w-5 h-5" />}
+                      {stage.status === 'upcoming' && <Clock className="w-5 h-5" />}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="font-medium text-gray-900 dark:text-white">{stage.stage}</h4>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">{stage.date}</span>
+                      </div>
+                      <Progress value={stage.progress} className="h-2" />
+                    </div>
                   </div>
-                  <div className="text-2xl font-bold text-blue-900 mb-1">{plotData?.currentTemp}°F</div>
-                  <div className="text-xs text-blue-700">Temperature</div>
-                </div>
-                <div className="text-center p-4 bg-green-50 rounded-xl">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <Sun className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div className="text-2xl font-bold text-green-900 mb-1">{plotData?.currentSunlight}%</div>
-                  <div className="text-xs text-green-700">Sunlight</div>
-                </div>
-                <div className="text-center p-4 bg-cyan-50 rounded-xl">
-                  <div className="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <Droplets className="w-4 h-4 text-cyan-600" />
-                  </div>
-                  <div className="text-2xl font-bold text-cyan-900 mb-1">{plotData?.currentMoisture}%</div>
-                  <div className="text-xs text-cyan-700">Water</div>
-                </div>
+                ))}
               </div>
             </CardContent>
           </Card>
 
-          {/* Growth Timeline */}
-          <Card className="border-0 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Growth Timeline</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="relative">
-                <div className="absolute left-4 top-8 bottom-0 w-0.5 bg-gray-200"></div>
-                <div className="space-y-6">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center z-10">
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">Week 1</p>
-                      <p className="text-sm text-gray-500">Germination completed</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center z-10">
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">Week 3</p>
-                      <p className="text-sm text-gray-500">First leaves appeared</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center z-10">
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">Week 6</p>
-                      <p className="text-sm text-gray-500">Currently flowering</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center z-10">
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-500">Week 10</p>
-                      <p className="text-sm text-gray-400">Expected harvest</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Tabs */}
+          {/* Enhanced Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-gray-100 rounded-xl p-1">
-              <TabsTrigger value="overview" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <TabsList className="grid w-full grid-cols-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-2 shadow-lg">
+              <TabsTrigger value="overview" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg">
+                <Eye className="w-4 h-4 mr-2" />
                 Overview
               </TabsTrigger>
-              <TabsTrigger value="activity" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                Activity Log
+              <TabsTrigger value="activity" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white data-[state=active]:shadow-lg">
+                <Activity className="w-4 h-4 mr-2" />
+                Activity
               </TabsTrigger>
-              <TabsTrigger value="analytics" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <TabsTrigger value="analytics" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-500 data-[state=active]:text-white data-[state=active]:shadow-lg">
+                <BarChart3 className="w-4 h-4 mr-2" />
                 Analytics
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="overview" className="mt-6 space-y-6">
-              <Card className="border-0 shadow-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold">Next Watering</h3>
-                    <Button
-                      onClick={handleWaterNow}
-                      disabled={watering}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl"
-                    >
-                      {watering ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-                      {watering ? "Watering..." : "Water Now"}
-                    </Button>
+            <TabsContent value="overview" className="mt-8 space-y-6">
+              {/* Next Watering Card */}
+              <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
+                <CardContent className="p-8">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xl font-semibold mb-2 flex items-center">
+                        <Droplets className="w-6 h-6 mr-2" />
+                        Next Watering
+                      </h3>
+                      <p className="text-3xl font-bold mb-2">{plotData?.nextWatering}</p>
+                      <p className="text-blue-100">Scheduled automatic watering</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-blue-100 text-sm">Expected duration</p>
+                      <p className="text-2xl font-bold">5 min</p>
+                    </div>
                   </div>
-                  <p className="text-2xl font-bold text-gray-900 mb-2">{plotData?.nextWatering}</p>
-                  <p className="text-gray-600">Scheduled automatic watering</p>
                 </CardContent>
               </Card>
 
+              {/* Calendar Schedule */}
               <CalendarSchedule 
                 schedule={plotData?.schedule || []} 
                 onDayClick={handleDayClick}
               />
 
-              <Card className="border-0 shadow-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold">Location</h3>
+              {/* Enhanced Location Card */}
+              <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <MapPin className="w-5 h-5 text-red-500" />
+                      <span>Location & Environment</span>
+                    </div>
                     <Button variant="ghost" size="sm" onClick={copyCoordinates}>
                       <Copy className="w-4 h-4" />
                     </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="text-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                      <Wind className="w-5 h-5 text-gray-600 dark:text-gray-300 mx-auto mb-1" />
+                      <div className="font-semibold">{plotData?.windSpeed} mph</div>
+                      <div className="text-xs text-gray-500">Wind Speed</div>
+                    </div>
+                    <div className="text-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                      <Sun className="w-5 h-5 text-orange-500 mx-auto mb-1" />
+                      <div className="font-semibold">UV {plotData?.uvIndex}</div>
+                      <div className="text-xs text-gray-500">UV Index</div>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2 mb-4">
-                    <MapPin className="w-4 h-4 text-gray-500" />
-                    <span className="text-gray-700">{plotData?.location}</span>
-                  </div>
-                  <MiniMap latitude={latitude} longitude={longitude} />
+                  <MiniMap latitude={latitude} longitude={longitude} plotName={plotData?.name} />
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="activity" className="mt-6">
-              <Card className="border-0 shadow-sm">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
+            <TabsContent value="activity" className="mt-8">
+              <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Activity className="w-5 h-5 text-blue-600" />
+                    <span>Recent Activity</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-xl">
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <Droplets className="w-4 h-4 text-blue-600" />
+                    {[
+                      { icon: Droplets, color: "blue", title: "Watering completed", desc: "15L water applied", time: "2 hours ago", bg: "bg-blue-50 dark:bg-blue-900/20" },
+                      { icon: TrendingUp, color: "green", title: "Moisture level improved", desc: "From 45% to 68%", time: "3 hours ago", bg: "bg-green-50 dark:bg-green-900/20" },
+                      { icon: AlertTriangle, color: "orange", title: "Low moisture alert", desc: "Moisture dropped to 45%", time: "5 hours ago", bg: "bg-orange-50 dark:bg-orange-900/20" },
+                      { icon: Leaf, color: "green", title: "Growth stage updated", desc: "Entered flowering stage", time: "1 day ago", bg: "bg-green-50 dark:bg-green-900/20" },
+                      { icon: Camera, color: "purple", title: "Photo captured", desc: "Weekly growth photo", time: "2 days ago", bg: "bg-purple-50 dark:bg-purple-900/20" }
+                    ].map((activity, index) => (
+                      <div key={index} className={`flex items-start space-x-4 p-4 ${activity.bg} rounded-2xl transition-all duration-200 hover:shadow-md`}>
+                        <div className={`w-12 h-12 bg-${activity.color}-100 dark:bg-${activity.color}-900/30 rounded-xl flex items-center justify-center`}>
+                          <activity.icon className={`w-5 h-5 text-${activity.color}-600`} />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-900 dark:text-white">{activity.title}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">{activity.desc}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {activity.time}
+                          </p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-gray-400" />
                       </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">Watering completed</p>
-                        <p className="text-sm text-gray-500">15L water applied • 2 hours ago</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-3 p-3 bg-green-50 rounded-xl">
-                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                        <TrendingUp className="w-4 h-4 text-green-600" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">Moisture level improved</p>
-                        <p className="text-sm text-gray-500">From 45% to 68% • 3 hours ago</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-3 p-3 bg-orange-50 rounded-xl">
-                      <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <AlertTriangle className="w-4 h-4 text-orange-600" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">Low moisture alert</p>
-                        <p className="text-sm text-gray-500">Moisture dropped to 45% • 5 hours ago</p>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="analytics" className="mt-6">
-              <Card className="border-0 shadow-sm">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Analytics</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-blue-50 rounded-xl">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <BarChart3 className="w-4 h-4 text-blue-600" />
-                        <span className="font-medium text-blue-900">Water Usage</span>
+            <TabsContent value="analytics" className="mt-8 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Droplets className="w-5 h-5 text-blue-600" />
+                      <span>Water Usage</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-4xl font-bold text-blue-600 mb-2">{plotData?.totalWaterToday}L</div>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">Used today</p>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Weekly total</span>
+                        <span className="font-semibold">{plotData?.weeklyTotal}L</span>
                       </div>
-                      <p className="text-2xl font-bold text-blue-900">{plotData?.totalWaterToday}L</p>
-                      <p className="text-sm text-blue-700">Today</p>
+                      <Progress value={75} className="h-2" />
                     </div>
-                    
-                    <div className="p-4 bg-green-50 rounded-xl">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <TrendingUp className="w-4 h-4 text-green-600" />
-                        <span className="font-medium text-green-900">Efficiency</span>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Gauge className="w-5 h-5 text-green-600" />
+                      <span>Efficiency</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-4xl font-bold text-green-600 mb-2">{plotData?.efficiency}%</div>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">This week</p>
+                    <div className="flex items-center space-x-2">
+                      <TrendingUp className="w-4 h-4 text-green-500" />
+                      <span className="text-sm text-green-600 font-medium">+5% from last week</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Nutrient Levels */}
+              <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Leaf className="w-5 h-5 text-green-600" />
+                    <span>Soil Nutrients</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {Object.entries(plotData?.nutrients || {}).map(([nutrient, value]) => (
+                      <div key={nutrient} className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="capitalize font-medium">{nutrient}</span>
+                          <span className="font-semibold">{value}%</span>
+                        </div>
+                        <Progress value={value as number} className="h-3" />
                       </div>
-                      <p className="text-2xl font-bold text-green-900">{plotData?.efficiency}%</p>
-                      <p className="text-sm text-green-700">This week</p>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Device Status */}
+              <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Zap className="w-5 h-5 text-purple-600" />
+                    <span>Device Status</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-3">
+                      <Battery className="w-5 h-5 text-green-500" />
+                      <div>
+                        <p className="font-medium">Battery</p>
+                        <p className="text-sm text-gray-500">{plotData?.batteryLevel}%</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Wifi className="w-5 h-5 text-blue-500" />
+                      <div>
+                        <p className="font-medium">Signal</p>
+                        <p className="text-sm text-gray-500">{plotData?.signalStrength}%</p>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -434,22 +588,30 @@ const PlotDetailsScreen = () => {
         </div>
       </ScrollArea>
 
-      {/* Modern Floating Water Button */}
-      <div className="fixed bottom-6 left-6 right-6 lg:left-80 lg:right-6 z-30">
+      {/* Enhanced Floating Action Button */}
+      <div className="fixed bottom-6 left-6 right-6 z-30">
         <Button
           onClick={handleWaterNow}
           disabled={watering}
-          className="w-full h-16 bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white font-semibold text-lg rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+          className="w-full h-18 bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 hover:from-blue-600 hover:via-cyan-600 hover:to-teal-600 text-white font-bold text-lg rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 border-0"
         >
           {watering ? (
             <>
               <Loader2 className="w-6 h-6 mr-3 animate-spin" />
-              Watering in progress...
+              <div className="text-center">
+                <div>Watering in progress...</div>
+                <div className="text-sm opacity-80">Please wait</div>
+              </div>
             </>
           ) : (
             <>
-              <Play className="w-6 h-6 mr-3" />
-              💧 Water Now (5 min)
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                <Droplets className="w-6 h-6" />
+              </div>
+              <div className="text-center">
+                <div>💧 Water Now</div>
+                <div className="text-sm opacity-80">5 minute cycle</div>
+              </div>
             </>
           )}
         </Button>
