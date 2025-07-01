@@ -298,7 +298,7 @@ const PlotDetailsScreen = () => {
             </div>
             
             <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm" onClick={shareplot} className="hover:bg-gray-100 dark:hover:bg-gray-800">
+              <Button variant="ghost" size="sm" onClick={sharePlot} className="hover:bg-gray-100 dark:hover:bg-gray-800">
                 <Share2 className="w-4 h-4" />
               </Button>
               <Button variant="ghost" size="sm" onClick={() => navigate(`/app/plot/${plotId}/settings`)}>
@@ -547,7 +547,7 @@ const PlotDetailsScreen = () => {
                       <div key={nutrient} className="space-y-2">
                         <div className="flex justify-between">
                           <span className="capitalize font-medium">{nutrient}</span>
-                          <span className="font-semibold">{value}%</span>
+                          <span className="font-semibold">{value as number}%</span>
                         </div>
                         <Progress value={value as number} className="h-3" />
                       </div>
