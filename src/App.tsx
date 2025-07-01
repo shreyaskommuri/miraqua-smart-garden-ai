@@ -21,6 +21,15 @@ import SpecificDayScreen from './components/screens/SpecificDayScreen';
 import WelcomeScreen from './components/screens/WelcomeScreen';
 import SignInScreen from './components/screens/SignInScreen';
 import SignUpScreen from './components/screens/SignUpScreen';
+import AddPlotScreen from './components/screens/AddPlotScreen';
+import ReportsScreen from './components/screens/ReportsScreen';
+import SensorManagementScreen from './components/screens/SensorManagementScreen';
+import DeviceControlScreen from './components/screens/DeviceControlScreen';
+import WeatherForecastScreen from './components/screens/WeatherForecastScreen';
+import CollaborationScreen from './components/screens/CollaborationScreen';
+import UserProfileScreen from './components/screens/UserProfileScreen';
+import NotificationSettingsScreen from './components/screens/NotificationSettingsScreen';
+import HelpScreen from './components/screens/HelpScreen';
 
 function App() {
   useEffect(() => {
@@ -58,6 +67,23 @@ function App() {
             <Route path="/signin" element={<SignInScreen />} />
             <Route path="/signup" element={<SignUpScreen />} />
             
+            {/* Standalone Routes */}
+            <Route path="/add-plot" element={<AddPlotScreen />} />
+            <Route path="/reports" element={<ReportsScreen />} />
+            <Route path="/sensors" element={<SensorManagementScreen />} />
+            <Route path="/devices" element={<DeviceControlScreen />} />
+            <Route path="/weather" element={<WeatherForecastScreen />} />
+            <Route path="/weather/:plotId" element={<WeatherForecastScreen />} />
+            <Route path="/collaboration" element={<CollaborationScreen />} />
+            <Route path="/profile" element={<UserProfileScreen />} />
+            <Route path="/notifications" element={<NotificationSettingsScreen />} />
+            <Route path="/help" element={<HelpScreen />} />
+            
+            {/* Plot Routes - These need to be outside the app layout */}
+            <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
+            <Route path="/plot/:plotId/settings" element={<PlotSettingsScreen />} />
+            <Route path="/plot/:plotId/day/:date" element={<SpecificDayScreen />} />
+            
             {/* Main App Routes */}
             <Route path="/" element={<Navigate to="/welcome" replace />} />
             <Route path="/app/*" element={
@@ -77,9 +103,6 @@ function App() {
                     <Route path="/community" element={<CommunityScreen />} />
                     <Route path="/marketplace" element={<MarketplaceScreen />} />
                     <Route path="/account" element={<AccountScreen />} />
-                    <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
-                    <Route path="/plot/:plotId/settings" element={<PlotSettingsScreen />} />
-                    <Route path="/plot/:plotId/day/:date" element={<SpecificDayScreen />} />
                   </Routes>
                 </div>
               </div>
