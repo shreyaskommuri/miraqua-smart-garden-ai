@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Leaf, Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
+import { Droplets, Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
 
 const SignInScreen = () => {
   const navigate = useNavigate();
@@ -15,38 +15,16 @@ const SignInScreen = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [error, setError] = useState("");
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
-    }
-    
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
-    
     setIsLoading(true);
-    setError("");
     
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
-      navigate("/home");
+      navigate("/app/home");
     } catch (err) {
-      setError("Invalid email or password. Please try again.");
+      console.error("Sign in error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -56,9 +34,9 @@ const SignInScreen = () => {
     setIsLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      navigate("/home");
+      navigate("/app/home");
     } catch (err) {
-      setError(`Failed to sign in with ${provider}`);
+      console.error(`${provider} sign in error:`, err);
     } finally {
       setIsLoading(false);
     }
@@ -66,9 +44,6 @@ const SignInScreen = () => {
 
   const updateFormData = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
   };
 
   return (
@@ -77,7 +52,7 @@ const SignInScreen = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Leaf className="w-8 h-8 text-white" />
+            <Droplets className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h1>
           <p className="text-gray-600">Sign in to your Miraqua account</p>
@@ -86,15 +61,8 @@ const SignInScreen = () => {
         <Card className="border-0 shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="text-xl text-center text-gray-800">Sign In</CardTitle>
-            <p className="text-sm text-center text-gray-600">Enter any credentials to continue</p>
           </CardHeader>
           <CardContent className="space-y-6">
-            {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
-                <p className="text-sm text-red-600">{error}</p>
-              </div>
-            )}
-
             <form onSubmit={handleSignIn} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-gray-700">Email</Label>
@@ -106,12 +74,11 @@ const SignInScreen = () => {
                     placeholder="Enter your email"
                     value={formData.email}
                     onChange={(e) => updateFormData("email", e.target.value)}
-                    className={`pl-10 h-12 border-gray-200 rounded-xl focus:border-green-500 ${errors.email ? 'border-red-500' : ''}`}
+                    className="pl-10 h-12 border-gray-200 rounded-xl focus:border-green-500"
                     disabled={isLoading}
                     required
                   />
                 </div>
-                {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
               </div>
 
               <div className="space-y-2">
@@ -124,7 +91,7 @@ const SignInScreen = () => {
                     placeholder="Enter your password"
                     value={formData.password}
                     onChange={(e) => updateFormData("password", e.target.value)}
-                    className={`pl-10 pr-10 h-12 border-gray-200 rounded-xl focus:border-green-500 ${errors.password ? 'border-red-500' : ''}`}
+                    className="pl-10 pr-10 h-12 border-gray-200 rounded-xl focus:border-green-500"
                     disabled={isLoading}
                     required
                   />
@@ -136,15 +103,6 @@ const SignInScreen = () => {
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
-                </div>
-                {errors.password && <p className="text-sm text-red-600">{errors.password}</p>}
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="text-sm">
-                  <Link to="/forgot-password" className="text-green-600 hover:text-green-700">
-                    Forgot password?
-                  </Link>
                 </div>
               </div>
 
@@ -195,7 +153,7 @@ const SignInScreen = () => {
                 disabled={isLoading}
               >
                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12.017 0C8.396 0 8.086.013 7.548.072 7.017.134 6.624.3 6.302.602s-.269.65-.33 1.177c-.061.526-.072.832-.072 4.948 0 4.125.011 4.431.072 4.958.061.526.166.875.33 1.177.165.302.464.468.994.53.525.061.832.072 4.948.072 4.125 0 4.431-.011 4.958-.072.526-.061.875-.166 1.177-.33.302-.165.468-.464.53-.994.061-.525.072-.832.072-4.948 0-4.125-.011-4.431-.072-4.958-.061-.526-.166-.875-.33-1.177-.165-.302-.464-.468-.994-.53C16.431.013 16.125 0 12.017 0zM12 5.838A6.162 6.162 0 1 0 12 18.162 6.162 6.162 0 0 0 12 5.838zM12 16A4 4 0 1 1 12 8a4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
                 </svg>
                 Apple
               </Button>

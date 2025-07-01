@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -109,6 +108,11 @@ const FarmerChatScreen = () => {
         setMessages(prev => [...prev, aiMessage]);
       }, 1000);
     }
+  };
+
+  const handleChatWithPlot = (plot: PlotData) => {
+    sessionStorage.setItem('selectedPlotForChat', JSON.stringify(plot));
+    navigate('/app/chat');
   };
 
   return (

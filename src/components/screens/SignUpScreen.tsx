@@ -22,10 +22,9 @@ const SignUpScreen = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Accept any credentials for demo purposes
     setTimeout(() => {
       setIsLoading(false);
-      navigate("/onboarding/crop");
+      navigate("/app/home");
     }, 1500);
   };
 
@@ -34,21 +33,20 @@ const SignUpScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <div className="w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Droplets className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900">Join Miraqua</h1>
           <p className="text-gray-600 mt-2">Create your smart garden account</p>
         </div>
 
-        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+        <Card className="border-0 shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="text-xl text-center text-gray-800">Create Account</CardTitle>
-            <p className="text-sm text-center text-gray-600">Enter any details to get started</p>
           </CardHeader>
           <CardContent className="space-y-6">
             <form onSubmit={handleSignUp} className="space-y-4">
@@ -62,7 +60,7 @@ const SignUpScreen = () => {
                     placeholder="Enter your full name"
                     value={formData.name}
                     onChange={(e) => updateFormData("name", e.target.value)}
-                    className="pl-10 h-12 border-gray-200 focus:border-green-500"
+                    className="pl-10 h-12 border-gray-200 focus:border-green-500 rounded-xl"
                     required
                   />
                 </div>
@@ -78,7 +76,7 @@ const SignUpScreen = () => {
                     placeholder="Enter your email"
                     value={formData.email}
                     onChange={(e) => updateFormData("email", e.target.value)}
-                    className="pl-10 h-12 border-gray-200 focus:border-green-500"
+                    className="pl-10 h-12 border-gray-200 focus:border-green-500 rounded-xl"
                     required
                   />
                 </div>
@@ -94,7 +92,7 @@ const SignUpScreen = () => {
                     placeholder="Create a password"
                     value={formData.password}
                     onChange={(e) => updateFormData("password", e.target.value)}
-                    className="pl-10 pr-10 h-12 border-gray-200 focus:border-green-500"
+                    className="pl-10 pr-10 h-12 border-gray-200 focus:border-green-500 rounded-xl"
                     required
                   />
                   <button
@@ -117,7 +115,7 @@ const SignUpScreen = () => {
                     placeholder="Confirm your password"
                     value={formData.confirmPassword}
                     onChange={(e) => updateFormData("confirmPassword", e.target.value)}
-                    className="pl-10 h-12 border-gray-200 focus:border-green-500"
+                    className="pl-10 h-12 border-gray-200 focus:border-green-500 rounded-xl"
                     required
                   />
                 </div>
@@ -126,7 +124,7 @@ const SignUpScreen = () => {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-medium shadow-lg"
+                className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-medium shadow-lg rounded-xl"
               >
                 {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
@@ -142,7 +140,7 @@ const SignUpScreen = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" className="h-12" onClick={() => navigate("/onboarding/crop")}>
+              <Button variant="outline" className="h-12 rounded-xl" onClick={() => navigate("/app/home")}>
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                   <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -151,11 +149,11 @@ const SignUpScreen = () => {
                 </svg>
                 Google
               </Button>
-              <Button variant="outline" className="h-12" onClick={() => navigate("/onboarding/crop")}>
+              <Button variant="outline" className="h-12 rounded-xl" onClick={() => navigate("/app/home")}>
                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
                 </svg>
-                Facebook
+                Apple
               </Button>
             </div>
 

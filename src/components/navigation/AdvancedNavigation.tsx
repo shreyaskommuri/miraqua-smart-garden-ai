@@ -39,35 +39,35 @@ interface NavItem {
 }
 
 const navigationItems: NavItem[] = [
-  { id: 'home', label: 'Dashboard', icon: Home, path: '/home' },
+  { id: 'home', label: 'Dashboard', icon: Home, path: '/app/home' },
   { 
     id: 'analytics', 
     label: 'AI Analytics', 
     icon: BarChart3, 
-    path: '/analytics',
+    path: '/app/analytics',
     subItems: [
-      { id: 'predictive', label: 'Predictive Dashboard', icon: Target, path: '/analytics/predictive' },
-      { id: 'anomalies', label: 'Anomaly Alerts', icon: Zap, path: '/analytics/anomalies' },
-      { id: 'plant-health', label: 'Plant Health Scanner', icon: Camera, path: '/analytics/plant-health' },
-      { id: 'yield', label: 'Yield Forecast', icon: Leaf, path: '/analytics/yield' }
+      { id: 'predictive', label: 'Predictive Dashboard', icon: Target, path: '/app/analytics/predictive' },
+      { id: 'anomalies', label: 'Anomaly Alerts', icon: Zap, path: '/app/analytics/anomalies' },
+      { id: 'plant-health', label: 'Plant Health Scanner', icon: Camera, path: '/app/analytics/plant-health' },
+      { id: 'yield', label: 'Yield Forecast', icon: Leaf, path: '/app/analytics/yield' }
     ]
   },
-  { id: 'map', label: 'Smart Map', icon: Map, path: '/map' },
-  { id: 'chat', label: 'AI Assistant', icon: MessageSquare, path: '/chat', badge: 3 },
+  { id: 'map', label: 'Smart Map', icon: Map, path: '/app/map' },
+  { id: 'chat', label: 'AI Assistant', icon: MessageSquare, path: '/app/chat', badge: 3 },
   { 
     id: 'community', 
     label: 'Community', 
     icon: Users, 
-    path: '/community'
+    path: '/app/community'
   },
   { 
     id: 'marketplace', 
     label: 'Marketplace', 
     icon: Store, 
-    path: '/marketplace',
+    path: '/app/marketplace',
     badge: 2
   },
-  { id: 'account', label: 'Account', icon: User, path: '/account' }
+  { id: 'account', label: 'Account', icon: User, path: '/app/account' }
 ];
 
 const AdvancedNavigation = () => {
@@ -243,7 +243,7 @@ const AdvancedNavigation = () => {
               <Button 
                 variant="outline" 
                 className="w-full justify-start border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl py-3 h-auto"
-                onClick={() => navigate('/analytics/plant-health')}
+                onClick={() => navigate('/app/analytics/plant-health')}
               >
                 <div className="p-2 bg-blue-100 rounded-xl mr-3">
                   <Camera className="w-4 h-4 text-blue-600" />
