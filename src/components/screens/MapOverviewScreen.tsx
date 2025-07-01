@@ -5,11 +5,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, MapPin, Droplets, Thermometer, Sun, Settings } from "lucide-react";
+import { ArrowLeft, Droplets, Thermometer, Sun, Settings } from "lucide-react";
+import InteractiveMap from "@/components/ui/InteractiveMap";
+import PresenceIndicator from "@/components/ui/PresenceIndicator";
+import { useOfflineData } from "@/hooks/useOfflineData";
 
 const MapOverviewScreen = () => {
   const navigate = useNavigate();
   const [selectedPlot, setSelectedPlot] = useState<any>(null);
+  const { isOnline, getPendingActionsCount } = useOfflineData();
 
   const plots = [
     {
@@ -20,8 +24,9 @@ const MapOverviewScreen = () => {
       longitude: -122.4194,
       moisture: 85,
       temperature: 72,
-      status: "optimal",
-      nextWatering: "2h 15m"
+      status: "optimal" as const,
+      nextWatering: "2h 15m",
+      sensorStatus: "online" as const
     },
     {
       id: 2,
@@ -31,8 +36,9 @@ const MapOverviewScreen = () => {
       longitude: -122.4196,
       moisture: 45,
       temperature: 71,
-      status: "needs-water",
-      nextWatering: "4h 30m"
+      status: "needs-water" as const,
+      nextWatering: "4h 30m",
+      sensorStatus: "online" as const
     },
     {
       id: 3,
@@ -42,23 +48,38 @@ const MapOverviewScreen = () => {
       longitude: -122.4192,
       moisture: 42,
       temperature: 75,
-      status: "attention",
-      nextWatering: "Now"
+      status: "attention" as const,
+      nextWatering: "Now",
+      sensorStatus: "offline" as const
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Fixed Header */}
-      <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-40 shadow-sm">
+      <header className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 fixed top-0 left-0 right-0 z-40 shadow-sm">
         <div className="px-4 py-3">
-          <div className="flex items-center space-x-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="p-2">
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">Map Overview</h1>
-              <p className="text-xs text-gray-600">{plots.length} plots</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="p-2">
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <div>
+                <h1 className="text-lg font-bold text-gray-900 dark:text-white">Map Overview</h1>
+                <p className="text-xs text-gray-600 dark:text-gray-400">{plots.length} plots</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              {/* Offline indicator */}
+              {!isOnline && (
+                <Badge variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-200">
+                  Offline ({getPendingActionsCount()} pending)
+                </Badge>
+              )}
+              
+              {/* Presence indicator */}
+              <PresenceIndicator plotId={selectedPlot?.id?.toString()} />
             </div>
           </div>
         </div>
@@ -68,95 +89,26 @@ const MapOverviewScreen = () => {
       <ScrollArea className="h-screen">
         <div className="pt-16 pb-24 px-4">
           <div className="space-y-4">
-            {/* Map Container */}
-            <Card className="border-0 shadow-lg bg-white">
-              <CardContent className="p-0">
-                <div className="relative w-full h-80 bg-gradient-to-br from-blue-100 to-green-100 rounded-lg">
-                  {/* Map grid overlay */}
-                  <div className="absolute inset-0 opacity-20">
-                    {Array.from({ length: 12 }).map((_, i) => (
-                      <div key={i} className="absolute w-full h-px bg-gray-300" style={{ top: `${i * 8.33}%` }} />
-                    ))}
-                    {Array.from({ length: 12 }).map((_, i) => (
-                      <div key={i} className="absolute h-full w-px bg-gray-300" style={{ left: `${i * 8.33}%` }} />
-                    ))}
-                  </div>
-                  
-                  {/* Plot pins */}
-                  {plots.map((plot, index) => (
-                    <div
-                      key={plot.id}
-                      className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group"
-                      style={{
-                        left: `${30 + index * 20}%`,
-                        top: `${40 + index * 10}%`
-                      }}
-                      onClick={() => setSelectedPlot(plot)}
-                    >
-                      <div className="relative">
-                        <div className={`w-6 h-6 rounded-full border-2 border-white shadow-lg transition-transform group-hover:scale-110 ${
-                          plot.status === 'optimal' ? 'bg-green-500' :
-                          plot.status === 'needs-water' ? 'bg-yellow-500' :
-                          plot.status === 'attention' ? 'bg-red-500' : 'bg-gray-500'
-                        }`}>
-                          <MapPin className="w-3 h-3 text-white m-0.5" />
-                        </div>
-                        <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="bg-black/80 text-white px-2 py-1 rounded text-xs whitespace-nowrap">
-                            {plot.name}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {/* Map controls */}
-                  <div className="absolute top-3 right-3 space-y-2">
-                    <Button size="sm" variant="outline" className="w-8 h-8 p-0 bg-white text-xs">
-                      +
-                    </Button>
-                    <Button size="sm" variant="outline" className="w-8 h-8 p-0 bg-white text-xs">
-                      -
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Legend */}
-            <Card className="border-0 shadow-md bg-white">
-              <CardContent className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-3">Status Legend</h3>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-sm">Optimal</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                    <span className="text-sm">Needs Water</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                    <span className="text-sm">Attention</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Interactive Map */}
+            <InteractiveMap 
+              plots={plots}
+              onPlotSelect={setSelectedPlot}
+              selectedPlot={selectedPlot}
+            />
 
             {/* Selected Plot Details */}
             {selectedPlot && (
-              <Card className="border-0 shadow-lg bg-white">
+              <Card className="border-0 shadow-lg bg-white dark:bg-gray-800">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="font-bold text-gray-900">{selectedPlot.name}</h3>
-                      <p className="text-sm text-gray-600">{selectedPlot.crop}</p>
+                      <h3 className="font-bold text-gray-900 dark:text-white">{selectedPlot.name}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{selectedPlot.crop}</p>
                     </div>
                     <Badge className={`text-xs ${
-                      selectedPlot.status === 'optimal' ? 'bg-green-100 text-green-700' :
-                      selectedPlot.status === 'needs-water' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-red-100 text-red-700'
+                      selectedPlot.status === 'optimal' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' :
+                      selectedPlot.status === 'needs-water' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' :
+                      'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
                     }`}>
                       {selectedPlot.status === 'optimal' ? 'Optimal' : 
                        selectedPlot.status === 'needs-water' ? 'Needs Water' : 'Attention'}
@@ -164,26 +116,26 @@ const MapOverviewScreen = () => {
                   </div>
                   
                   <div className="grid grid-cols-3 gap-3 mb-4">
-                    <div className="text-center p-3 bg-blue-50 rounded-lg">
-                      <Droplets className="w-5 h-5 text-blue-600 mx-auto mb-1" />
-                      <div className="text-sm font-bold text-blue-900">{selectedPlot.moisture}%</div>
-                      <div className="text-xs text-blue-700">Moisture</div>
+                    <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                      <Droplets className="w-5 h-5 text-blue-600 dark:text-blue-400 mx-auto mb-1" />
+                      <div className="text-sm font-bold text-blue-900 dark:text-blue-300">{selectedPlot.moisture}%</div>
+                      <div className="text-xs text-blue-700 dark:text-blue-400">Moisture</div>
                     </div>
-                    <div className="text-center p-3 bg-orange-50 rounded-lg">
-                      <Thermometer className="w-5 h-5 text-orange-600 mx-auto mb-1" />
-                      <div className="text-sm font-bold text-orange-900">{selectedPlot.temperature}°F</div>
-                      <div className="text-xs text-orange-700">Temperature</div>
+                    <div className="text-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                      <Thermometer className="w-5 h-5 text-orange-600 dark:text-orange-400 mx-auto mb-1" />
+                      <div className="text-sm font-bold text-orange-900 dark:text-orange-300">{selectedPlot.temperature}°F</div>
+                      <div className="text-xs text-orange-700 dark:text-orange-400">Temperature</div>
                     </div>
-                    <div className="text-center p-3 bg-green-50 rounded-lg">
-                      <Sun className="w-5 h-5 text-green-600 mx-auto mb-1" />
-                      <div className="text-sm font-bold text-green-900">Good</div>
-                      <div className="text-xs text-green-700">Sunlight</div>
+                    <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                      <Sun className="w-5 h-5 text-green-600 dark:text-green-400 mx-auto mb-1" />
+                      <div className="text-sm font-bold text-green-900 dark:text-green-300">Good</div>
+                      <div className="text-xs text-green-700 dark:text-green-400">Sunlight</div>
                     </div>
                   </div>
                   
                   <div className="flex space-x-2">
                     <Button 
-                      onClick={() => navigate(`/plot/${selectedPlot.id}`)}
+                      onClick={() => navigate(`/app/plot/${selectedPlot.id}`)}
                       className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm"
                     >
                       View Details

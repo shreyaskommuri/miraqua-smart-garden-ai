@@ -1,6 +1,8 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { I18nProvider } from './contexts/I18nContext';
 import AdvancedNavigation from './components/navigation/AdvancedNavigation';
 import HomeScreen from './components/screens/HomeScreen';
 import AnalyticsScreen from './components/screens/AnalyticsScreen';
@@ -21,51 +23,80 @@ import SignInScreen from './components/screens/SignInScreen';
 import SignUpScreen from './components/screens/SignUpScreen';
 
 function App() {
+  useEffect(() => {
+    // Register service worker for PWA functionality
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('SW registered: ', registration);
+          })
+          .catch((registrationError) => {
+            console.log('SW registration failed: ', registrationError);
+          });
+      });
+    }
+
+    // Add manifest link to head
+    const manifestLink = document.createElement('link');
+    manifestLink.rel = 'manifest';
+    manifestLink.href = '/manifest.json';
+    document.head.appendChild(manifestLink);
+
+    return () => {
+      document.head.removeChild(manifestLink);
+    };
+  }, []);
+
   return (
-    <Router>
-      <Routes>
-        {/* Authentication Routes */}
-        <Route path="/welcome" element={<WelcomeScreen />} />
-        <Route path="/signin" element={<SignInScreen />} />
-        <Route path="/signup" element={<SignUpScreen />} />
-        
-        {/* Main App Routes */}
-        <Route path="/" element={<Navigate to="/welcome" replace />} />
-        <Route path="/app/*" element={
-          <div className="flex h-screen bg-gray-50">
-            <AdvancedNavigation />
-            <div className="flex-1 overflow-y-auto">
-              <Routes>
-                <Route path="/" element={<Navigate to="/home" replace />} />
-                <Route path="/home" element={<HomeScreen />} />
-                <Route path="/analytics" element={<AnalyticsScreen />} />
-                <Route path="/analytics/predictive" element={<PredictiveDashboardScreen />} />
-                <Route path="/analytics/anomalies" element={<AnomalyAlertsScreen />} />
-                <Route path="/analytics/plant-health" element={<PlantHealthScannerScreen />} />
-                <Route path="/analytics/yield" element={<YieldForecastScreen />} />
-                <Route path="/map" element={<MapOverviewScreen />} />
-                <Route path="/chat" element={<FarmerChatScreen />} />
-                <Route path="/community" element={<CommunityScreen />} />
-                <Route path="/marketplace" element={<MarketplaceScreen />} />
-                <Route path="/account" element={<AccountScreen />} />
-                <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
-                <Route path="/plot/:plotId/settings" element={<PlotSettingsScreen />} />
-                <Route path="/plot/:plotId/day/:date" element={<SpecificDayScreen />} />
-              </Routes>
-            </div>
-          </div>
-        } />
-        
-        {/* Legacy routes redirect */}
-        <Route path="/home" element={<Navigate to="/app/home" replace />} />
-        <Route path="/analytics" element={<Navigate to="/app/analytics" replace />} />
-        <Route path="/map" element={<Navigate to="/app/map" replace />} />
-        <Route path="/chat" element={<Navigate to="/app/chat" replace />} />
-        <Route path="/community" element={<Navigate to="/app/community" replace />} />
-        <Route path="/marketplace" element={<Navigate to="/app/marketplace" replace />} />
-        <Route path="/account" element={<Navigate to="/app/account" replace />} />
-      </Routes>
-    </Router>
+    <ThemeProvider>
+      <I18nProvider>
+        <Router>
+          <Routes>
+            {/* Authentication Routes */}
+            <Route path="/welcome" element={<WelcomeScreen />} />
+            <Route path="/signin" element={<SignInScreen />} />
+            <Route path="/signup" element={<SignUpScreen />} />
+            
+            {/* Main App Routes */}
+            <Route path="/" element={<Navigate to="/welcome" replace />} />
+            <Route path="/app/*" element={
+              <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+                <AdvancedNavigation />
+                <div className="flex-1 overflow-y-auto">
+                  <Routes>
+                    <Route path="/" element={<Navigate to="/home" replace />} />
+                    <Route path="/home" element={<HomeScreen />} />
+                    <Route path="/analytics" element={<AnalyticsScreen />} />
+                    <Route path="/analytics/predictive" element={<PredictiveDashboardScreen />} />
+                    <Route path="/analytics/anomalies" element={<AnomalyAlertsScreen />} />
+                    <Route path="/analytics/plant-health" element={<PlantHealthScannerScreen />} />
+                    <Route path="/analytics/yield" element={<YieldForecastScreen />} />
+                    <Route path="/map" element={<MapOverviewScreen />} />
+                    <Route path="/chat" element={<FarmerChatScreen />} />
+                    <Route path="/community" element={<CommunityScreen />} />
+                    <Route path="/marketplace" element={<MarketplaceScreen />} />
+                    <Route path="/account" element={<AccountScreen />} />
+                    <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
+                    <Route path="/plot/:plotId/settings" element={<PlotSettingsScreen />} />
+                    <Route path="/plot/:plotId/day/:date" element={<SpecificDayScreen />} />
+                  </Routes>
+                </div>
+              </div>
+            } />
+            
+            {/* Legacy routes redirect */}
+            <Route path="/home" element={<Navigate to="/app/home" replace />} />
+            <Route path="/analytics" element={<Navigate to="/app/analytics" replace />} />
+            <Route path="/map" element={<Navigate to="/app/map" replace />} />
+            <Route path="/chat" element={<Navigate to="/app/chat" replace />} />
+            <Route path="/community" element={<Navigate to="/app/community" replace />} />
+            <Route path="/marketplace" element={<Navigate to="/app/marketplace" replace />} />
+            <Route path="/account" element={<Navigate to="/app/account" replace />} />
+          </Routes>
+        </Router>
+      </I18nProvider>
+    </ThemeProvider>
   );
 }
 
