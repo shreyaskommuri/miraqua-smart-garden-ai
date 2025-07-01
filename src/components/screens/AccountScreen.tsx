@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,7 +46,7 @@ interface UserProfile {
   waterSaved: number;
   isPremium: boolean;
   twoFactorEnabled: boolean;
-  theme: 'light' | 'dark';
+  theme: 'light' | 'dark' | 'system';
   language: string;
   timezone: string;
   plan: string;
@@ -66,7 +67,7 @@ const AccountScreen = () => {
     waterSaved: 142,
     isPremium: true,
     twoFactorEnabled: false,
-    theme: 'light',
+    theme: 'system',
     language: 'en',
     timezone: 'America/New_York',
     plan: 'Premium'
@@ -199,7 +200,7 @@ const AccountScreen = () => {
   };
 
   const handleLanguageChange = (newLanguage: string) => {
-    setLanguage(newLanguage);
+    setLanguage(newLanguage as 'en' | 'es' | 'hi' | 'fr');
     setProfile(prev => ({ ...prev, language: newLanguage }));
     setIsDirty(true);
   };
@@ -498,12 +499,12 @@ const AccountScreen = () => {
             <CardContent className="space-y-4">
               {/* Notification Settings */}
               <div onClick={() => navigate('/notifications')} className="cursor-pointer">
-                <div className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors">
+                <div className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
                   <div className="flex items-center space-x-3">
-                    <Bell className="w-5 h-5 text-gray-600" />
+                    <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                     <div>
                       <p className="font-medium">Notification Settings</p>
-                      <p className="text-sm text-gray-600">Manage alerts and reminders</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Manage alerts and reminders</p>
                     </div>
                   </div>
                   <ChevronRight className="w-5 h-5 text-gray-400" />
@@ -512,12 +513,12 @@ const AccountScreen = () => {
 
               {/* Subscription */}
               <div onClick={() => navigate('/subscription')} className="cursor-pointer">
-                <div className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors">
+                <div className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
                   <div className="flex items-center space-x-3">
-                    <CreditCard className="w-5 h-5 text-gray-600" />
+                    <CreditCard className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                     <div>
                       <p className="font-medium">Manage Subscription</p>
-                      <p className="text-sm text-gray-600">Current plan: {profile.plan}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Current plan: {profile.plan}</p>
                     </div>
                   </div>
                   <ChevronRight className="w-5 h-5 text-gray-400" />
@@ -526,12 +527,12 @@ const AccountScreen = () => {
 
               {/* Help & Support */}
               <div onClick={() => navigate('/help')} className="cursor-pointer">
-                <div className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors">
+                <div className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
                   <div className="flex items-center space-x-3">
-                    <HelpCircle className="w-5 h-5 text-gray-600" />
+                    <HelpCircle className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                     <div>
                       <p className="font-medium">Help & Support</p>
-                      <p className="text-sm text-gray-600">FAQs, contact support</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">FAQs, contact support</p>
                     </div>
                   </div>
                   <ChevronRight className="w-5 h-5 text-gray-400" />
@@ -546,17 +547,17 @@ const AccountScreen = () => {
               <CardTitle>Legal</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <a href="/terms" className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors">
+              <a href="/terms" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
                 <div className="flex items-center space-x-3">
-                  <FileText className="w-5 h-5 text-gray-600" />
+                  <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                   <span className="font-medium">Terms of Service</span>
                 </div>
                 <ChevronRight className="w-5 h-5 text-gray-400" />
               </a>
               
-              <a href="/privacy" className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors">
+              <a href="/privacy" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
                 <div className="flex items-center space-x-3">
-                  <Shield className="w-5 h-5 text-gray-600" />
+                  <Shield className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                   <span className="font-medium">Privacy Policy</span>
                 </div>
                 <ChevronRight className="w-5 h-5 text-gray-400" />
@@ -565,9 +566,9 @@ const AccountScreen = () => {
           </Card>
 
           {/* Danger Zone */}
-          <Card className="border-red-200 shadow-lg">
+          <Card className="border-red-200 dark:border-red-800 shadow-lg">
             <CardHeader>
-              <CardTitle className="text-red-600">Danger Zone</CardTitle>
+              <CardTitle className="text-red-600 dark:text-red-400">Danger Zone</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <AlertDialog>
