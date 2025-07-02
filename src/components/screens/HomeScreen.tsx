@@ -20,11 +20,13 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PlotCard from "@/components/PlotCard";
+import { getPlots, Plot } from "@/services/mockDataService";
 
 const HomeScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [plots, setPlots] = useState<Plot[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -33,76 +35,24 @@ const HomeScreen = () => {
       setLoading(true);
       setError("");
       try {
-        // Simulate loading delay
-        await new Promise(resolve => setTimeout(resolve, 1200));
+        const plotData = await getPlots();
+        setPlots(plotData);
       } catch (err) {
         setError("Failed to load plots");
+        toast({
+          title: "Error",
+          description: "Failed to load your plots. Please try again.",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [toast]);
 
-  const mockPlots = [
-    {
-      id: "1",
-      name: "Cherry Tomato Garden",
-      crop: "Cherry Tomatoes",
-      variety: "Sweet 100",
-      location: "Backyard Plot A",
-      currentTemp: 72,
-      currentMoisture: 68,
-      currentSunlight: 85,
-      healthScore: 87,
-      nextWatering: "Tomorrow 6:00 AM",
-      lastWatered: "2 hours ago",
-      isOnline: true,
-      coordinates: {
-        lat: 37.7749,
-        lon: -122.4194
-      }
-    },
-    {
-      id: "2", 
-      name: "Herb Garden",
-      crop: "Mixed Herbs",
-      variety: "Basil & Rosemary",
-      location: "Kitchen Window",
-      currentTemp: 70,
-      currentMoisture: 55,
-      currentSunlight: 92,
-      healthScore: 92,
-      nextWatering: "Today 8:00 PM",
-      lastWatered: "6 hours ago",
-      isOnline: true,
-      coordinates: {
-        lat: 37.7849,
-        lon: -122.4094
-      }
-    },
-    {
-      id: "3",
-      name: "Pepper Patch",
-      crop: "Bell Peppers",
-      variety: "California Wonder",
-      location: "Side Garden",
-      currentTemp: 75,
-      currentMoisture: 42,
-      currentSunlight: 78,
-      healthScore: 73,
-      nextWatering: "In 2 hours",
-      lastWatered: "1 day ago",
-      isOnline: false,
-      coordinates: {
-        lat: 37.7649,
-        lon: -122.4294
-      }
-    }
-  ];
-
-  const filteredPlots = mockPlots.filter(plot =>
+  const filteredPlots = plots.filter(plot =>
     plot.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     plot.crop.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -111,11 +61,12 @@ const HomeScreen = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
         <div className="p-6 space-y-6">
-          <div className="animate-pulse">
-            <div className="h-20 bg-white dark:bg-gray-800 rounded-2xl shadow-sm mb-6"></div>
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-32 bg-white dark:bg-gray-800 rounded-2xl shadow-sm mb-4"></div>
-            ))}
+          <div className="flex items-center justify-center min-h-[50vh]">
+            <div className="text-center">
+              <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Loading your gardens...</h3>
+              <p className="text-gray-600 dark:text-gray-300">Please wait while we fetch your plot data</p>
+            </div>
           </div>
         </div>
       </div>
@@ -165,7 +116,12 @@ const HomeScreen = () => {
               <Button variant="ghost" size="sm" className="btn-modern">
                 <Bell className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" className="btn-modern">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="btn-modern"
+                onClick={() => navigate("/app/analytics")}
+              >
                 <BarChart3 className="w-4 h-4" />
               </Button>
               <ThemeSwitcher />
@@ -208,7 +164,7 @@ const HomeScreen = () => {
             <Card className="glass border-0 shadow-xl">
               <CardContent className="p-6 text-center">
                 <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                  {Math.round(filteredPlots.reduce((sum, p) => sum + p.currentMoisture, 0) / filteredPlots.length)}%
+                  {filteredPlots.length > 0 ? Math.round(filteredPlots.reduce((sum, p) => sum + p.currentMoisture, 0) / filteredPlots.length) : 0}%
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-300">
                   Avg Moisture
@@ -219,7 +175,7 @@ const HomeScreen = () => {
             <Card className="glass border-0 shadow-xl">
               <CardContent className="p-6 text-center">
                 <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-2">
-                  {Math.round(filteredPlots.reduce((sum, p) => sum + p.healthScore, 0) / filteredPlots.length)}%
+                  {filteredPlots.length > 0 ? Math.round(filteredPlots.reduce((sum, p) => sum + p.healthScore, 0) / filteredPlots.length) : 0}%
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-300">
                   Avg Health

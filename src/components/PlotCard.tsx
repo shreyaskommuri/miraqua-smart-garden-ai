@@ -14,42 +14,44 @@ import {
   Wifi,
   WifiOff,
   Heart,
-  Battery
+  Settings
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Plot, waterPlot } from '@/services/mockDataService';
+import { useToast } from '@/hooks/use-toast';
 
 interface PlotCardProps {
-  plot: {
-    id: string;
-    name: string;
-    crop: string;
-    variety?: string;
-    location: string;
-    currentTemp: number;
-    currentMoisture: number;
-    currentSunlight: number;
-    healthScore: number;
-    nextWatering: string;
-    lastWatered: string;
-    isOnline: boolean;
-    coordinates: {
-      lat: number;
-      lon: number;
-    };
-  };
+  plot: Plot;
 }
 
 const PlotCard: React.FC<PlotCardProps> = ({ plot }) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleCardClick = () => {
-    navigate(`/app/plot/${plot.id}?lat=${plot.coordinates.lat}&lon=${plot.coordinates.lon}`);
+    navigate(`/app/plot/${plot.id}`);
   };
 
-  const handleWaterNow = (e: React.MouseEvent) => {
+  const handleWaterNow = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Handle immediate watering action
-    console.log(`Starting immediate watering for plot ${plot.id}`);
+    try {
+      await waterPlot(plot.id);
+      toast({
+        title: "Watering Started",
+        description: `${plot.name} is now being watered.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to start watering. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSettings = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/app/plot/${plot.id}/settings`);
   };
 
   const getHealthColor = (score: number) => {
@@ -82,6 +84,14 @@ const PlotCard: React.FC<PlotCardProps> = ({ plot }) => {
                   <WifiOff className="w-4 h-4 text-red-500" />
                 )}
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-6 h-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={handleSettings}
+              >
+                <Settings className="w-3 h-3" />
+              </Button>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
               {plot.crop} {plot.variety && `• ${plot.variety}`}

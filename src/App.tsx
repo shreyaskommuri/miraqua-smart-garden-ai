@@ -109,10 +109,8 @@ function App() {
               </div>
             } />
             
-            {/* Root redirect */}
-            <Route path="/" element={<Navigate to="/welcome" replace />} />
-            
-            {/* Legacy routes redirect */}
+            {/* Root and legacy routes redirect to app */}
+            <Route path="/" element={<Navigate to="/app/home" replace />} />
             <Route path="/home" element={<Navigate to="/app/home" replace />} />
             <Route path="/analytics" element={<Navigate to="/app/analytics" replace />} />
             <Route path="/map" element={<Navigate to="/app/map" replace />} />
