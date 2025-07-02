@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -100,9 +101,9 @@ function App() {
                     <Route path="/account" element={<AccountScreen />} />
                     
                     {/* Plot Detail Routes */}
-                    <Route path="/app/plot/:plotId" element={<PlotDetailsScreen />} />
-                    <Route path="/app/plot/:plotId/settings" element={<PlotSettingsScreen />} />
-                    <Route path="/app/plot/:plotId/day/:date" element={<SpecificDayScreen />} />
+                    <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
+                    <Route path="/plot/:plotId/settings" element={<PlotSettingsScreen />} />
+                    <Route path="/plot/:plotId/day/:date" element={<SpecificDayScreen />} />
                   </Routes>
                 </div>
               </div>

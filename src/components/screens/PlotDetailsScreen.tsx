@@ -4,14 +4,12 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { CalendarSchedule } from "@/components/ui/CalendarSchedule";
 import { MiniMap } from "@/components/ui/MiniMap";
 import { Progress } from "@/components/ui/progress";
 import { 
   ArrowLeft, 
-  MessageSquare, 
   Settings, 
   Droplets, 
   Thermometer, 
@@ -21,25 +19,13 @@ import {
   Loader2,
   AlertTriangle,
   RefreshCw,
-  TrendingUp,
   Activity,
-  Leaf,
   Calendar,
-  BarChart3,
-  Camera,
   Share2,
   Heart,
-  Gauge,
-  Wind,
-  Eye,
-  Clock,
-  Target,
-  Award,
   Wifi,
-  WifiOff,
-  Battery,
-  ChevronRight,
-  Zap
+  Clock,
+  Battery
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -53,8 +39,6 @@ const PlotDetailsScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [watering, setWatering] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [isOnline, setIsOnline] = useState(true);
 
   const latitude = parseFloat(searchParams.get('lat') || '37.7749');
   const longitude = parseFloat(searchParams.get('lon') || '-122.4194');
@@ -67,7 +51,7 @@ const PlotDetailsScreen = () => {
       console.log(`Fetching plot data for plot: ${plotId}`);
       
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 800));
       
       const mockSchedule = [
         {
@@ -108,17 +92,20 @@ const PlotDetailsScreen = () => {
         '1': {
           name: "Cherry Tomato Garden",
           crop: "Cherry Tomatoes",
-          variety: "Sweet 100"
+          variety: "Sweet 100",
+          healthScore: 87
         },
         '2': {
           name: "Herb Garden", 
           crop: "Mixed Herbs",
-          variety: "Basil & Rosemary"
+          variety: "Basil & Rosemary",
+          healthScore: 92
         },
         '3': {
           name: "Pepper Patch",
           crop: "Bell Peppers", 
-          variety: "California Wonder"
+          variety: "California Wonder",
+          healthScore: 73
         }
       };
 
@@ -131,40 +118,15 @@ const PlotDetailsScreen = () => {
         currentTemp: 72,
         currentMoisture: 68,
         currentSunlight: 85,
-        humidity: 62,
-        windSpeed: 8,
-        uvIndex: 7,
-        cropAge: "45 days",
-        plantingDate: "May 15, 2024",
-        expectedHarvest: "August 20, 2024",
         nextWatering: "Tomorrow 6:00 AM",
         schedule: mockSchedule,
-        totalWaterToday: 15,
-        weeklyTotal: 95,
-        efficiency: 92,
-        healthScore: 87,
         lastWatered: "2 hours ago",
-        soilPh: 6.8,
-        batteryLevel: 78,
-        signalStrength: 85,
-        nutrients: {
-          nitrogen: 75,
-          phosphorus: 82,
-          potassium: 68
-        },
+        isOnline: true,
         sensors: [
           { id: 1, name: "Soil Moisture", value: 68, unit: "%", status: "good", lastUpdate: "2 min ago" },
           { id: 2, name: "Temperature", value: 72, unit: "°F", status: "optimal", lastUpdate: "1 min ago" },
           { id: 3, name: "Light", value: 85, unit: "%", status: "good", lastUpdate: "3 min ago" },
           { id: 4, name: "pH Level", value: 6.8, unit: "pH", status: "good", lastUpdate: "5 min ago" }
-        ],
-        growthStages: [
-          { stage: "Germination", date: "May 15", status: "completed", progress: 100 },
-          { stage: "Seedling", date: "May 25", status: "completed", progress: 100 },
-          { stage: "Vegetative", date: "Jun 10", status: "completed", progress: 100 },
-          { stage: "Flowering", date: "Jun 30", status: "current", progress: 75 },
-          { stage: "Fruiting", date: "Jul 20", status: "upcoming", progress: 0 },
-          { stage: "Harvest", date: "Aug 20", status: "upcoming", progress: 0 }
         ]
       });
 

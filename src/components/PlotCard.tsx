@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -10,15 +9,14 @@ import {
   Thermometer, 
   Sun, 
   MapPin, 
-  Settings, 
-  Activity,
+  Clock, 
+  Play,
   Wifi,
   WifiOff,
   Heart,
-  TrendingUp,
-  Calendar,
-  AlertCircle
+  Battery
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface PlotCardProps {
   plot: {
@@ -32,171 +30,146 @@ interface PlotCardProps {
     currentSunlight: number;
     healthScore: number;
     nextWatering: string;
-    isOnline?: boolean;
-    lastWatered?: string;
+    lastWatered: string;
+    isOnline: boolean;
     coordinates: {
       lat: number;
       lon: number;
     };
   };
-  onClick?: () => void;
 }
 
-const PlotCard: React.FC<PlotCardProps> = ({ plot, onClick }) => {
+const PlotCard: React.FC<PlotCardProps> = ({ plot }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    if (onClick) {
-      onClick();
-    } else {
-      navigate(`/app/plot/${plot.id}?lat=${plot.coordinates.lat}&lon=${plot.coordinates.lon}`);
-    }
+    navigate(`/app/plot/${plot.id}?lat=${plot.coordinates.lat}&lon=${plot.coordinates.lon}`);
   };
 
-  const handleSettingsClick = (e: React.MouseEvent) => {
+  const handleWaterNow = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate(`/app/plot/${plot.id}/settings?lat=${plot.coordinates.lat}&lon=${plot.coordinates.lon}`);
+    // Handle immediate watering action
+    console.log(`Starting immediate watering for plot ${plot.id}`);
   };
 
   const getHealthColor = (score: number) => {
-    if (score >= 80) return 'text-green-600 bg-green-50';
-    if (score >= 60) return 'text-yellow-600 bg-yellow-50';
-    return 'text-red-600 bg-red-50';
+    if (score >= 80) return 'text-green-600 dark:text-green-400';
+    if (score >= 60) return 'text-yellow-600 dark:text-yellow-400';
+    return 'text-red-600 dark:text-red-400';
   };
 
-  const getMoistureColor = (moisture: number) => {
-    if (moisture >= 60) return 'bg-blue-500';
-    if (moisture >= 40) return 'bg-yellow-500';
-    return 'bg-red-500';
+  const getHealthBadgeColor = (score: number) => {
+    if (score >= 80) return 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800';
+    if (score >= 60) return 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800';
+    return 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
   };
 
   return (
     <Card 
-      className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 transform"
+      className="glass border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 animate-fade-in-up"
       onClick={handleCardClick}
     >
-      <CardHeader className="pb-4">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-2xl">🍅</span>
+      <CardContent className="p-6">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1">
+            <div className="flex items-center space-x-2 mb-2">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">{plot.name}</h3>
+              <div className="relative">
+                {plot.isOnline ? (
+                  <Wifi className="w-4 h-4 text-green-500" />
+                ) : (
+                  <WifiOff className="w-4 h-4 text-red-500" />
+                )}
               </div>
-              {plot.isOnline !== false ? (
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
-                  <Wifi className="w-2.5 h-2.5 text-white" />
-                </div>
-              ) : (
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
-                  <WifiOff className="w-2.5 h-2.5 text-white" />
-                </div>
-              )}
             </div>
-            
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
+              {plot.crop} {plot.variety && `• ${plot.variety}`}
+            </p>
+            <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
+              <MapPin className="w-3 h-3 mr-1" />
+              {plot.location}
+            </div>
+          </div>
+          <Badge className={`${getHealthBadgeColor(plot.healthScore)} text-xs`}>
+            <Heart className="w-3 h-3 mr-1" />
+            {plot.healthScore}%
+          </Badge>
+        </div>
+
+        {/* Metrics Grid */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="text-center">
+            <div className="flex items-center justify-center space-x-1 mb-2">
+              <Droplets className="w-4 h-4 text-blue-500" />
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                {plot.currentMoisture}%
+              </span>
+            </div>
+            <Progress value={plot.currentMoisture} className="h-2 mb-1" />
+            <p className="text-xs text-gray-500 dark:text-gray-400">Moisture</p>
+          </div>
+          
+          <div className="text-center">
+            <div className="flex items-center justify-center space-x-1 mb-2">
+              <Thermometer className="w-4 h-4 text-orange-500" />
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                {plot.currentTemp}°F
+              </span>
+            </div>
+            <Progress value={(plot.currentTemp - 32) * 1.8} className="h-2 mb-1" />
+            <p className="text-xs text-gray-500 dark:text-gray-400">Temperature</p>
+          </div>
+          
+          <div className="text-center">
+            <div className="flex items-center justify-center space-x-1 mb-2">
+              <Sun className="w-4 h-4 text-yellow-500" />
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                {plot.currentSunlight}%
+              </span>
+            </div>
+            <Progress value={plot.currentSunlight} className="h-2 mb-1" />
+            <p className="text-xs text-gray-500 dark:text-gray-400">Sunlight</p>
+          </div>
+        </div>
+
+        {/* Next Watering Info */}
+        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-4 mb-4">
+          <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-lg font-bold text-gray-900 dark:text-white">
-                {plot.name}
-              </CardTitle>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                {plot.crop} {plot.variety && `• ${plot.variety}`}
+              <div className="flex items-center space-x-2 text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                <Clock className="w-4 h-4" />
+                <span>Next: {plot.nextWatering}</span>
+              </div>
+              <p className="text-xs text-blue-700 dark:text-blue-300">
+                Last watered: {plot.lastWatered}
               </p>
             </div>
+            {plot.currentMoisture < 50 && (
+              <Button
+                size="sm"
+                onClick={handleWaterNow}
+                className="bg-blue-600 hover:bg-blue-700 text-white btn-modern"
+              >
+                <Play className="w-3 h-3 mr-1" />
+                Water
+              </Button>
+            )}
           </div>
-          
+        </div>
+
+        {/* Status Indicator */}
+        <div className="flex items-center justify-between text-xs">
           <div className="flex items-center space-x-2">
-            <Badge className={`text-xs px-2 py-1 ${getHealthColor(plot.healthScore)}`}>
-              <Heart className="w-3 h-3 mr-1" />
-              {plot.healthScore}%
-            </Badge>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleSettingsClick}
-              className="hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              <Settings className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-4">
-        {/* Status Grid */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-            <Droplets className="w-5 h-5 text-blue-600 mx-auto mb-1" />
-            <div className="text-lg font-bold text-gray-900 dark:text-white">
-              {plot.currentMoisture}%
-            </div>
-            <div className="text-xs text-gray-500">Moisture</div>
-          </div>
-          
-          <div className="text-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-xl">
-            <Thermometer className="w-5 h-5 text-orange-600 mx-auto mb-1" />
-            <div className="text-lg font-bold text-gray-900 dark:text-white">
-              {plot.currentTemp}°F
-            </div>
-            <div className="text-xs text-gray-500">Temperature</div>
-          </div>
-          
-          <div className="text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl">
-            <Sun className="w-5 h-5 text-yellow-600 mx-auto mb-1" />
-            <div className="text-lg font-bold text-gray-900 dark:text-white">
-              {plot.currentSunlight}%
-            </div>
-            <div className="text-xs text-gray-500">Sunlight</div>
-          </div>
-        </div>
-
-        {/* Moisture Progress */}
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600 dark:text-gray-300">Soil Moisture</span>
-            <span className="font-medium">{plot.currentMoisture}%</span>
-          </div>
-          <Progress 
-            value={plot.currentMoisture} 
-            className="h-2"
-            style={{
-              backgroundColor: 'rgb(229 231 235)',
-            }}
-          />
-        </div>
-
-        {/* Next Watering */}
-        <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl">
-          <div className="flex items-center space-x-2">
-            <Calendar className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
-              Next Watering
+            <div className={`w-2 h-2 rounded-full ${plot.isOnline ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            <span className="text-gray-600 dark:text-gray-300">
+              {plot.isOnline ? 'Online' : 'Offline'}
             </span>
           </div>
-          <span className="text-sm font-bold text-blue-700 dark:text-blue-300">
-            {plot.nextWatering}
-          </span>
-        </div>
-
-        {/* Location */}
-        <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-          <MapPin className="w-4 h-4" />
-          <span>{plot.location}</span>
-        </div>
-
-        {/* Last Activity */}
-        {plot.lastWatered && (
-          <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-            <Activity className="w-4 h-4" />
-            <span>Last watered {plot.lastWatered}</span>
+          <div className={`font-medium ${getHealthColor(plot.healthScore)}`}>
+            Health: {plot.healthScore}%
           </div>
-        )}
-
-        {/* Offline Warning */}
-        {plot.isOnline === false && (
-          <div className="flex items-center space-x-2 p-2 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg text-sm">
-            <AlertCircle className="w-4 h-4" />
-            <span>Device offline</span>
-          </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );

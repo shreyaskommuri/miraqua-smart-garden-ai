@@ -1,50 +1,22 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { ThemeSwitcher } from "@/components/ui/ThemeSwitcher";
 import {
-  ArrowLeft,
-  ArrowRight,
   Plus,
   Search,
   Settings,
   Bell,
   BarChart3,
-  ListChecks,
-  LayoutDashboard,
   Loader2,
   AlertTriangle,
   RefreshCw,
-  TrendingUp,
-  TrendingDown,
-  Activity,
-  Droplets,
-  Thermometer,
-  Sun,
-  MapPin,
-  Copy,
-  Play,
-  Leaf,
-  Zap,
-  Calendar,
-  Camera,
-  Share2,
-  Heart,
-  Gauge,
-  Cloud,
-  Wind,
-  Eye,
-  Clock,
-  Target,
-  Award,
   Wifi,
-  WifiOff,
-  Battery,
-  ChevronRight,
-  Info
+  WifiOff
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PlotCard from "@/components/PlotCard";
@@ -173,7 +145,7 @@ const HomeScreen = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Enhanced Header */}
-      <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40 shadow-sm">
+      <header className="glass border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40 shadow-sm">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -190,13 +162,14 @@ const HomeScreen = () => {
             </div>
             
             <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="btn-modern">
                 <Bell className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="btn-modern">
                 <BarChart3 className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => navigate("/app/settings")}>
+              <ThemeSwitcher />
+              <Button variant="ghost" size="sm" className="btn-modern" onClick={() => navigate("/app/account")}>
                 <Settings className="w-4 h-4" />
               </Button>
             </div>
@@ -211,18 +184,91 @@ const HomeScreen = () => {
             <Input
               type="text"
               placeholder="Search plots..."
-              className="rounded-full pl-10 pr-4 shadow-sm dark:bg-gray-800 dark:border-gray-700"
+              className="rounded-full pl-10 pr-4 shadow-lg glass border-0"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 dark:text-gray-400" />
           </div>
 
+          {/* Status Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="glass border-0 shadow-xl">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
+                  {filteredPlots.filter(p => p.isOnline).length}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 flex items-center justify-center">
+                  <Wifi className="w-4 h-4 mr-1" />
+                  Online Plots
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="glass border-0 shadow-xl">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                  {Math.round(filteredPlots.reduce((sum, p) => sum + p.currentMoisture, 0) / filteredPlots.length)}%
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">
+                  Avg Moisture
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="glass border-0 shadow-xl">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-2">
+                  {Math.round(filteredPlots.reduce((sum, p) => sum + p.healthScore, 0) / filteredPlots.length)}%
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">
+                  Avg Health
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Plots Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPlots.map(plot => (
-              <PlotCard key={plot.id} plot={plot} />
-            ))}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Your Plots ({filteredPlots.length})
+              </h2>
+            </div>
+            
+            {filteredPlots.length === 0 ? (
+              <Card className="glass border-0 shadow-xl">
+                <CardContent className="p-12 text-center">
+                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span className="text-3xl">🌱</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    {searchQuery ? 'No plots found' : 'No plots yet'}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-6">
+                    {searchQuery 
+                      ? `No plots match "${searchQuery}". Try adjusting your search.`
+                      : 'Create your first plot to start monitoring your garden.'
+                    }
+                  </p>
+                  {!searchQuery && (
+                    <Button 
+                      onClick={() => navigate("/add-plot")}
+                      className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white btn-modern"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Your First Plot
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredPlots.map(plot => (
+                  <PlotCard key={plot.id} plot={plot} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </ScrollArea>
@@ -230,8 +276,8 @@ const HomeScreen = () => {
       {/* Floating Action Button */}
       <div className="fixed bottom-6 left-6 right-6 z-30">
         <Button
-          onClick={() => navigate("/app/new-plot")}
-          className="w-full h-16 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold text-lg rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 border-0"
+          onClick={() => navigate("/add-plot")}
+          className="w-full h-16 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold text-lg rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 border-0 btn-modern"
         >
           <Plus className="w-6 h-6 mr-3" />
           Add New Plot
