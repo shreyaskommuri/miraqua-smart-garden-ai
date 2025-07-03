@@ -218,6 +218,10 @@ const PlotDetailsScreen = () => {
     navigate(`/app/plot/${plotId}/day/${day.date}?lat=${latitude}&lon=${longitude}`);
   };
 
+  const handleCalendarClick = (date: string) => {
+    navigate(`/app/calendar/${plotId}?date=${date}&lat=${latitude}&lon=${longitude}`);
+  };
+
   const copyCoordinates = () => {
     navigator.clipboard.writeText(`${latitude}, ${longitude}`);
     toast({
@@ -499,10 +503,11 @@ const PlotDetailsScreen = () => {
             </CardContent>
           </Card>
 
-          {/* Updated Calendar Schedule with 2-week view */}
+          {/* Updated Calendar Schedule with new props */}
           <CalendarSchedule 
             schedule={plotData.schedule} 
             onDayClick={handleDayClick}
+            onCalendarClick={handleCalendarClick}
             showManualControls={true}
             onVolumeAdjust={adjustWaterVolume}
           />

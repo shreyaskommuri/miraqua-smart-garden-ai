@@ -4,7 +4,7 @@ import { Card, CardContent } from './card';
 import { Badge } from './badge';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
-import { Droplets, Calendar, Plus, Minus, ChevronRight } from 'lucide-react';
+import { Droplets, Calendar, Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ScheduleDay {
@@ -20,6 +20,7 @@ interface ScheduleDay {
 interface CalendarScheduleProps {
   schedule: ScheduleDay[];
   onDayClick?: (day: ScheduleDay) => void;
+  onCalendarClick?: (date: string) => void;
   className?: string;
   showManualControls?: boolean;
   onVolumeAdjust?: (date: string, adjustment: number) => void;
@@ -28,79 +29,80 @@ interface CalendarScheduleProps {
 export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
   schedule,
   onDayClick,
+  onCalendarClick,
   className,
   showManualControls = false,
   onVolumeAdjust
 }) => {
   const isMobile = useIsMobile();
+  const [currentMonth, setCurrentMonth] = React.useState(new Date());
 
-  const getTimeSlotColor = (slot: { time: string; duration: number; volume: number }) => {
-    if (slot.volume >= 20) return 'bg-gradient-to-r from-blue-600 to-blue-700';
-    if (slot.volume >= 10) return 'bg-gradient-to-r from-blue-500 to-blue-600';
-    return 'bg-gradient-to-r from-blue-400 to-blue-500';
-  };
+  const generateCalendarDays = () => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
 
-  const getDayColor = (day: ScheduleDay) => {
-    if (day.isToday) return 'ring-2 ring-emerald-400 bg-emerald-50 border-emerald-200';
-    if (day.hasWatering) return 'bg-blue-50 border-blue-200';
-    return 'bg-white border-gray-200';
-  };
-
-  const getTotalVolume = (day: ScheduleDay) => {
-    return (day.morning?.volume || 0) + (day.afternoon?.volume || 0) + (day.evening?.volume || 0);
-  };
-
-  const handleVolumeAdjust = (day: ScheduleDay, adjustment: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    onVolumeAdjust?.(day.date, adjustment);
-  };
-
-  // Generate 14 days of schedule data
-  const generateTwoWeeksSchedule = () => {
-    const twoWeeksData = [];
+    const days = [];
     const today = new Date();
     
-    for (let i = 0; i < 14; i++) {
-      const currentDate = new Date(today);
-      currentDate.setDate(today.getDate() + i);
+    for (let i = 0; i < 42; i++) {
+      const currentDate = new Date(startDate);
+      currentDate.setDate(startDate.getDate() + i);
       
       const dateStr = currentDate.toISOString().split('T')[0];
-      const dayOfWeek = currentDate.toLocaleDateString('en-US', { weekday: 'short' });
+      const isCurrentMonth = currentDate.getMonth() === month;
+      const isToday = currentDate.toDateString() === today.toDateString();
       
       const existingDay = schedule.find(day => day.date === dateStr);
+      const hasWatering = existingDay?.hasWatering || (isCurrentMonth && Math.random() > 0.6);
       
-      if (existingDay) {
-        twoWeeksData.push(existingDay);
-      } else {
-        const hasWatering = Math.random() > 0.3;
-        const mockDay: ScheduleDay = {
-          date: dateStr,
-          dayOfWeek,
-          hasWatering,
-          isToday: i === 0,
-        };
-        
-        if (hasWatering) {
-          if (Math.random() > 0.5) {
-            mockDay.morning = { time: '06:00', duration: 5, volume: Math.floor(Math.random() * 15) + 5 };
-          }
-          if (Math.random() > 0.7) {
-            mockDay.evening = { time: '18:00', duration: 3, volume: Math.floor(Math.random() * 10) + 3 };
-          }
-        }
-        
-        twoWeeksData.push(mockDay);
-      }
+      days.push({
+        date: dateStr,
+        dayOfWeek: currentDate.toLocaleDateString('en-US', { weekday: 'short' }),
+        day: currentDate.getDate(),
+        isCurrentMonth,
+        isToday,
+        hasWatering,
+        scheduleData: existingDay
+      });
     }
     
-    return twoWeeksData;
+    return days;
   };
 
-  const twoWeeksSchedule = generateTwoWeeksSchedule();
+  const calendarDays = generateCalendarDays();
+  const monthName = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    setCurrentMonth(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(prev.getMonth() + (direction === 'next' ? 1 : -1));
+      return newDate;
+    });
+  };
+
+  const handleDayClick = (day: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (day.scheduleData) {
+      onDayClick?.(day.scheduleData);
+    }
+  };
+
+  const handleCalendarClick = (day: any) => {
+    onCalendarClick?.(day.date);
+  };
+
+  const getTotalVolume = (day: any) => {
+    if (!day.scheduleData) return 0;
+    const schedule = day.scheduleData;
+    return (schedule.morning?.volume || 0) + (schedule.afternoon?.volume || 0) + (schedule.evening?.volume || 0);
+  };
 
   return (
     <div className={cn("space-y-4", className)}>
-      {/* Mobile-Optimized Schedule Card */}
       <Card className="border-0 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white px-6 py-4">
@@ -110,112 +112,113 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
                 <Calendar className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-bold">2-Week Schedule</h3>
-                <p className="text-emerald-100 text-sm">Tap days to view details</p>
+                <h3 className="text-lg font-bold">Watering Schedule</h3>
+                <p className="text-emerald-100 text-sm">Tap dates for details</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Mobile-First Schedule List */}
-        <div className="p-4">
-          <div className="space-y-3">
-            {twoWeeksSchedule.map((day, index) => (
-              <div
-                key={day.date}
-                className={cn(
-                  "rounded-xl border-2 transition-all duration-200 cursor-pointer active:scale-95",
-                  getDayColor(day),
-                  "min-h-[80px] p-4"
-                )}
-                onClick={() => onDayClick?.(day)}
-              >
-                <div className="flex items-center justify-between">
-                  {/* Left: Date Info */}
-                  <div className="flex items-center space-x-4">
-                    <div className="text-center">
-                      <div className={cn(
-                        "text-2xl font-bold",
-                        day.isToday ? "text-emerald-600" : "text-gray-900"
-                      )}>
-                        {new Date(day.date).getDate()}
-                      </div>
-                      <div className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        {day.dayOfWeek}
-                      </div>
-                    </div>
-                    
-                    {/* Watering Schedule */}
-                    <div className="flex-1">
-                      {day.hasWatering ? (
-                        <div className="space-y-2">
-                          {/* Time slots */}
-                          <div className="flex space-x-2">
-                            {[day.morning, day.afternoon, day.evening].map((slot, slotIndex) => (
-                              slot ? (
-                                <div key={slotIndex} className="flex items-center space-x-1">
-                                  <div className={cn(
-                                    "w-3 h-3 rounded-full",
-                                    getTimeSlotColor(slot)
-                                  )} />
-                                  <span className="text-xs text-gray-600">{slot.time}</span>
-                                </div>
-                              ) : null
-                            ))}
-                          </div>
-                          
-                          {/* Total volume */}
-                          <div className="flex items-center space-x-2">
-                            <Droplets className="w-4 h-4 text-blue-500" />
-                            <span className="text-sm font-medium text-gray-900">
-                              {getTotalVolume(day)}L total
-                            </span>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex items-center space-x-2">
-                          <div className="w-3 h-3 rounded-full bg-gray-200" />
-                          <span className="text-sm text-gray-500">Rest day</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+        {/* Calendar Navigation */}
+        <div className="px-6 py-4 bg-gray-50 flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigateMonth('prev')}
+            className="text-gray-600 hover:text-gray-900"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <h4 className="text-lg font-semibold text-gray-900">{monthName}</h4>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigateMonth('next')}
+            className="text-gray-600 hover:text-gray-900"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
 
-                  {/* Right: Controls */}
-                  <div className="flex items-center space-x-2">
-                    {/* Manual Controls */}
-                    {showManualControls && day.hasWatering && (
-                      <div className="flex items-center space-x-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="w-8 h-8 p-0 bg-gray-100 hover:bg-gray-200"
-                          onClick={(e) => handleVolumeAdjust(day, -2, e)}
-                        >
-                          <Minus className="w-3 h-3" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="w-8 h-8 p-0 bg-gray-100 hover:bg-gray-200"
-                          onClick={(e) => handleVolumeAdjust(day, 2, e)}
-                        >
-                          <Plus className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    )}
-                    
-                    {/* Arrow indicator */}
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
-                  </div>
+        {/* Calendar Grid */}
+        <div className="p-6">
+          {/* Week Headers */}
+          <div className="grid grid-cols-7 gap-2 mb-3">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              <div key={day} className="text-center text-xs font-medium text-gray-500 uppercase tracking-wide py-2">
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Calendar Days */}
+          <div className="grid grid-cols-7 gap-2">
+            {calendarDays.map((day, index) => (
+              <div
+                key={index}
+                className={cn(
+                  "relative aspect-square rounded-xl border-2 transition-all duration-200 cursor-pointer active:scale-95 flex flex-col items-center justify-center p-2",
+                  day.isCurrentMonth ? "border-gray-200 hover:border-blue-300 bg-white" : "border-transparent bg-gray-50",
+                  day.isToday && "ring-2 ring-emerald-400 ring-opacity-50 animate-pulse bg-emerald-50 border-emerald-200",
+                  day.hasWatering && day.isCurrentMonth && "bg-blue-50 border-blue-200"
+                )}
+                onClick={() => handleCalendarClick(day)}
+              >
+                {/* Date Number */}
+                <div 
+                  className={cn(
+                    "text-lg font-semibold mb-1 transition-colors cursor-pointer",
+                    day.isCurrentMonth ? "text-gray-900" : "text-gray-400",
+                    day.isToday && "text-emerald-600"
+                  )}
+                  onClick={(e) => handleDayClick(day, e)}
+                >
+                  {day.day}
                 </div>
 
-                {/* Today indicator */}
-                {day.isToday && (
-                  <div className="mt-2 flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                    <span className="text-xs font-medium text-emerald-600">Today</span>
+                {/* Watering Indicator */}
+                {day.hasWatering && day.isCurrentMonth && (
+                  <div className="flex flex-col items-center space-y-1">
+                    <Droplets className="w-3 h-3 text-blue-500" />
+                    {day.scheduleData && (
+                      <span className="text-xs text-blue-600 font-medium">
+                        {getTotalVolume(day)}L
+                      </span>
+                    )}
                   </div>
+                )}
+
+                {/* Manual Controls */}
+                {showManualControls && day.hasWatering && day.scheduleData && (
+                  <div className="absolute -bottom-1 -right-1 flex space-x-1">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="w-6 h-6 p-0 bg-white shadow-md hover:bg-gray-100"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onVolumeAdjust?.(day.date, -2);
+                      }}
+                    >
+                      <Minus className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="w-6 h-6 p-0 bg-white shadow-md hover:bg-gray-100"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onVolumeAdjust?.(day.date, 2);
+                      }}
+                    >
+                      <Plus className="w-3 h-3" />
+                    </Button>
+                  </div>
+                )}
+
+                {/* Today Pulse Indicator */}
+                {day.isToday && (
+                  <div className="absolute inset-0 rounded-xl ring-2 ring-emerald-400 ring-opacity-30 animate-pulse pointer-events-none" />
                 )}
               </div>
             ))}
@@ -223,22 +226,23 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
         </div>
       </Card>
 
-      {/* Compact Legend */}
+      {/* Legend */}
       <Card className="border-0 shadow-md rounded-2xl bg-white/80 backdrop-blur-sm">
         <CardContent className="p-4">
-          <h4 className="font-medium text-gray-900 mb-3 text-center text-sm">Watering Intensity</h4>
-          <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center justify-between text-sm">
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-3 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full" />
-              <span className="text-gray-700">Light</span>
+              <div className="w-4 h-4 bg-emerald-100 border-2 border-emerald-400 rounded-lg animate-pulse" />
+              <span className="text-gray-700">Today</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full" />
-              <span className="text-gray-700">Medium</span>
+              <div className="w-4 h-4 bg-blue-100 border-2 border-blue-200 rounded-lg flex items-center justify-center">
+                <Droplets className="w-2 h-2 text-blue-500" />
+              </div>
+              <span className="text-gray-700">Scheduled</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full" />
-              <span className="text-gray-700">Heavy</span>
+              <div className="w-4 h-4 bg-white border-2 border-gray-200 rounded-lg" />
+              <span className="text-gray-700">Available</span>
             </div>
           </div>
         </CardContent>
