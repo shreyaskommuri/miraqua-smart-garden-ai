@@ -125,16 +125,16 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
             ))}
           </div>
 
-          {/* Calendar Days - 2 rows of 7 days */}
-          <div className="space-y-2">
+          {/* Calendar Days - 2 rows of 7 days with proper spacing */}
+          <div className="space-y-3">
             {/* First Week */}
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 gap-2">
               {calendarDays.slice(0, 7).map((day, index) => (
                 <div
                   key={index}
                   className={cn(
-                    "relative aspect-square rounded-lg border transition-all duration-200 p-1 flex flex-col items-center justify-center cursor-pointer active:scale-95 min-h-[50px]",
-                    "border-gray-200 hover:border-blue-300 bg-white hover:shadow-md",
+                    "relative rounded-lg border transition-all duration-200 p-2 flex flex-col items-center justify-center cursor-pointer active:scale-95",
+                    "border-gray-200 hover:border-blue-300 bg-white hover:shadow-md aspect-square min-h-[60px]",
                     day.isToday && "ring-2 ring-emerald-400 bg-emerald-50 border-emerald-300 shadow-lg",
                     day.hasWatering && !day.isToday && "bg-blue-50 border-blue-200"
                   )}
@@ -154,7 +154,7 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
                   {/* Watering Indicator */}
                   {day.hasWatering && (
                     <div className="flex flex-col items-center">
-                      <Droplets className="w-2.5 h-2.5 text-blue-500 mb-0.5" />
+                      <Droplets className="w-3 h-3 text-blue-500 mb-0.5" />
                       {day.scheduleData && (
                         <span className="text-xs text-blue-600 font-medium leading-none">
                           {getTotalVolume(day)}L
@@ -169,24 +169,24 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="w-3 h-3 p-0 bg-white shadow-sm hover:bg-gray-100"
+                        className="w-4 h-4 p-0 bg-white shadow-sm hover:bg-gray-100"
                         onClick={(e) => {
                           e.stopPropagation();
                           onVolumeAdjust?.(day.date, -2);
                         }}
                       >
-                        <Minus className="w-1.5 h-1.5" />
+                        <Minus className="w-2 h-2" />
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="w-3 h-3 p-0 bg-white shadow-sm hover:bg-gray-100"
+                        className="w-4 h-4 p-0 bg-white shadow-sm hover:bg-gray-100"
                         onClick={(e) => {
                           e.stopPropagation();
                           onVolumeAdjust?.(day.date, 2);
                         }}
                       >
-                        <Plus className="w-1.5 h-1.5" />
+                        <Plus className="w-2 h-2" />
                       </Button>
                     </div>
                   )}
@@ -200,13 +200,13 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
             </div>
 
             {/* Second Week */}
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 gap-2">
               {calendarDays.slice(7, 14).map((day, index) => (
                 <div
                   key={index + 7}
                   className={cn(
-                    "relative aspect-square rounded-lg border transition-all duration-200 p-1 flex flex-col items-center justify-center cursor-pointer active:scale-95 min-h-[50px]",
-                    "border-gray-200 hover:border-blue-300 bg-white hover:shadow-md",
+                    "relative rounded-lg border transition-all duration-200 p-2 flex flex-col items-center justify-center cursor-pointer active:scale-95",
+                    "border-gray-200 hover:border-blue-300 bg-white hover:shadow-md aspect-square min-h-[60px]",
                     day.isToday && "ring-2 ring-emerald-400 bg-emerald-50 border-emerald-300 shadow-lg",
                     day.hasWatering && !day.isToday && "bg-blue-50 border-blue-200"
                   )}
@@ -226,7 +226,7 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
                   {/* Watering Indicator */}
                   {day.hasWatering && (
                     <div className="flex flex-col items-center">
-                      <Droplets className="w-2.5 h-2.5 text-blue-500 mb-0.5" />
+                      <Droplets className="w-3 h-3 text-blue-500 mb-0.5" />
                       {day.scheduleData && (
                         <span className="text-xs text-blue-600 font-medium leading-none">
                           {getTotalVolume(day)}L
@@ -241,24 +241,24 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="w-3 h-3 p-0 bg-white shadow-sm hover:bg-gray-100"
+                        className="w-4 h-4 p-0 bg-white shadow-sm hover:bg-gray-100"
                         onClick={(e) => {
                           e.stopPropagation();
                           onVolumeAdjust?.(day.date, -2);
                         }}
                       >
-                        <Minus className="w-1.5 h-1.5" />
+                        <Minus className="w-2 h-2" />
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="w-3 h-3 p-0 bg-white shadow-sm hover:bg-gray-100"
+                        className="w-4 h-4 p-0 bg-white shadow-sm hover:bg-gray-100"
                         onClick={(e) => {
                           e.stopPropagation();
                           onVolumeAdjust?.(day.date, 2);
                         }}
                       >
-                        <Plus className="w-1.5 h-1.5" />
+                        <Plus className="w-2 h-2" />
                       </Button>
                     </div>
                   )}

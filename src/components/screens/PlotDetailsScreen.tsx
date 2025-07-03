@@ -322,9 +322,9 @@ const PlotDetailsScreen = () => {
         </div>
       )}
 
-      {/* Enhanced Header - Fixed positioning with proper padding */}
-      <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40 shadow-sm">
-        <div className="px-4 py-4 safe-area-top">
+      {/* Enhanced Header - Positioned below top nav with margin */}
+      <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm mt-16">
+        <div className="px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Button 
@@ -379,7 +379,7 @@ const PlotDetailsScreen = () => {
         </div>
       </header>
 
-      <ScrollArea className="h-[calc(100vh-120px)]">
+      <ScrollArea className="h-[calc(100vh-160px)]">
         <div className="p-6 space-y-8 pb-8">
           {/* Enhanced Photo/Map Header */}
           <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm overflow-hidden">
@@ -515,6 +515,7 @@ const PlotDetailsScreen = () => {
             onCalendarClick={handleCalendarClick}
             showManualControls={true}
             onVolumeAdjust={adjustWaterVolume}
+            plotId={plotId}
           />
 
           {/* Notifications Settings */}
