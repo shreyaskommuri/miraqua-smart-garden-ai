@@ -41,81 +41,79 @@ import AdvancedNavigation from "@/components/navigation/AdvancedNavigation";
 
 const AppNavigator = () => {
   return (
-    <Router>
-      <Routes>
-        {/* Welcome & Auth */}
-        <Route path="/" element={<Navigate to="/welcome" replace />} />
-        <Route path="/welcome" element={<WelcomeScreen />} />
-        <Route path="/signin" element={<SignInScreen />} />
-        <Route path="/signup" element={<SignUpScreen />} />
-        <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
+    <Routes>
+      {/* Welcome & Auth */}
+      <Route path="/" element={<Navigate to="/welcome" replace />} />
+      <Route path="/welcome" element={<WelcomeScreen />} />
+      <Route path="/signin" element={<SignInScreen />} />
+      <Route path="/signup" element={<SignUpScreen />} />
+      <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
 
-        {/* Onboarding Flow */}
-        <Route path="/onboarding/crop" element={<OnboardingCropScreen />} />
-        <Route path="/onboarding/location" element={<OnboardingLocationScreen />} />
-        <Route path="/onboarding/advanced" element={<OnboardingAdvancedSettingsScreen />} />
-        <Route path="/onboarding/complete" element={<OnboardingCompleteScreen />} />
+      {/* Onboarding Flow */}
+      <Route path="/onboarding/crop" element={<OnboardingCropScreen />} />
+      <Route path="/onboarding/location" element={<OnboardingLocationScreen />} />
+      <Route path="/onboarding/advanced" element={<OnboardingAdvancedSettingsScreen />} />
+      <Route path="/onboarding/complete" element={<OnboardingCompleteScreen />} />
 
-        {/* Add Plot */}
-        <Route path="/add-plot" element={<AddPlotScreen />} />
+      {/* Add Plot */}
+      <Route path="/add-plot" element={<AddPlotScreen />} />
 
-        {/* Standalone Features */}
-        <Route path="/reports" element={<ReportsScreen />} />
-        <Route path="/sensors" element={<SensorManagementScreen />} />
-        <Route path="/devices" element={<DeviceControlScreen />} />
-        <Route path="/weather" element={<WeatherForecastScreen />} />
-        <Route path="/weather/:plotId" element={<WeatherForecastScreen />} />
-        <Route path="/collaboration" element={<CollaborationScreen />} />
-        <Route path="/profile" element={<UserProfileScreen />} />
-        <Route path="/notifications" element={<NotificationSettingsScreen />} />
-        <Route path="/help" element={<HelpScreen />} />
+      {/* Standalone Features */}
+      <Route path="/reports" element={<ReportsScreen />} />
+      <Route path="/sensors" element={<SensorManagementScreen />} />
+      <Route path="/devices" element={<DeviceControlScreen />} />
+      <Route path="/weather" element={<WeatherForecastScreen />} />
+      <Route path="/weather/:plotId" element={<WeatherForecastScreen />} />
+      <Route path="/collaboration" element={<CollaborationScreen />} />
+      <Route path="/profile" element={<UserProfileScreen />} />
+      <Route path="/notifications" element={<NotificationSettingsScreen />} />
+      <Route path="/help" element={<HelpScreen />} />
 
-        {/* Main App Routes with Navigation */}
-        <Route path="/app/*" element={
-          <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
-            <AdvancedNavigation />
-            <div className="flex-1 overflow-y-auto">
-              <Routes>
-                <Route path="/" element={<Navigate to="/home" replace />} />
-                <Route path="/home" element={<HomeScreen />} />
-                <Route path="/analytics" element={<AnalyticsScreen />} />
-                <Route path="/analytics/predictive" element={<PredictiveDashboardScreen />} />
-                <Route path="/analytics/anomalies" element={<AnomalyAlertsScreen />} />
-                <Route path="/analytics/plant-health" element={<PlantHealthScannerScreen />} />
-                <Route path="/analytics/yield" element={<YieldForecastScreen />} />
-                <Route path="/map" element={<MapOverviewScreen />} />
-                <Route path="/chat" element={<FarmerChatScreen />} />
-                <Route path="/community" element={<CommunityScreen />} />
-                <Route path="/marketplace" element={<MarketplaceScreen />} />
-                <Route path="/account" element={<AccountScreen />} />
-                
-                {/* Plot Detail Routes */}
-                <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
-                <Route path="/plot/:plotId/settings" element={<PlotSettingsScreen />} />
-                <Route path="/day/:plotId/:date" element={<SpecificDayScreen />} />
-                <Route path="/calendar/:plotId" element={<CalendarScreen />} />
-              </Routes>
-            </div>
+      {/* Main App Routes with Navigation */}
+      <Route path="/app/*" element={
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+          <AdvancedNavigation />
+          <div className="flex-1 overflow-y-auto">
+            <Routes>
+              <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="/home" element={<HomeScreen />} />
+              <Route path="/analytics" element={<AnalyticsScreen />} />
+              <Route path="/analytics/predictive" element={<PredictiveDashboardScreen />} />
+              <Route path="/analytics/anomalies" element={<AnomalyAlertsScreen />} />
+              <Route path="/analytics/plant-health" element={<PlantHealthScannerScreen />} />
+              <Route path="/analytics/yield" element={<YieldForecastScreen />} />
+              <Route path="/map" element={<MapOverviewScreen />} />
+              <Route path="/chat" element={<FarmerChatScreen />} />
+              <Route path="/community" element={<CommunityScreen />} />
+              <Route path="/marketplace" element={<MarketplaceScreen />} />
+              <Route path="/account" element={<AccountScreen />} />
+              
+              {/* Plot Detail Routes */}
+              <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
+              <Route path="/plot/:plotId/settings" element={<PlotSettingsScreen />} />
+              <Route path="/day/:plotId/:date" element={<SpecificDayScreen />} />
+              <Route path="/calendar/:plotId" element={<CalendarScreen />} />
+            </Routes>
           </div>
-        } />
+        </div>
+      } />
 
-        {/* Legacy redirects */}
-        <Route path="/home" element={<Navigate to="/app/home" replace />} />
-        <Route path="/analytics" element={<Navigate to="/app/analytics" replace />} />
-        <Route path="/map" element={<Navigate to="/app/map" replace />} />
-        <Route path="/chat" element={<Navigate to="/app/chat" replace />} />
-        <Route path="/community" element={<Navigate to="/app/community" replace />} />
-        <Route path="/marketplace" element={<Navigate to="/app/marketplace" replace />} />
-        <Route path="/account" element={<Navigate to="/app/account" replace />} />
+      {/* Legacy redirects */}
+      <Route path="/home" element={<Navigate to="/app/home" replace />} />
+      <Route path="/analytics" element={<Navigate to="/app/analytics" replace />} />
+      <Route path="/map" element={<Navigate to="/app/map" replace />} />
+      <Route path="/chat" element={<Navigate to="/app/chat" replace />} />
+      <Route path="/community" element={<Navigate to="/app/community" replace />} />
+      <Route path="/marketplace" element={<Navigate to="/app/marketplace" replace />} />
+      <Route path="/account" element={<Navigate to="/app/account" replace />} />
 
-        {/* Plot routes outside app */}
-        <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
-        <Route path="/plot/:plotId/day/:day" element={<SpecificDayScreen />} />
+      {/* Plot routes outside app */}
+      <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
+      <Route path="/plot/:plotId/day/:day" element={<SpecificDayScreen />} />
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/welcome" replace />} />
-      </Routes>
-    </Router>
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/welcome" replace />} />
+    </Routes>
   );
 };
 
