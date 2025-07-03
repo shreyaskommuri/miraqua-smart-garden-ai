@@ -217,24 +217,24 @@ const PlotSettingsScreen = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      {/* Header */}
-      <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-b border-gray-100 dark:border-gray-700 sticky top-0 z-30 shadow-sm">
-        <div className="px-6 py-6">
+      {/* Fixed Header */}
+      <header className="fixed top-0 left-0 right-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border-b border-gray-100 dark:border-gray-700 z-50 shadow-sm">
+        <div className="px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="rounded-xl p-2">
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                  Plot Settings
+                <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                  Settings
                 </h1>
-                <p className="text-gray-600 dark:text-gray-300 mt-1">Configure "{plotData.name}"</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Configure "{plotData.name}"</p>
               </div>
             </div>
-            <div className="flex space-x-3">
+            <div className="flex items-center space-x-3">
               {hasChanges && (
-                <Badge variant="secondary" className="animate-pulse">
+                <Badge variant="secondary" className="animate-pulse text-xs">
                   Unsaved changes
                 </Badge>
               )}
@@ -246,17 +246,19 @@ const PlotSettingsScreen = () => {
                 className="rounded-xl border-green-200 text-green-700 hover:bg-green-50 dark:border-green-600 dark:text-green-400"
               >
                 <Save className="w-4 h-4 mr-2" />
-                {loading ? "Saving..." : "Save Changes"}
+                {loading ? "Saving..." : "Save"}
               </Button>
             </div>
           </div>
         </div>
       </header>
 
-      <ScrollArea className="h-[calc(100vh-120px)]">
-        <div className="px-6 py-8 space-y-8 max-w-6xl mx-auto">
+      {/* Main Content with proper top padding */}
+      <div className="pt-24 px-4 pb-8">
+        <div className="max-w-4xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="sticky top-32 z-20 bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg -mx-6 px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+            {/* Tabs Navigation */}
+            <div className="mb-6">
               <TabsList className="grid w-full grid-cols-4 bg-gray-100 dark:bg-gray-700 rounded-2xl p-1">
                 <TabsTrigger 
                   value="general" 
@@ -285,7 +287,7 @@ const PlotSettingsScreen = () => {
               </TabsList>
             </div>
 
-            <TabsContent value="general" className="mt-8 space-y-6">
+            <TabsContent value="general" className="space-y-6">
               {/* Basic Information */}
               <Card className="border-0 shadow-lg rounded-2xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
                 <CardHeader className="pb-4">
@@ -324,7 +326,7 @@ const PlotSettingsScreen = () => {
                     </Select>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 rounded-2xl">
                       <div className="flex items-center space-x-3 mb-2">
                         <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -346,7 +348,7 @@ const PlotSettingsScreen = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="watering" className="mt-8 space-y-6">
+            <TabsContent value="watering" className="space-y-6">
               {/* Watering Settings */}
               <Card className="border-0 shadow-lg rounded-2xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
                 <CardHeader className="pb-4">
@@ -423,7 +425,7 @@ const PlotSettingsScreen = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="sensors" className="mt-8 space-y-6">
+            <TabsContent value="sensors" className="space-y-6">
               {/* Sensor Settings */}
               <Card className="border-0 shadow-lg rounded-2xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
                 <CardHeader className="pb-4">
@@ -507,7 +509,7 @@ const PlotSettingsScreen = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="advanced" className="mt-8 space-y-6">
+            <TabsContent value="advanced" className="space-y-6">
               {/* Advanced Settings */}
               <Card className="border-0 shadow-lg rounded-2xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
                 <CardHeader className="pb-4">
@@ -596,7 +598,7 @@ const PlotSettingsScreen = () => {
             </TabsContent>
           </Tabs>
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 };
