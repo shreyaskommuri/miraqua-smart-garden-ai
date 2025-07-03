@@ -322,9 +322,9 @@ const PlotDetailsScreen = () => {
         </div>
       )}
 
-      {/* Enhanced Header */}
+      {/* Enhanced Header - Fixed positioning with proper padding */}
       <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40 shadow-sm">
-        <div className="px-4 py-3">
+        <div className="px-4 py-4 safe-area-top">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Button 
@@ -379,8 +379,8 @@ const PlotDetailsScreen = () => {
         </div>
       </header>
 
-      <ScrollArea className="h-[calc(100vh-100px)]">
-        <div className="p-6 space-y-8 pb-24">
+      <ScrollArea className="h-[calc(100vh-120px)]">
+        <div className="p-6 space-y-8 pb-8">
           {/* Enhanced Photo/Map Header */}
           <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm overflow-hidden">
             <div className="relative h-64 bg-gradient-to-r from-green-400 to-emerald-500">
@@ -610,37 +610,37 @@ const PlotDetailsScreen = () => {
               <MiniMap latitude={latitude} longitude={longitude} plotName={plotData.name} />
             </CardContent>
           </Card>
+
+          {/* Action Buttons - Now positioned under Location & Environment */}
+          <div className="flex space-x-4">
+            <Button
+              variant="outline"
+              className="flex-1 h-14 bg-white/90 backdrop-blur-sm border-gray-300 hover:bg-white"
+              onClick={() => navigate('/app/chat')}
+            >
+              <MessageCircle className="w-5 h-5 mr-2" />
+              Ask Miraqua
+            </Button>
+            <Button
+              onClick={handleWaterNow}
+              disabled={watering}
+              className="flex-1 h-14 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold rounded-2xl shadow-2xl"
+            >
+              {watering ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Watering...
+                </>
+              ) : (
+                <>
+                  <Droplets className="w-5 h-5 mr-2" />
+                  Water Now
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </ScrollArea>
-
-      {/* Bottom Action Buttons */}
-      <div className="fixed bottom-6 left-6 right-6 z-30 flex space-x-4">
-        <Button
-          variant="outline"
-          className="flex-1 h-14 bg-white/90 backdrop-blur-sm border-gray-300 hover:bg-white"
-          onClick={() => navigate('/app/chat')}
-        >
-          <MessageCircle className="w-5 h-5 mr-2" />
-          Ask Miraqua
-        </Button>
-        <Button
-          onClick={handleWaterNow}
-          disabled={watering}
-          className="flex-1 h-14 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold rounded-2xl shadow-2xl"
-        >
-          {watering ? (
-            <>
-              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-              Watering...
-            </>
-          ) : (
-            <>
-              <Droplets className="w-5 h-5 mr-2" />
-              Water Now
-            </>
-          )}
-        </Button>
-      </div>
     </div>
   );
 };
