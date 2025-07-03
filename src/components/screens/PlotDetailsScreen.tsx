@@ -324,29 +324,34 @@ const PlotDetailsScreen = () => {
 
       {/* Enhanced Header */}
       <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40 shadow-sm">
-        <div className="px-6 py-4">
+        <div className="px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+            <div className="flex items-center space-x-3">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => navigate(-1)}
+                className="w-10 h-10 p-0 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
                 <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
-                    <span className="text-3xl">🌿</span>
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
+                    <span className="text-2xl">🌿</span>
                   </div>
-                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
-                    <Wifi className="w-3 h-3 text-white" />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+                    <Wifi className="w-2.5 h-2.5 text-white" />
                   </div>
                 </div>
                 
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{plotData.name}</h1>
-                  <div className="flex items-center space-x-3 mt-1">
-                    <p className="text-gray-600 dark:text-gray-300">{plotData.crop} • {plotData.variety}</p>
+                  <h1 className="text-lg font-bold text-gray-900 dark:text-white">{plotData.name}</h1>
+                  <div className="flex items-center space-x-2 mt-0.5">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{plotData.crop} • {plotData.variety}</p>
                     <Badge variant="outline" className="text-xs">
-                      <Heart className="w-3 h-3 mr-1 text-red-500" />
+                      <Heart className="w-2.5 h-2.5 mr-1 text-red-500" />
                       Health: {plotData.healthScore}%
                     </Badge>
                   </div>
@@ -354,18 +359,18 @@ const PlotDetailsScreen = () => {
               </div>
             </div>
             
-            <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm" onClick={exportPDF}>
+            <div className="flex items-center space-x-1">
+              <Button variant="ghost" size="sm" onClick={exportPDF} className="w-9 h-9 p-0">
                 <Download className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" onClick={sharePlot}>
+              <Button variant="ghost" size="sm" onClick={sharePlot} className="w-9 h-9 p-0">
                 <Share2 className="w-4 h-4" />
               </Button>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => navigate(`/app/plot/${plotId}/settings`)}
-                className="bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200"
+                className="w-9 h-9 p-0 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200"
               >
                 <Settings className="w-4 h-4" />
               </Button>

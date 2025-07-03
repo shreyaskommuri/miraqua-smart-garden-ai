@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -30,6 +29,7 @@ import CollaborationScreen from './components/screens/CollaborationScreen';
 import UserProfileScreen from './components/screens/UserProfileScreen';
 import NotificationSettingsScreen from './components/screens/NotificationSettingsScreen';
 import HelpScreen from './components/screens/HelpScreen';
+import CalendarScreen from './components/screens/CalendarScreen';
 
 function App() {
   useEffect(() => {
@@ -103,7 +103,8 @@ function App() {
                     {/* Plot Detail Routes */}
                     <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
                     <Route path="/plot/:plotId/settings" element={<PlotSettingsScreen />} />
-                    <Route path="/plot/:plotId/day/:date" element={<SpecificDayScreen />} />
+                    <Route path="/day/:plotId/:date" element={<SpecificDayScreen />} />
+                    <Route path="/calendar/:plotId" element={<CalendarScreen />} />
                   </Routes>
                 </div>
               </div>
