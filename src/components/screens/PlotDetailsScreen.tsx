@@ -318,7 +318,7 @@ const PlotDetailsScreen = () => {
         </div>
       )}
 
-      {/* Header */}
+      {/* Enhanced Header */}
       <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40 shadow-sm">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
@@ -357,7 +357,12 @@ const PlotDetailsScreen = () => {
               <Button variant="ghost" size="sm" onClick={sharePlot}>
                 <Share2 className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => navigate(`/app/plot/${plotId}/settings`)}>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => navigate(`/app/plot/${plotId}/settings`)}
+                className="bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200"
+              >
                 <Settings className="w-4 h-4" />
               </Button>
             </div>
@@ -367,32 +372,45 @@ const PlotDetailsScreen = () => {
 
       <ScrollArea className="h-[calc(100vh-100px)]">
         <div className="p-6 space-y-8 pb-24">
-          {/* Photo/Map Header */}
+          {/* Enhanced Photo/Map Header */}
           <Card className="border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm overflow-hidden">
-            <div className="relative h-48 bg-gradient-to-r from-green-400 to-emerald-500">
+            <div className="relative h-64 bg-gradient-to-r from-green-400 to-emerald-500">
+              <div className="absolute inset-0 bg-black/10"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <Camera className="w-12 h-12 text-white/60" />
-                <span className="ml-3 text-white/80">Tap to add plot photo</span>
+                <div className="text-center text-white">
+                  <Camera className="w-16 h-16 mx-auto mb-4 opacity-60" />
+                  <span className="text-lg font-medium">Tap to add plot photo</span>
+                  <p className="text-sm opacity-80 mt-1">Show off your beautiful garden</p>
+                </div>
               </div>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="absolute top-4 right-4 text-white hover:bg-white/20"
+                className="absolute top-4 right-4 text-white hover:bg-white/20 backdrop-blur-sm"
               >
                 <Maximize className="w-4 h-4" />
               </Button>
             </div>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
+            <CardContent className="p-6 bg-gradient-to-br from-white to-gray-50">
+              <div className="grid grid-cols-3 gap-6 text-center">
+                <div className="space-y-2">
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto">
+                    <MapPin className="w-6 h-6 text-blue-600" />
+                  </div>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">{plotData.area}m²</p>
-                  <p className="text-sm text-gray-500">Area</p>
+                  <p className="text-sm text-gray-500">Plot Area</p>
                 </div>
-                <div>
+                <div className="space-y-2">
+                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto">
+                    <Calendar className="w-6 h-6 text-green-600" />
+                  </div>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">{getCropAge()}</p>
                   <p className="text-sm text-gray-500">Crop Age</p>
                 </div>
-                <div>
+                <div className="space-y-2">
+                  <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto">
+                    <Droplets className="w-6 h-6 text-emerald-600" />
+                  </div>
                   <p className="text-2xl font-bold text-green-600">{plotData.waterSavings}%</p>
                   <p className="text-sm text-gray-500">Water Saved</p>
                 </div>
@@ -481,7 +499,7 @@ const PlotDetailsScreen = () => {
             </CardContent>
           </Card>
 
-          {/* Calendar Schedule with Manual Controls */}
+          {/* Updated Calendar Schedule with 2-week view */}
           <CalendarSchedule 
             schedule={plotData.schedule} 
             onDayClick={handleDayClick}
