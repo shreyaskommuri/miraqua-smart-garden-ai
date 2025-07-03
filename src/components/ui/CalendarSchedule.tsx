@@ -2,8 +2,9 @@
 import React from 'react';
 import { Card, CardContent } from './card';
 import { Badge } from './badge';
+import { Button } from './button';
 import { cn } from '@/lib/utils';
-import { Droplets, Calendar } from 'lucide-react';
+import { Droplets, Calendar, Plus, Minus } from 'lucide-react';
 
 interface ScheduleDay {
   date: string;
@@ -19,12 +20,16 @@ interface CalendarScheduleProps {
   schedule: ScheduleDay[];
   onDayClick?: (day: ScheduleDay) => void;
   className?: string;
+  showManualControls?: boolean;
+  onVolumeAdjust?: (date: string, adjustment: number) => void;
 }
 
 export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
   schedule,
   onDayClick,
-  className
+  className,
+  showManualControls = false,
+  onVolumeAdjust
 }) => {
   const getTimeSlotColor = (slot: { time: string; duration: number; volume: number }) => {
     if (slot.volume >= 20) return 'bg-gradient-to-r from-blue-600 to-blue-700';
@@ -42,6 +47,11 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
     return (day.morning?.volume || 0) + (day.afternoon?.volume || 0) + (day.evening?.volume || 0);
   };
 
+  const handleVolumeAdjust = (day: ScheduleDay, adjustment: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    onVolumeAdjust?.(day.date, adjustment);
+  };
+
   return (
     <div className={cn("space-y-8", className)}>
       {/* Modern Calendar Card */}
@@ -54,7 +64,9 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
             </div>
             <div>
               <h3 className="text-xl font-bold">Weekly Schedule</h3>
-              <p className="text-emerald-100 text-sm">Tap any day to view details</p>
+              <p className="text-emerald-100 text-sm">
+                {showManualControls ? 'Tap days to view • Use +/- to adjust' : 'Tap any day to view details'}
+              </p>
             </div>
           </div>
         </div>
@@ -84,6 +96,28 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
                 {/* Today indicator */}
                 {day.isToday && (
                   <div className="absolute top-2 right-2 w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
+                )}
+
+                {/* Manual Controls */}
+                {showManualControls && day.hasWatering && (
+                  <div className="absolute top-1 left-1 right-1 flex justify-between">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="w-6 h-6 p-0 bg-white/80 hover:bg-white"
+                      onClick={(e) => handleVolumeAdjust(day, -2, e)}
+                    >
+                      <Minus className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="w-6 h-6 p-0 bg-white/80 hover:bg-white"
+                      onClick={(e) => handleVolumeAdjust(day, 2, e)}
+                    >
+                      <Plus className="w-3 h-3" />
+                    </Button>
+                  </div>
                 )}
 
                 <div className="h-full p-4 flex flex-col justify-between">
