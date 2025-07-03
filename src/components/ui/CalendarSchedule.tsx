@@ -4,7 +4,8 @@ import { Card, CardContent } from './card';
 import { Badge } from './badge';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
-import { Droplets, Calendar, Plus, Minus } from 'lucide-react';
+import { Droplets, Calendar, Plus, Minus, ChevronRight } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ScheduleDay {
   date: string;
@@ -31,6 +32,8 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
   showManualControls = false,
   onVolumeAdjust
 }) => {
+  const isMobile = useIsMobile();
+
   const getTimeSlotColor = (slot: { time: string; duration: number; volume: number }) => {
     if (slot.volume >= 20) return 'bg-gradient-to-r from-blue-600 to-blue-700';
     if (slot.volume >= 10) return 'bg-gradient-to-r from-blue-500 to-blue-600';
@@ -38,9 +41,9 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
   };
 
   const getDayColor = (day: ScheduleDay) => {
-    if (day.isToday) return 'ring-2 ring-emerald-400 bg-white shadow-xl scale-105';
-    if (day.hasWatering) return 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-md hover:shadow-lg';
-    return 'bg-white/80 border-slate-200 hover:bg-white hover:shadow-md';
+    if (day.isToday) return 'ring-2 ring-emerald-400 bg-emerald-50 border-emerald-200';
+    if (day.hasWatering) return 'bg-blue-50 border-blue-200';
+    return 'bg-white border-gray-200';
   };
 
   const getTotalVolume = (day: ScheduleDay) => {
@@ -52,7 +55,7 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
     onVolumeAdjust?.(day.date, adjustment);
   };
 
-  // Generate 2 weeks of schedule data (14 days)
+  // Generate 14 days of schedule data
   const generateTwoWeeksSchedule = () => {
     const twoWeeksData = [];
     const today = new Date();
@@ -64,14 +67,12 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
       const dateStr = currentDate.toISOString().split('T')[0];
       const dayOfWeek = currentDate.toLocaleDateString('en-US', { weekday: 'short' });
       
-      // Find existing schedule data or create mock data
       const existingDay = schedule.find(day => day.date === dateStr);
       
       if (existingDay) {
         twoWeeksData.push(existingDay);
       } else {
-        // Generate mock watering schedule
-        const hasWatering = Math.random() > 0.3; // 70% chance of watering
+        const hasWatering = Math.random() > 0.3;
         const mockDay: ScheduleDay = {
           date: dateStr,
           dayOfWeek,
@@ -98,232 +99,146 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
   const twoWeeksSchedule = generateTwoWeeksSchedule();
 
   return (
-    <div className={cn("space-y-6", className)}>
-      {/* Modern Calendar Card */}
-      <Card className="border-0 shadow-xl rounded-3xl bg-white/90 backdrop-blur-sm overflow-hidden">
+    <div className={cn("space-y-4", className)}>
+      {/* Mobile-Optimized Schedule Card */}
+      <Card className="border-0 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white px-8 py-6">
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-              <Calendar className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold">2-Week Schedule</h3>
-              <p className="text-emerald-100 text-sm">
-                {showManualControls ? 'Tap days to view • Use +/- to adjust' : 'Tap any day to view details'}
-              </p>
+        <div className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                <Calendar className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold">2-Week Schedule</h3>
+                <p className="text-emerald-100 text-sm">Tap days to view details</p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* 2-Week Calendar Grid */}
-        <div className="p-8">
-          {/* Week 1 */}
-          <div className="mb-8">
-            <h4 className="text-sm font-semibold text-slate-600 mb-4">This Week</h4>
-            
-            {/* Day Labels */}
-            <div className="grid grid-cols-7 gap-3 mb-4">
-              {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((day) => (
-                <div key={day} className="text-center">
-                  <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">{day}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Week 1 Days */}
-            <div className="grid grid-cols-7 gap-3">
-              {twoWeeksSchedule.slice(0, 7).map((day, index) => (
-                <div
-                  key={day.date}
-                  className={cn(
-                    "aspect-square rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:scale-105 relative overflow-hidden",
-                    getDayColor(day)
-                  )}
-                  onClick={() => onDayClick?.(day)}
-                >
-                  {/* Today indicator */}
-                  {day.isToday && (
-                    <div className="absolute top-2 right-2 w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
-                  )}
-
-                  {/* Manual Controls */}
-                  {showManualControls && day.hasWatering && (
-                    <div className="absolute top-1 left-1 right-1 flex justify-between">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="w-5 h-5 p-0 bg-white/80 hover:bg-white"
-                        onClick={(e) => handleVolumeAdjust(day, -2, e)}
-                      >
-                        <Minus className="w-2 h-2" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="w-5 h-5 p-0 bg-white/80 hover:bg-white"
-                        onClick={(e) => handleVolumeAdjust(day, 2, e)}
-                      >
-                        <Plus className="w-2 h-2" />
-                      </Button>
-                    </div>
-                  )}
-
-                  <div className="h-full p-3 flex flex-col justify-between">
-                    {/* Date */}
+        {/* Mobile-First Schedule List */}
+        <div className="p-4">
+          <div className="space-y-3">
+            {twoWeeksSchedule.map((day, index) => (
+              <div
+                key={day.date}
+                className={cn(
+                  "rounded-xl border-2 transition-all duration-200 cursor-pointer active:scale-95",
+                  getDayColor(day),
+                  "min-h-[80px] p-4"
+                )}
+                onClick={() => onDayClick?.(day)}
+              >
+                <div className="flex items-center justify-between">
+                  {/* Left: Date Info */}
+                  <div className="flex items-center space-x-4">
                     <div className="text-center">
                       <div className={cn(
-                        "text-lg font-bold mb-1",
-                        day.isToday ? "text-emerald-600" : "text-slate-900"
+                        "text-2xl font-bold",
+                        day.isToday ? "text-emerald-600" : "text-gray-900"
                       )}>
                         {new Date(day.date).getDate()}
                       </div>
-                    </div>
-                    
-                    {/* Watering Indicators */}
-                    <div className="space-y-1">
-                      {day.hasWatering ? (
-                        <>
-                          {[day.morning, day.afternoon, day.evening].map((slot, slotIndex) => (
-                            slot ? (
-                              <div key={slotIndex} className="space-y-1">
-                                <div className={cn(
-                                  "h-1.5 rounded-full shadow-sm",
-                                  getTimeSlotColor(slot)
-                                )} />
-                              </div>
-                            ) : (
-                              <div key={slotIndex} className="h-1.5 bg-slate-100 rounded-full opacity-30" />
-                            )
-                          ))}
-                          
-                          {/* Volume Badge */}
-                          <div className="text-center mt-1">
-                            <Badge variant="secondary" className="text-xs px-1 py-0">
-                              {getTotalVolume(day)}L
-                            </Badge>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="text-center">
-                          <span className="text-xs text-slate-400">Rest</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Week 2 */}
-          <div>
-            <h4 className="text-sm font-semibold text-slate-600 mb-4">Next Week</h4>
-            
-            {/* Day Labels */}
-            <div className="grid grid-cols-7 gap-3 mb-4">
-              {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((day) => (
-                <div key={day} className="text-center">
-                  <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">{day}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Week 2 Days */}
-            <div className="grid grid-cols-7 gap-3">
-              {twoWeeksSchedule.slice(7, 14).map((day, index) => (
-                <div
-                  key={day.date}
-                  className={cn(
-                    "aspect-square rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:scale-105 relative overflow-hidden",
-                    getDayColor(day)
-                  )}
-                  onClick={() => onDayClick?.(day)}
-                >
-                  {/* Manual Controls */}
-                  {showManualControls && day.hasWatering && (
-                    <div className="absolute top-1 left-1 right-1 flex justify-between">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="w-5 h-5 p-0 bg-white/80 hover:bg-white"
-                        onClick={(e) => handleVolumeAdjust(day, -2, e)}
-                      >
-                        <Minus className="w-2 h-2" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="w-5 h-5 p-0 bg-white/80 hover:bg-white"
-                        onClick={(e) => handleVolumeAdjust(day, 2, e)}
-                      >
-                        <Plus className="w-2 h-2" />
-                      </Button>
-                    </div>
-                  )}
-
-                  <div className="h-full p-3 flex flex-col justify-between">
-                    {/* Date */}
-                    <div className="text-center">
-                      <div className="text-lg font-bold mb-1 text-slate-900">
-                        {new Date(day.date).getDate()}
+                      <div className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        {day.dayOfWeek}
                       </div>
                     </div>
                     
-                    {/* Watering Indicators */}
-                    <div className="space-y-1">
+                    {/* Watering Schedule */}
+                    <div className="flex-1">
                       {day.hasWatering ? (
-                        <>
-                          {[day.morning, day.afternoon, day.evening].map((slot, slotIndex) => (
-                            slot ? (
-                              <div key={slotIndex} className="space-y-1">
-                                <div className={cn(
-                                  "h-1.5 rounded-full shadow-sm",
-                                  getTimeSlotColor(slot)
-                                )} />
-                              </div>
-                            ) : (
-                              <div key={slotIndex} className="h-1.5 bg-slate-100 rounded-full opacity-30" />
-                            )
-                          ))}
-                          
-                          {/* Volume Badge */}
-                          <div className="text-center mt-1">
-                            <Badge variant="secondary" className="text-xs px-1 py-0">
-                              {getTotalVolume(day)}L
-                            </Badge>
+                        <div className="space-y-2">
+                          {/* Time slots */}
+                          <div className="flex space-x-2">
+                            {[day.morning, day.afternoon, day.evening].map((slot, slotIndex) => (
+                              slot ? (
+                                <div key={slotIndex} className="flex items-center space-x-1">
+                                  <div className={cn(
+                                    "w-3 h-3 rounded-full",
+                                    getTimeSlotColor(slot)
+                                  )} />
+                                  <span className="text-xs text-gray-600">{slot.time}</span>
+                                </div>
+                              ) : null
+                            ))}
                           </div>
-                        </>
+                          
+                          {/* Total volume */}
+                          <div className="flex items-center space-x-2">
+                            <Droplets className="w-4 h-4 text-blue-500" />
+                            <span className="text-sm font-medium text-gray-900">
+                              {getTotalVolume(day)}L total
+                            </span>
+                          </div>
+                        </div>
                       ) : (
-                        <div className="text-center">
-                          <span className="text-xs text-slate-400">Rest</span>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-3 h-3 rounded-full bg-gray-200" />
+                          <span className="text-sm text-gray-500">Rest day</span>
                         </div>
                       )}
                     </div>
                   </div>
+
+                  {/* Right: Controls */}
+                  <div className="flex items-center space-x-2">
+                    {/* Manual Controls */}
+                    {showManualControls && day.hasWatering && (
+                      <div className="flex items-center space-x-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="w-8 h-8 p-0 bg-gray-100 hover:bg-gray-200"
+                          onClick={(e) => handleVolumeAdjust(day, -2, e)}
+                        >
+                          <Minus className="w-3 h-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="w-8 h-8 p-0 bg-gray-100 hover:bg-gray-200"
+                          onClick={(e) => handleVolumeAdjust(day, 2, e)}
+                        >
+                          <Plus className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {/* Arrow indicator */}
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                  </div>
                 </div>
-              ))}
-            </div>
+
+                {/* Today indicator */}
+                {day.isToday && (
+                  <div className="mt-2 flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    <span className="text-xs font-medium text-emerald-600">Today</span>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </Card>
 
-      {/* Modern Legend */}
-      <Card className="border-0 shadow-lg rounded-3xl bg-white/80 backdrop-blur-sm">
-        <CardContent className="p-6">
-          <h4 className="font-semibold text-slate-900 mb-4 text-center">Watering Intensity</h4>
-          <div className="flex items-center justify-center space-x-8 text-sm">
-            <div className="flex items-center space-x-3">
-              <div className="w-6 h-3 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full shadow-sm" />
-              <span className="text-slate-700 font-medium">Light (5-10L)</span>
+      {/* Compact Legend */}
+      <Card className="border-0 shadow-md rounded-2xl bg-white/80 backdrop-blur-sm">
+        <CardContent className="p-4">
+          <h4 className="font-medium text-gray-900 mb-3 text-center text-sm">Watering Intensity</h4>
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-3 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full" />
+              <span className="text-gray-700">Light</span>
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-6 h-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full shadow-sm" />
-              <span className="text-slate-700 font-medium">Medium (10-20L)</span>
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full" />
+              <span className="text-gray-700">Medium</span>
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-6 h-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full shadow-sm" />
-              <span className="text-slate-700 font-medium">Heavy (20L+)</span>
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full" />
+              <span className="text-gray-700">Heavy</span>
             </div>
           </div>
         </CardContent>
