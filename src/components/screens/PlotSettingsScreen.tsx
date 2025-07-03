@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -93,6 +92,10 @@ const PlotSettingsScreen = () => {
     { value: "spinach", label: "Spinach" },
     { value: "kale", label: "Kale" }
   ];
+
+  const handleBackNavigation = () => {
+    navigate(`/app/plot/${plotId}`);
+  };
 
   useEffect(() => {
     // Simulate loading plot data
@@ -222,7 +225,7 @@ const PlotSettingsScreen = () => {
         <div className="px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="rounded-xl p-2">
+              <Button variant="ghost" size="sm" onClick={handleBackNavigation} className="rounded-xl p-2">
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               <div>
