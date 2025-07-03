@@ -40,43 +40,60 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
-  const generateNext14Days = () => {
-    const days = [];
+  const generateNext14DaysCalendar = () => {
     const today = new Date();
+    const startDate = new Date(today);
     
-    for (let i = 0; i < 14; i++) {
-      const currentDate = new Date(today);
-      currentDate.setDate(today.getDate() + i);
+    // Find the start of the week (Sunday) for today
+    const dayOfWeek = today.getDay();
+    startDate.setDate(today.getDate() - dayOfWeek);
+    
+    const days = [];
+    
+    // Generate enough days to show 2 weeks worth of calendar grid
+    for (let i = 0; i < 21; i++) { // 3 weeks to ensure we cover 14 days from today
+      const currentDate = new Date(startDate);
+      currentDate.setDate(startDate.getDate() + i);
       
       const dateStr = currentDate.toISOString().split('T')[0];
-      const isToday = i === 0;
+      const todayStr = today.toISOString().split('T')[0];
+      const isToday = dateStr === todayStr;
+      
+      // Check if this date is within the next 14 days from today
+      const daysDiff = Math.floor((currentDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      const isWithinNext14Days = daysDiff >= 0 && daysDiff < 14;
+      const isPast = daysDiff < 0;
       
       const existingDay = schedule.find(day => day.date === dateStr);
-      const hasWatering = existingDay?.hasWatering || Math.random() > 0.6;
+      const hasWatering = existingDay?.hasWatering || (isWithinNext14Days && Math.random() > 0.6);
       
       days.push({
         date: dateStr,
-        dayOfWeek: currentDate.toLocaleDateString('en-US', { weekday: 'short' }),
         day: currentDate.getDate(),
+        dayOfWeek: currentDate.toLocaleDateString('en-US', { weekday: 'short' }),
         month: currentDate.toLocaleDateString('en-US', { month: 'short' }),
         isToday,
-        hasWatering,
-        scheduleData: existingDay
+        hasWatering: isWithinNext14Days ? hasWatering : false,
+        scheduleData: existingDay,
+        isWithinNext14Days,
+        isPast,
+        isCurrentMonth: currentDate.getMonth() === today.getMonth()
       });
     }
     
     return days;
   };
 
-  const calendarDays = generateNext14Days();
+  const calendarDays = generateNext14DaysCalendar();
 
   const handleDayClick = (day: any, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!day.isWithinNext14Days) return;
     
     // Navigate to SpecificDayScreen
     const searchParams = new URLSearchParams({
       date: day.date,
-      lat: '37.7749', // You might want to pass these as props
+      lat: '37.7749',
       lon: '-122.4194'
     });
     
@@ -84,6 +101,8 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
   };
 
   const handleCalendarClick = (day: any) => {
+    if (!day.isWithinNext14Days) return;
+    
     // Navigate to full calendar view
     const searchParams = new URLSearchParams({
       date: day.date,
@@ -118,43 +137,51 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
           </div>
         </div>
 
-        {/* Calendar Grid - Mobile Optimized */}
+        {/* Calendar Grid */}
         <div className="p-6">
-          <div className="grid grid-cols-2 gap-3">
+          {/* Week Headers */}
+          <div className="grid grid-cols-7 gap-2 mb-4">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Calendar Days Grid */}
+          <div className="grid grid-cols-7 gap-2">
             {calendarDays.map((day, index) => (
               <div
                 key={index}
                 className={cn(
-                  "relative rounded-xl border-2 transition-all duration-200 cursor-pointer active:scale-95 p-4 min-h-[80px]",
-                  "border-gray-200 hover:border-blue-300 bg-white",
+                  "relative aspect-square rounded-xl border-2 transition-all duration-200 p-3 flex flex-col items-center justify-center min-h-[70px]",
+                  day.isWithinNext14Days 
+                    ? "cursor-pointer active:scale-95 border-gray-200 hover:border-blue-300 bg-white" 
+                    : "border-transparent bg-gray-50 opacity-40",
                   day.isToday && "ring-2 ring-emerald-400 ring-opacity-50 animate-pulse bg-emerald-50 border-emerald-200",
-                  day.hasWatering && "bg-blue-50 border-blue-200"
+                  day.hasWatering && day.isWithinNext14Days && "bg-blue-50 border-blue-200",
+                  !day.isCurrentMonth && day.isWithinNext14Days && "opacity-60"
                 )}
-                onClick={() => handleCalendarClick(day)}
+                onClick={() => day.isWithinNext14Days && handleCalendarClick(day)}
               >
-                {/* Date and Month */}
+                {/* Date Number - clickable for day details */}
                 <div 
-                  className="flex flex-col items-start mb-2 cursor-pointer"
-                  onClick={(e) => handleDayClick(day, e)}
-                >
-                  <div className={cn(
-                    "text-2xl font-bold transition-colors",
-                    "text-gray-900",
+                  className={cn(
+                    "text-xl font-bold transition-colors mb-2 cursor-pointer hover:scale-110 transition-transform",
+                    day.isWithinNext14Days ? "text-gray-900" : "text-gray-400",
                     day.isToday && "text-emerald-600"
-                  )}>
-                    {day.day}
-                  </div>
-                  <div className="text-sm text-gray-500 font-medium">
-                    {day.month} • {day.dayOfWeek}
-                  </div>
+                  )}
+                  onClick={(e) => day.isWithinNext14Days && handleDayClick(day, e)}
+                >
+                  {day.day}
                 </div>
 
                 {/* Watering Indicator */}
-                {day.hasWatering && (
-                  <div className="flex items-center space-x-2">
-                    <Droplets className="w-4 h-4 text-blue-500" />
+                {day.hasWatering && day.isWithinNext14Days && (
+                  <div className="flex flex-col items-center">
+                    <Droplets className="w-3 h-3 text-blue-500 mb-1" />
                     {day.scheduleData && (
-                      <span className="text-sm text-blue-600 font-medium">
+                      <span className="text-xs text-blue-600 font-medium">
                         {getTotalVolume(day)}L
                       </span>
                     )}
@@ -162,29 +189,29 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
                 )}
 
                 {/* Manual Controls */}
-                {showManualControls && day.hasWatering && day.scheduleData && (
-                  <div className="absolute top-2 right-2 flex space-x-1">
+                {showManualControls && day.hasWatering && day.scheduleData && day.isWithinNext14Days && (
+                  <div className="absolute top-1 right-1 flex space-x-1">
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="w-6 h-6 p-0 bg-white shadow-md hover:bg-gray-100"
+                      className="w-5 h-5 p-0 bg-white shadow-md hover:bg-gray-100"
                       onClick={(e) => {
                         e.stopPropagation();
                         onVolumeAdjust?.(day.date, -2);
                       }}
                     >
-                      <Minus className="w-3 h-3" />
+                      <Minus className="w-2 h-2" />
                     </Button>
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="w-6 h-6 p-0 bg-white shadow-md hover:bg-gray-100"
+                      className="w-5 h-5 p-0 bg-white shadow-md hover:bg-gray-100"
                       onClick={(e) => {
                         e.stopPropagation();
                         onVolumeAdjust?.(day.date, 2);
                       }}
                     >
-                      <Plus className="w-3 h-3" />
+                      <Plus className="w-2 h-2" />
                     </Button>
                   </div>
                 )}
