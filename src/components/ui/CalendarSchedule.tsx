@@ -40,11 +40,10 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
-  const generateNext14DaysCalendar = () => {
+  const generateNext14Days = () => {
     const today = new Date();
     const days = [];
     
-    // Start from today and generate 14 days
     for (let i = 0; i < 14; i++) {
       const currentDate = new Date(today);
       currentDate.setDate(today.getDate() + i);
@@ -60,35 +59,20 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
         date: dateStr,
         day: currentDate.getDate(),
         dayOfWeek: currentDate.toLocaleDateString('en-US', { weekday: 'short' }),
-        month: currentDate.toLocaleDateString('en-US', { month: 'short' }),
         isToday,
         hasWatering,
-        scheduleData: existingDay,
-        isCurrentMonth: currentDate.getMonth() === today.getMonth()
+        scheduleData: existingDay
       });
     }
     
     return days;
   };
 
-  const calendarDays = generateNext14DaysCalendar();
-
-  // Group days into weeks for proper grid display
-  const weekRows = [];
-  let currentWeek = [];
-  
-  calendarDays.forEach((day, index) => {
-    currentWeek.push(day);
-    if (currentWeek.length === 7 || index === calendarDays.length - 1) {
-      weekRows.push([...currentWeek]);
-      currentWeek = [];
-    }
-  });
+  const calendarDays = generateNext14Days();
 
   const handleDayClick = (day: any, e: React.MouseEvent) => {
     e.stopPropagation();
     
-    // Navigate to SpecificDayScreen
     const searchParams = new URLSearchParams({
       date: day.date,
       lat: '37.7749',
@@ -99,7 +83,6 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
   };
 
   const handleCalendarClick = (day: any) => {
-    // Navigate to full calendar view
     const searchParams = new URLSearchParams({
       date: day.date,
       lat: '37.7749',
@@ -116,19 +99,17 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
   };
 
   return (
-    <div className={cn("space-y-4", className)}>
+    <div className={cn("space-y-4 w-full", className)}>
       <Card className="border-0 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                <Calendar className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold">Next 2 Weeks</h3>
-                <p className="text-emerald-100 text-xs">Tap dates for details</p>
-              </div>
+        <div className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white px-4 py-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Calendar className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-lg font-bold">Next 2 Weeks</h3>
+              <p className="text-emerald-100 text-sm">Tap dates for details</p>
             </div>
           </div>
         </div>
@@ -138,87 +119,157 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
           {/* Week Headers */}
           <div className="grid grid-cols-7 gap-1 mb-3">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="text-center text-xs font-medium text-gray-500 py-1">
+              <div key={day} className="text-center text-xs font-semibold text-gray-600 py-2">
                 {day}
               </div>
             ))}
           </div>
 
-          {/* Calendar Days Grid - Week by Week */}
-          <div className="space-y-1">
-            {weekRows.map((week, weekIndex) => (
-              <div key={weekIndex} className="grid grid-cols-7 gap-1">
-                {week.map((day, dayIndex) => (
-                  <div
-                    key={`${weekIndex}-${dayIndex}`}
+          {/* Calendar Days - 2 rows of 7 days */}
+          <div className="space-y-2">
+            {/* First Week */}
+            <div className="grid grid-cols-7 gap-1">
+              {calendarDays.slice(0, 7).map((day, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    "relative aspect-square rounded-lg border transition-all duration-200 p-1 flex flex-col items-center justify-center cursor-pointer active:scale-95 min-h-[50px]",
+                    "border-gray-200 hover:border-blue-300 bg-white hover:shadow-md",
+                    day.isToday && "ring-2 ring-emerald-400 bg-emerald-50 border-emerald-300 shadow-lg",
+                    day.hasWatering && !day.isToday && "bg-blue-50 border-blue-200"
+                  )}
+                  onClick={() => handleCalendarClick(day)}
+                >
+                  {/* Date Number - clickable for day details */}
+                  <div 
                     className={cn(
-                      "relative aspect-square rounded-lg border transition-all duration-200 p-2 flex flex-col items-center justify-center min-h-[60px] cursor-pointer active:scale-95",
-                      "border-gray-200 hover:border-blue-300 bg-white",
-                      day.isToday && "ring-2 ring-emerald-400 ring-opacity-50 bg-emerald-50 border-emerald-200",
-                      day.hasWatering && "bg-blue-50 border-blue-200"
+                      "text-sm font-bold transition-all cursor-pointer hover:scale-110 mb-1",
+                      day.isToday ? "text-emerald-600" : "text-gray-900"
                     )}
-                    onClick={() => handleCalendarClick(day)}
+                    onClick={(e) => handleDayClick(day, e)}
                   >
-                    {/* Date Number - clickable for day details */}
-                    <div 
-                      className={cn(
-                        "text-sm font-bold transition-colors mb-1 cursor-pointer hover:scale-110 transition-transform",
-                        "text-gray-900",
-                        day.isToday && "text-emerald-600"
-                      )}
-                      onClick={(e) => handleDayClick(day, e)}
-                    >
-                      {day.day}
-                    </div>
-
-                    {/* Watering Indicator */}
-                    {day.hasWatering && (
-                      <div className="flex flex-col items-center">
-                        <Droplets className="w-2.5 h-2.5 text-blue-500 mb-0.5" />
-                        {day.scheduleData && (
-                          <span className="text-xs text-blue-600 font-medium">
-                            {getTotalVolume(day)}L
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Manual Controls */}
-                    {showManualControls && day.hasWatering && day.scheduleData && (
-                      <div className="absolute top-0.5 right-0.5 flex space-x-0.5">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="w-4 h-4 p-0 bg-white shadow-sm hover:bg-gray-100"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onVolumeAdjust?.(day.date, -2);
-                          }}
-                        >
-                          <Minus className="w-2 h-2" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="w-4 h-4 p-0 bg-white shadow-sm hover:bg-gray-100"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onVolumeAdjust?.(day.date, 2);
-                          }}
-                        >
-                          <Plus className="w-2 h-2" />
-                        </Button>
-                      </div>
-                    )}
-
-                    {/* Today Pulse Indicator */}
-                    {day.isToday && (
-                      <div className="absolute inset-0 rounded-lg ring-2 ring-emerald-400 ring-opacity-30 animate-pulse pointer-events-none" />
-                    )}
+                    {day.day}
                   </div>
-                ))}
-              </div>
-            ))}
+
+                  {/* Watering Indicator */}
+                  {day.hasWatering && (
+                    <div className="flex flex-col items-center">
+                      <Droplets className="w-2.5 h-2.5 text-blue-500 mb-0.5" />
+                      {day.scheduleData && (
+                        <span className="text-xs text-blue-600 font-medium leading-none">
+                          {getTotalVolume(day)}L
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Manual Controls */}
+                  {showManualControls && day.hasWatering && day.scheduleData && (
+                    <div className="absolute top-0.5 right-0.5 flex space-x-0.5">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="w-3 h-3 p-0 bg-white shadow-sm hover:bg-gray-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onVolumeAdjust?.(day.date, -2);
+                        }}
+                      >
+                        <Minus className="w-1.5 h-1.5" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="w-3 h-3 p-0 bg-white shadow-sm hover:bg-gray-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onVolumeAdjust?.(day.date, 2);
+                        }}
+                      >
+                        <Plus className="w-1.5 h-1.5" />
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Today Pulse Indicator */}
+                  {day.isToday && (
+                    <div className="absolute inset-0 rounded-lg ring-2 ring-emerald-400 ring-opacity-30 animate-pulse pointer-events-none" />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Second Week */}
+            <div className="grid grid-cols-7 gap-1">
+              {calendarDays.slice(7, 14).map((day, index) => (
+                <div
+                  key={index + 7}
+                  className={cn(
+                    "relative aspect-square rounded-lg border transition-all duration-200 p-1 flex flex-col items-center justify-center cursor-pointer active:scale-95 min-h-[50px]",
+                    "border-gray-200 hover:border-blue-300 bg-white hover:shadow-md",
+                    day.isToday && "ring-2 ring-emerald-400 bg-emerald-50 border-emerald-300 shadow-lg",
+                    day.hasWatering && !day.isToday && "bg-blue-50 border-blue-200"
+                  )}
+                  onClick={() => handleCalendarClick(day)}
+                >
+                  {/* Date Number - clickable for day details */}
+                  <div 
+                    className={cn(
+                      "text-sm font-bold transition-all cursor-pointer hover:scale-110 mb-1",
+                      day.isToday ? "text-emerald-600" : "text-gray-900"
+                    )}
+                    onClick={(e) => handleDayClick(day, e)}
+                  >
+                    {day.day}
+                  </div>
+
+                  {/* Watering Indicator */}
+                  {day.hasWatering && (
+                    <div className="flex flex-col items-center">
+                      <Droplets className="w-2.5 h-2.5 text-blue-500 mb-0.5" />
+                      {day.scheduleData && (
+                        <span className="text-xs text-blue-600 font-medium leading-none">
+                          {getTotalVolume(day)}L
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Manual Controls */}
+                  {showManualControls && day.hasWatering && day.scheduleData && (
+                    <div className="absolute top-0.5 right-0.5 flex space-x-0.5">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="w-3 h-3 p-0 bg-white shadow-sm hover:bg-gray-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onVolumeAdjust?.(day.date, -2);
+                        }}
+                      >
+                        <Minus className="w-1.5 h-1.5" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="w-3 h-3 p-0 bg-white shadow-sm hover:bg-gray-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onVolumeAdjust?.(day.date, 2);
+                        }}
+                      >
+                        <Plus className="w-1.5 h-1.5" />
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Today Pulse Indicator */}
+                  {day.isToday && (
+                    <div className="absolute inset-0 rounded-lg ring-2 ring-emerald-400 ring-opacity-30 animate-pulse pointer-events-none" />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </Card>
