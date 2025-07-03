@@ -39,7 +39,7 @@ const AppNavigator = () => {
         <Route path="/signup" element={<SignUpScreen />} />
         <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
 
-        {/* Onboarding */}
+        {/* Onboarding Flow - Fixed routing */}
         <Route path="/onboarding/crop" element={<OnboardingCropScreen />} />
         <Route path="/onboarding/location" element={<OnboardingLocationScreen />} />
         <Route path="/onboarding/advanced" element={<OnboardingAdvancedSettingsScreen />} />
@@ -47,6 +47,7 @@ const AppNavigator = () => {
 
         {/* Main App */}
         <Route path="/app/*" element={<MainTabs />} />
+        <Route path="/home" element={<Navigate to="/app/home" replace />} />
 
         {/* Plot Management */}
         <Route path="/add-plot" element={<AddPlotScreen />} />
