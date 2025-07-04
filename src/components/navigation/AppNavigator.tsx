@@ -32,7 +32,7 @@ import ReportsScreen from "@/components/screens/ReportsScreen";
 import SensorManagementScreen from "@/components/screens/SensorManagementScreen";
 import DeviceControlScreen from "@/components/screens/DeviceControlScreen";
 import WeatherForecastScreen from "@/components/screens/WeatherForecastScreen";
-import CollaborationScreen from "@/components/screens/CollaborationScreen";
+import CollaborationScreen from "@/components/screens/CollaborationScreen";             
 import UserProfileScreen from "@/components/screens/UserProfileScreen";
 import NotificationSettingsScreen from "@/components/screens/NotificationSettingsScreen";
 import HelpScreen from "@/components/screens/HelpScreen";
@@ -69,31 +69,138 @@ const AppNavigator = () => {
       <Route path="/notifications" element={<NotificationSettingsScreen />} />
       <Route path="/help" element={<HelpScreen />} />
 
-      {/* Main App Routes with Navigation */}
-      <Route path="/app/*" element={
+      {/* Main App Routes with Navigation Layout */}
+      <Route path="/app/home" element={
         <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
           <AdvancedNavigation />
-          <div className="flex-1 overflow-y-auto">
-            <Routes>
-              <Route path="/" element={<Navigate to="/home" replace />} />
-              <Route path="/home" element={<HomeScreen />} />
-              <Route path="/analytics" element={<AnalyticsScreen />} />
-              <Route path="/analytics/predictive" element={<PredictiveDashboardScreen />} />
-              <Route path="/analytics/anomalies" element={<AnomalyAlertsScreen />} />
-              <Route path="/analytics/plant-health" element={<PlantHealthScannerScreen />} />
-              <Route path="/analytics/yield" element={<YieldForecastScreen />} />
-              <Route path="/map" element={<MapOverviewScreen />} />
-              <Route path="/chat" element={<FarmerChatScreen />} />
-              <Route path="/community" element={<CommunityScreen />} />
-              <Route path="/marketplace" element={<MarketplaceScreen />} />
-              <Route path="/account" element={<AccountScreen />} />
-              
-              {/* Plot Detail Routes */}
-              <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
-              <Route path="/plot/:plotId/settings" element={<PlotSettingsScreen />} />
-              <Route path="/day/:plotId/:date" element={<SpecificDayScreen />} />
-              <Route path="/calendar/:plotId" element={<CalendarScreen />} />
-            </Routes>
+          <div className="flex-1 overflow-y-auto lg:ml-72">
+            <HomeScreen />
+          </div>
+        </div>
+      } />
+      
+      <Route path="/app/analytics" element={
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+          <AdvancedNavigation />
+          <div className="flex-1 overflow-y-auto lg:ml-72">
+            <AnalyticsScreen />
+          </div>
+        </div>
+      } />
+      
+      <Route path="/app/analytics/predictive" element={
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+          <AdvancedNavigation />
+          <div className="flex-1 overflow-y-auto lg:ml-72">
+            <PredictiveDashboardScreen />
+          </div>
+        </div>
+      } />
+      
+      <Route path="/app/analytics/anomalies" element={
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+          <AdvancedNavigation />
+          <div className="flex-1 overflow-y-auto lg:ml-72">
+            <AnomalyAlertsScreen />
+          </div>
+        </div>
+      } />
+      
+      <Route path="/app/analytics/plant-health" element={
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+          <AdvancedNavigation />
+          <div className="flex-1 overflow-y-auto lg:ml-72">
+            <PlantHealthScannerScreen />
+          </div>
+        </div>
+      } />
+      
+      <Route path="/app/analytics/yield" element={
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+          <AdvancedNavigation />
+          <div className="flex-1 overflow-y-auto lg:ml-72">
+            <YieldForecastScreen />
+          </div>
+        </div>
+      } />
+      
+      <Route path="/app/map" element={
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+          <AdvancedNavigation />
+          <div className="flex-1 overflow-y-auto lg:ml-72">
+            <MapOverviewScreen />
+          </div>
+        </div>
+      } />
+      
+      <Route path="/app/chat" element={
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+          <AdvancedNavigation />
+          <div className="flex-1 overflow-y-auto lg:ml-72">
+            <FarmerChatScreen />
+          </div>
+        </div>
+      } />
+      
+      <Route path="/app/community" element={
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+          <AdvancedNavigation />
+          <div className="flex-1 overflow-y-auto lg:ml-72">
+            <CommunityScreen />
+          </div>
+        </div>
+      } />
+      
+      <Route path="/app/marketplace" element={
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+          <AdvancedNavigation />
+          <div className="flex-1 overflow-y-auto lg:ml-72">
+            <MarketplaceScreen />
+          </div>
+        </div>
+      } />
+      
+      <Route path="/app/account" element={
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+          <AdvancedNavigation />
+          <div className="flex-1 overflow-y-auto lg:ml-72">
+            <AccountScreen />
+          </div>
+        </div>
+      } />
+      
+      <Route path="/app/plot/:plotId" element={
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+          <AdvancedNavigation />
+          <div className="flex-1 overflow-y-auto lg:ml-72">
+            <PlotDetailsScreen />
+          </div>
+        </div>
+      } />
+      
+      <Route path="/app/plot/:plotId/settings" element={
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+          <AdvancedNavigation />
+          <div className="flex-1 overflow-y-auto lg:ml-72">
+            <PlotSettingsScreen />
+          </div>
+        </div>
+      } />
+      
+      <Route path="/app/day/:plotId/:date" element={
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+          <AdvancedNavigation />
+          <div className="flex-1 overflow-y-auto lg:ml-72">
+            <SpecificDayScreen />
+          </div>
+        </div>
+      } />
+      
+      <Route path="/app/calendar/:plotId" element={
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+          <AdvancedNavigation />
+          <div className="flex-1 overflow-y-auto lg:ml-72">
+            <CalendarScreen />
           </div>
         </div>
       } />
