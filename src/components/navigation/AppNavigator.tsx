@@ -69,6 +69,15 @@ const AppNavigator = () => {
       <Route path="/notifications" element={<NotificationSettingsScreen />} />
       <Route path="/help" element={<HelpScreen />} />
 
+      {/* Legacy redirects - MUST be before main app routes */}
+      <Route path="/home" element={<Navigate to="/app/home" replace />} />
+      <Route path="/analytics" element={<Navigate to="/app/analytics" replace />} />
+      <Route path="/map" element={<Navigate to="/app/map" replace />} />
+      <Route path="/chat" element={<Navigate to="/app/chat" replace />} />
+      <Route path="/community" element={<Navigate to="/app/community" replace />} />
+      <Route path="/marketplace" element={<Navigate to="/app/marketplace" replace />} />
+      <Route path="/account" element={<Navigate to="/app/account" replace />} />
+
       {/* Main App Routes with Navigation Layout */}
       <Route path="/app/home" element={
         <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
@@ -204,15 +213,6 @@ const AppNavigator = () => {
           </div>
         </div>
       } />
-
-      {/* Legacy redirects */}
-      <Route path="/home" element={<Navigate to="/app/home" replace />} />
-      <Route path="/analytics" element={<Navigate to="/app/analytics" replace />} />
-      <Route path="/map" element={<Navigate to="/app/map" replace />} />
-      <Route path="/chat" element={<Navigate to="/app/chat" replace />} />
-      <Route path="/community" element={<Navigate to="/app/community" replace />} />
-      <Route path="/marketplace" element={<Navigate to="/app/marketplace" replace />} />
-      <Route path="/account" element={<Navigate to="/app/account" replace />} />
 
       {/* Plot routes outside app */}
       <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
