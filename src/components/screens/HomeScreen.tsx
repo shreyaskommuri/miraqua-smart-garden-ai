@@ -57,6 +57,27 @@ const HomeScreen = () => {
     plot.crop.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Calculate dynamic statistics
+  const onlinePlots = filteredPlots.filter(p => p.isOnline).length;
+  const avgMoisture = filteredPlots.length > 0 
+    ? Math.round(filteredPlots.reduce((sum, p) => sum + p.currentMoisture, 0) / filteredPlots.length) 
+    : 0;
+  const avgHealth = filteredPlots.length > 0 
+    ? Math.round(filteredPlots.reduce((sum, p) => sum + p.healthScore, 0) / filteredPlots.length) 
+    : 0;
+  
+  // Calculate total water used (mock calculation based on plot data)
+  const totalWaterUsed = filteredPlots.reduce((sum, plot) => {
+    // Simulate water usage based on plot area and moisture level
+    const dailyUsage = plot.area * (100 - plot.currentMoisture) * 0.1;
+    return sum + dailyUsage;
+  }, 0);
+
+  // Calculate water savings percentage
+  const waterSavings = filteredPlots.length > 0 
+    ? Math.round((avgMoisture / 100) * 30) // Simulate savings based on optimal moisture
+    : 0;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
@@ -147,12 +168,12 @@ const HomeScreen = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 dark:text-gray-400" />
           </div>
 
-          {/* Status Overview */}
+          {/* Dynamic Status Overview */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="glass border-0 shadow-xl">
               <CardContent className="p-6 text-center">
                 <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
-                  {filteredPlots.filter(p => p.isOnline).length}
+                  {onlinePlots}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-300 flex items-center justify-center">
                   <Wifi className="w-4 h-4 mr-1" />
@@ -164,7 +185,7 @@ const HomeScreen = () => {
             <Card className="glass border-0 shadow-xl">
               <CardContent className="p-6 text-center">
                 <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                  {filteredPlots.length > 0 ? Math.round(filteredPlots.reduce((sum, p) => sum + p.currentMoisture, 0) / filteredPlots.length) : 0}%
+                  {avgMoisture}%
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-300">
                   Avg Moisture
@@ -175,7 +196,7 @@ const HomeScreen = () => {
             <Card className="glass border-0 shadow-xl">
               <CardContent className="p-6 text-center">
                 <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-2">
-                  {filteredPlots.length > 0 ? Math.round(filteredPlots.reduce((sum, p) => sum + p.healthScore, 0) / filteredPlots.length) : 0}%
+                  {avgHealth}%
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-300">
                   Avg Health
@@ -226,6 +247,44 @@ const HomeScreen = () => {
               </div>
             )}
           </div>
+
+          {/* Dynamic Analytics Preview */}
+          <Card className="glass border-0 shadow-xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Weekly Summary</h3>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => navigate("/app/analytics")}
+                  className="text-indigo-600 hover:text-indigo-700"
+                >
+                  View Analytics
+                </Button>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-1">
+                    {Math.round(totalWaterUsed)}L
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Water Used</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">
+                    {waterSavings}%
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Water Saved</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-1">
+                    {filteredPlots.length}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Active Plots</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </ScrollArea>
 
