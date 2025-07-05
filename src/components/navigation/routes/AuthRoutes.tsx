@@ -6,7 +6,7 @@ import SignInScreen from "@/components/screens/SignInScreen";
 import SignUpScreen from "@/components/screens/SignUpScreen";
 import ForgotPasswordScreen from "@/components/screens/ForgotPasswordScreen";
 
-export const AuthRoutes = () => (
+export const authRoutes = (
   <>
     <Route path="/" element={<Navigate to="/welcome" replace />} />
     <Route path="/welcome" element={<WelcomeScreen />} />

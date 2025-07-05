@@ -1,31 +1,30 @@
 
 import React from "react";
 import { Route } from "react-router-dom";
+import Index from "@/pages/Index";
 import AddPlotScreen from "@/components/screens/AddPlotScreen";
+import CollaborationScreen from "@/components/screens/CollaborationScreen";
+import DeviceControlScreen from "@/components/screens/DeviceControlScreen";
+import ExportReportsScreen from "@/components/screens/ExportReportsScreen";
+import HelpScreen from "@/components/screens/HelpScreen";
+import NotificationSettingsScreen from "@/components/screens/NotificationSettingsScreen";
 import ReportsScreen from "@/components/screens/ReportsScreen";
 import SensorManagementScreen from "@/components/screens/SensorManagementScreen";
-import DeviceControlScreen from "@/components/screens/DeviceControlScreen";
-import WeatherForecastScreen from "@/components/screens/WeatherForecastScreen";
-import CollaborationScreen from "@/components/screens/CollaborationScreen";
 import UserProfileScreen from "@/components/screens/UserProfileScreen";
-import NotificationSettingsScreen from "@/components/screens/NotificationSettingsScreen";
-import HelpScreen from "@/components/screens/HelpScreen";
-import PlotDetailsScreen from "@/components/screens/PlotDetailsScreen";
-import SpecificDayScreen from "@/components/screens/SpecificDayScreen";
+import WeatherForecastScreen from "@/components/screens/WeatherForecastScreen";
 
-export const StandaloneRoutes = () => (
+export const standaloneRoutes = (
   <>
+    <Route path="/dashboard" element={<Index />} />
     <Route path="/add-plot" element={<AddPlotScreen />} />
-    <Route path="/reports" element={<ReportsScreen />} />
-    <Route path="/sensors" element={<SensorManagementScreen />} />
-    <Route path="/devices" element={<DeviceControlScreen />} />
-    <Route path="/weather" element={<WeatherForecastScreen />} />
-    <Route path="/weather/:plotId" element={<WeatherForecastScreen />} />
     <Route path="/collaboration" element={<CollaborationScreen />} />
-    <Route path="/profile" element={<UserProfileScreen />} />
-    <Route path="/notifications" element={<NotificationSettingsScreen />} />
+    <Route path="/device-control" element={<DeviceControlScreen />} />
+    <Route path="/export-reports" element={<ExportReportsScreen />} />
     <Route path="/help" element={<HelpScreen />} />
-    <Route path="/plot/:plotId" element={<PlotDetailsScreen />} />
-    <Route path="/plot/:plotId/day/:day" element={<SpecificDayScreen />} />
+    <Route path="/notification-settings" element={<NotificationSettingsScreen />} />
+    <Route path="/reports" element={<ReportsScreen />} />
+    <Route path="/sensor-management" element={<SensorManagementScreen />} />
+    <Route path="/user-profile" element={<UserProfileScreen />} />
+    <Route path="/weather-forecast" element={<WeatherForecastScreen />} />
   </>
 );

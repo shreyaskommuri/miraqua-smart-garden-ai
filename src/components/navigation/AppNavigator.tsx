@@ -1,20 +1,20 @@
 
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { AuthRoutes } from "./routes/AuthRoutes";
-import { OnboardingRoutes } from "./routes/OnboardingRoutes";
-import { StandaloneRoutes } from "./routes/StandaloneRoutes";
-import { LegacyRedirects } from "./routes/LegacyRedirects";
-import { MainAppRoutes } from "./routes/MainAppRoutes";
+import { authRoutes } from "./routes/AuthRoutes";
+import { onboardingRoutes } from "./routes/OnboardingRoutes";
+import { standaloneRoutes } from "./routes/StandaloneRoutes";
+import { legacyRedirects } from "./routes/LegacyRedirects";
+import { mainAppRoutes } from "./routes/MainAppRoutes";
 
 const AppNavigator = () => {
   return (
     <Routes>
-      <AuthRoutes />
-      <OnboardingRoutes />
-      <StandaloneRoutes />
-      <LegacyRedirects />
-      <MainAppRoutes />
+      {authRoutes}
+      {onboardingRoutes}
+      {standaloneRoutes}
+      {legacyRedirects}
+      {mainAppRoutes}
       <Route path="*" element={<Navigate to="/welcome" replace />} />
     </Routes>
   );

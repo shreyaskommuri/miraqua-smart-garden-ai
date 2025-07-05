@@ -18,7 +18,7 @@ import PlotSettingsScreen from "@/components/screens/PlotSettingsScreen";
 import SpecificDayScreen from "@/components/screens/SpecificDayScreen";
 import CalendarScreen from "@/components/screens/CalendarScreen";
 
-export const MainAppRoutes = () => (
+export const mainAppRoutes = (
   <>
     <Route path="/app/home" element={
       <AppLayout>
