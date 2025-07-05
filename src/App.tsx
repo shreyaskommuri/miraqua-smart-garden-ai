@@ -1,5 +1,6 @@
 
 import React, { useEffect } from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { I18nProvider } from './contexts/I18nContext';
 import AppNavigator from './components/navigation/AppNavigator';
@@ -33,11 +34,13 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider>
-      <I18nProvider>
-        <AppNavigator />
-      </I18nProvider>
-    </ThemeProvider>
+    <BrowserRouter>
+      <ThemeProvider>
+        <I18nProvider>
+          <AppNavigator />
+        </I18nProvider>
+      </ThemeProvider>
+    </BrowserRouter>
   );
 }
 
