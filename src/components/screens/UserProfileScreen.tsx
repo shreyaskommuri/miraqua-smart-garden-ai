@@ -7,11 +7,6 @@ import { ArrowLeft } from "lucide-react";
 const UserProfileScreen = () => {
   const navigate = useNavigate();
 
-  // This redirects to AccountScreen since they have the same functionality
-  React.useEffect(() => {
-    navigate('/account');
-  }, [navigate]);
-
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -27,7 +22,10 @@ const UserProfileScreen = () => {
       
       <div className="p-4">
         <div className="text-center">
-          <p className="text-gray-600">Redirecting to account settings...</p>
+          <p className="text-gray-600 mb-4">This screen shares functionality with Account Settings.</p>
+          <Button onClick={() => navigate('/app/account')} className="bg-blue-500 hover:bg-blue-600 text-white">
+            Go to Account Settings
+          </Button>
         </div>
       </div>
     </div>
