@@ -1,5 +1,6 @@
+
 import React, { useState } from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -15,14 +16,12 @@ import {
   WifiOff,
   Menu,
   X,
-  Search,
   Plus,
   Zap,
   Target,
   Users,
   Shield,
   Store,
-  Eye,
   Camera,
   Leaf,
   Sprout
@@ -54,19 +53,8 @@ const navigationItems: NavItem[] = [
   },
   { id: 'map', label: 'Smart Map', icon: Map, path: '/app/map' },
   { id: 'chat', label: 'AI Assistant', icon: MessageSquare, path: '/app/chat', badge: 3 },
-  { 
-    id: 'community', 
-    label: 'Community', 
-    icon: Users, 
-    path: '/app/community'
-  },
-  { 
-    id: 'marketplace', 
-    label: 'Marketplace', 
-    icon: Store, 
-    path: '/app/marketplace',
-    badge: 2
-  },
+  { id: 'community', label: 'Community', icon: Users, path: '/app/community' },
+  { id: 'marketplace', label: 'Marketplace', icon: Store, path: '/app/marketplace', badge: 2 },
   { id: 'account', label: 'Account', icon: User, path: '/app/account' }
 ];
 
@@ -74,8 +62,21 @@ const AdvancedNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+
+  React.useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems(prev => 
@@ -89,6 +90,11 @@ const AdvancedNavigation = () => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setIsOpen(false);
+  };
+
   const renderNavItem = (item: NavItem, isSubItem = false) => {
     const Icon = item.icon;
     const active = isActive(item.path);
@@ -99,59 +105,58 @@ const AdvancedNavigation = () => {
       <div key={item.id} className={cn("w-full", isSubItem && "ml-4")}>
         <div
           className={cn(
-            "flex items-center justify-between w-full px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer group",
+            "flex items-center justify-between w-full px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer group",
             active 
-              ? "bg-green-600 text-white shadow-sm" 
-              : "text-gray-700 hover:bg-gray-50",
-            isSubItem && "py-2 text-sm rounded-lg"
+              ? "bg-green-600 text-white" 
+              : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800",
+            isSubItem && "py-2 text-sm"
           )}
           onClick={() => {
             if (hasSubItems) {
               toggleExpanded(item.id);
             } else {
-              navigate(item.path);
-              setIsOpen(false);
+              handleNavigation(item.path);
             }
           }}
         >
           <div className="flex items-center space-x-3">
             <div className={cn(
-              "p-2 rounded-lg transition-all duration-200",
+              "p-1.5 rounded-md transition-all duration-200",
               active 
                 ? "bg-white/20" 
-                : "bg-gray-100 group-hover:bg-white",
-              isSubItem && "p-1.5"
+                : "bg-gray-100 group-hover:bg-white dark:bg-gray-800 dark:group-hover:bg-gray-700",
+              isSubItem && "p-1"
             )}>
               <Icon className={cn(
                 "w-4 h-4 transition-colors duration-200",
-                active ? "text-white" : "text-gray-600 group-hover:text-gray-900",
+                active ? "text-white" : "text-gray-600 group-hover:text-gray-900 dark:text-gray-400",
                 isSubItem && "w-3.5 h-3.5"
               )} />
             </div>
             <span className={cn(
               "font-medium transition-colors duration-200",
-              active ? "text-white" : "text-gray-700 group-hover:text-gray-900"
+              active ? "text-white" : "text-gray-700 group-hover:text-gray-900 dark:text-gray-300"
             )}>
               {item.label}
             </span>
             {item.badge && (
-              <Badge className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+              <Badge className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
                 {item.badge}
               </Badge>
             )}
           </div>
           {hasSubItems && (
             <div className={cn(
-              "transform transition-transform duration-200",
+              "transform transition-transform duration-200 text-gray-400",
               isExpanded ? "rotate-90" : "rotate-0"
             )}>
-              <div className="w-2 h-2 border-r-2 border-b-2 border-current transform rotate-45"></div>
+              ▶
             </div>
           )}
         </div>
         
         {hasSubItems && isExpanded && (
-          <div className="mt-2 space-y-1">
+          <div className="mt-1 space-y-1">
             {item.subItems!.map(subItem => renderNavItem(subItem, true))}
           </div>
         )}
@@ -162,43 +167,40 @@ const AdvancedNavigation = () => {
   return (
     <>
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-100 z-50">
-        <div className="flex items-center justify-between px-6 py-4">
+      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 z-50">
+        <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center space-x-3">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsOpen(true)}
-              className="hover:bg-gray-100 rounded-xl p-2"
+              className="p-2"
             >
-              <Menu className="w-6 h-6 text-gray-700" />
+              <Menu className="w-5 h-5" />
             </Button>
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
                 <Sprout className="w-4 h-4 text-white" />
               </div>
-              <div className="text-xl font-bold text-gray-900">
-                Miraqua
-              </div>
+              <span className="text-lg font-bold text-gray-900 dark:text-white">Miraqua</span>
             </div>
           </div>
           
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center space-x-2 px-3 py-2 bg-gray-50 rounded-xl">
+          <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
               {isOnline ? (
-                <Wifi className="w-4 h-4 text-green-500" />
+                <Wifi className="w-3 h-3 text-green-500" />
               ) : (
-                <WifiOff className="w-4 h-4 text-red-500" />
+                <WifiOff className="w-3 h-3 text-red-500" />
               )}
-              <span className="text-xs text-gray-600 font-medium">
-                {isOnline ? "Live" : "Offline"}
+              <span className="text-xs text-gray-600 dark:text-gray-400">
+                {isOnline ? "Online" : "Offline"}
               </span>
             </div>
-            
-            <Button variant="ghost" size="sm" className="relative hover:bg-gray-100 rounded-xl p-2">
-              <Bell className="w-5 h-5 text-gray-700" />
-              <Badge className="absolute -top-1 -right-1 bg-red-500 text-white w-5 h-5 text-xs rounded-full flex items-center justify-center">
-                7
+            <Button variant="ghost" size="sm" className="relative p-2">
+              <Bell className="w-4 h-4" />
+              <Badge className="absolute -top-1 -right-1 bg-red-500 text-white w-4 h-4 text-xs rounded-full flex items-center justify-center">
+                3
               </Badge>
             </Button>
           </div>
@@ -206,103 +208,89 @@ const AdvancedNavigation = () => {
       </div>
 
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex lg:w-72 lg:flex-col lg:fixed lg:inset-y-0 lg:border-r lg:border-gray-100 lg:bg-white lg:z-40">
-        <div className="flex items-center justify-start h-20 border-b border-gray-100 px-6">
+      <div className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:border-r lg:border-gray-200 lg:bg-white lg:dark:bg-gray-900 lg:dark:border-gray-700 lg:z-40">
+        <div className="flex items-center h-16 border-b border-gray-200 dark:border-gray-700 px-4">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center">
-              <Sprout className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+              <Sprout className="w-4 h-4 text-white" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">
-              Miraqua
-            </div>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">Miraqua</span>
           </div>
         </div>
         
-        <ScrollArea className="flex-1 px-6 py-8">
-          <div className="space-y-2">
+        <ScrollArea className="flex-1 px-4 py-4">
+          <div className="space-y-1">
             {navigationItems.map(item => renderNavItem(item))}
           </div>
           
           {/* Quick Actions */}
-          <div className="mt-12 pt-8 border-t border-gray-100">
-            <div className="text-sm font-semibold text-gray-700 mb-6 px-2">Quick Actions</div>
-            <div className="space-y-3">
+          <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3 px-2">QUICK ACTIONS</div>
+            <div className="space-y-2">
               <Button 
                 variant="outline" 
-                className="w-full justify-start border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl py-3 h-auto"
-                onClick={() => navigate('/add-plot')}
+                className="w-full justify-start text-left h-auto py-2"
+                onClick={() => handleNavigation('/add-plot')}
               >
-                <div className="p-2 bg-green-100 rounded-xl mr-3">
-                  <Plus className="w-4 h-4 text-green-600" />
-                </div>
-                <div className="text-left">
-                  <div className="font-medium">Add New Plot</div>
-                  <div className="text-xs text-gray-500">Expand your garden</div>
-                </div>
+                <Plus className="w-4 h-4 mr-2" />
+                Add New Plot
               </Button>
               <Button 
                 variant="outline" 
-                className="w-full justify-start border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl py-3 h-auto"
-                onClick={() => navigate('/app/analytics/plant-health')}
+                className="w-full justify-start text-left h-auto py-2"
+                onClick={() => handleNavigation('/app/analytics/plant-health')}
               >
-                <div className="p-2 bg-blue-100 rounded-xl mr-3">
-                  <Camera className="w-4 h-4 text-blue-600" />
-                </div>
-                <div className="text-left">
-                  <div className="font-medium">Scan Plants</div>
-                  <div className="text-xs text-gray-500">Check plant health</div>
-                </div>
+                <Camera className="w-4 h-4 mr-2" />
+                Scan Plants
               </Button>
             </div>
           </div>
         </ScrollArea>
         
         {/* Status Footer */}
-        <div className="p-6 border-t border-gray-100 bg-gray-50">
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <div className={cn(
-                "w-3 h-3 rounded-full",
+                "w-2 h-2 rounded-full",
                 isOnline ? "bg-green-500" : "bg-red-500"
               )}></div>
-              <span className="text-gray-600 font-medium">
+              <span className="text-gray-600 dark:text-gray-400 text-xs">
                 {isOnline ? "System Online" : "Offline Mode"}
               </span>
             </div>
-            <Shield className="w-5 h-5 text-gray-400" />
+            <Shield className="w-4 h-4 text-gray-400" />
           </div>
         </div>
       </div>
 
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Sidebar */}
       {isOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div 
-            className="fixed inset-0 bg-black/20"
+            className="fixed inset-0 bg-black/50"
             onClick={() => setIsOpen(false)}
           />
-          <div className="relative flex flex-col w-80 bg-white shadow-xl">
-            <div className="flex items-center justify-between h-16 px-6 border-b border-gray-100">
+          <div className="relative flex flex-col w-80 max-w-full bg-white dark:bg-gray-900 shadow-xl">
+            <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
                   <Sprout className="w-4 h-4 text-white" />
                 </div>
-                <div className="text-xl font-bold text-gray-900">
-                  Miraqua
-                </div>
+                <span className="text-xl font-bold text-gray-900 dark:text-white">Miraqua</span>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsOpen(false)}
-                className="hover:bg-gray-100 rounded-xl p-2"
+                className="p-2"
               >
-                <X className="w-5 h-5 text-gray-700" />
+                <X className="w-5 h-5" />
               </Button>
             </div>
             
-            <ScrollArea className="flex-1 px-6 py-8">
-              <div className="space-y-2">
+            <ScrollArea className="flex-1 px-4 py-4">
+              <div className="space-y-1">
                 {navigationItems.map(item => renderNavItem(item))}
               </div>
             </ScrollArea>

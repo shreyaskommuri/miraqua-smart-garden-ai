@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { I18nProvider } from './contexts/I18nContext';
 import AppNavigator from './components/navigation/AppNavigator';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
   useEffect(() => {
@@ -34,13 +35,15 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter>
-      <ThemeProvider>
-        <I18nProvider>
-          <AppNavigator />
-        </I18nProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <ThemeProvider>
+          <I18nProvider>
+            <AppNavigator />
+          </I18nProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 

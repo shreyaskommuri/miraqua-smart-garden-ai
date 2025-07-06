@@ -27,37 +27,47 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [plots, setPlots] = useState<Plot[]>([]);
+  const [retryCount, setRetryCount] = useState(0);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const plotData = await getPlots();
-        setPlots(plotData);
-      } catch (err) {
-        setError("Failed to load plots");
+  const fetchData = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const plotData = await getPlots();
+      setPlots(plotData);
+      setRetryCount(0);
+    } catch (err) {
+      console.error("Failed to load plots:", err);
+      setError("Failed to load plots");
+      if (retryCount < 3) {
+        setTimeout(() => {
+          setRetryCount(prev => prev + 1);
+          fetchData();
+        }, 1000 * (retryCount + 1));
+      } else {
         toast({
-          title: "Error",
-          description: "Failed to load your plots. Please try again.",
+          title: "Connection Error",
+          description: "Unable to load your plots. Please check your connection and try again.",
           variant: "destructive",
         });
-      } finally {
-        setLoading(false);
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
-  }, [toast]);
+  }, []);
 
   const filteredPlots = plots.filter(plot =>
     plot.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     plot.crop.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Calculate dynamic statistics
+  // Calculate statistics
   const onlinePlots = filteredPlots.filter(p => p.isOnline).length;
   const avgMoisture = filteredPlots.length > 0 
     ? Math.round(filteredPlots.reduce((sum, p) => sum + p.currentMoisture, 0) / filteredPlots.length) 
@@ -65,46 +75,38 @@ const HomeScreen = () => {
   const avgHealth = filteredPlots.length > 0 
     ? Math.round(filteredPlots.reduce((sum, p) => sum + p.healthScore, 0) / filteredPlots.length) 
     : 0;
-  
-  // Calculate total water used (mock calculation based on plot data)
-  const totalWaterUsed = filteredPlots.reduce((sum, plot) => {
-    // Simulate water usage based on plot area and moisture level
-    const dailyUsage = plot.area * (100 - plot.currentMoisture) * 0.1;
-    return sum + dailyUsage;
-  }, 0);
-
-  // Calculate water savings percentage
-  const waterSavings = filteredPlots.length > 0 
-    ? Math.round((avgMoisture / 100) * 30) // Simulate savings based on optimal moisture
-    : 0;
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
-        <div className="p-6 space-y-6">
-          <div className="flex items-center justify-center min-h-[50vh]">
-            <div className="text-center">
-              <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Loading your gardens...</h3>
-              <p className="text-gray-600 dark:text-gray-300">Please wait while we fetch your plot data</p>
-            </div>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center space-y-4">
+            <Loader2 className="w-12 h-12 animate-spin text-green-600 mx-auto" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Loading your gardens...</h3>
+            <p className="text-gray-600 dark:text-gray-300">Please wait while we fetch your plot data</p>
+            {retryCount > 0 && (
+              <p className="text-sm text-yellow-600">Retrying... ({retryCount}/3)</p>
+            )}
           </div>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error && retryCount >= 3) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 dark:from-gray-900 dark:to-gray-800">
-        <div className="p-6">
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+        <div className="flex items-center justify-center min-h-screen p-6">
+          <Card className="max-w-md w-full">
             <CardContent className="p-8 text-center">
-              <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-6" />
-              <h3 className="text-2xl font-bold text-red-800 dark:text-red-400 mb-4">Oops! Something went wrong</h3>
-              <p className="text-red-600 dark:text-red-300 mb-6 text-lg">{error}</p>
-              <Button onClick={() => window.location.reload()} size="lg" className="bg-red-600 hover:bg-red-700">
-                <RefreshCw className="w-5 h-5 mr-2" />
+              <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-red-800 dark:text-red-400 mb-2">Connection Failed</h3>
+              <p className="text-red-600 dark:text-red-300 mb-6">{error}</p>
+              <Button onClick={() => {
+                setRetryCount(0);
+                fetchData();
+              }} className="bg-red-600 hover:bg-red-700">
+                <RefreshCw className="w-4 h-4 mr-2" />
                 Try Again
               </Button>
             </CardContent>
@@ -116,37 +118,29 @@ const HomeScreen = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      {/* Enhanced Header */}
-      <header className="glass border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40 shadow-sm">
+      {/* Header */}
+      <header className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="relative">
-                <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
-                  <span className="text-3xl">🌱</span>
-                </div>
+              <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
+                <span className="text-2xl">🌱</span>
               </div>
-              
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Gardens</h1>
-                <p className="text-gray-600 dark:text-gray-300">Manage and monitor your plots</p>
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white">My Gardens</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Manage and monitor your plots</p>
               </div>
             </div>
             
             <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm" className="btn-modern">
+              <Button variant="ghost" size="sm">
                 <Bell className="w-4 h-4" />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="btn-modern"
-                onClick={() => navigate("/app/analytics")}
-              >
+              <Button variant="ghost" size="sm" onClick={() => navigate("/app/analytics")}>
                 <BarChart3 className="w-4 h-4" />
               </Button>
               <ThemeSwitcher />
-              <Button variant="ghost" size="sm" className="btn-modern" onClick={() => navigate("/app/account")}>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/app/account")}>
                 <Settings className="w-4 h-4" />
               </Button>
             </div>
@@ -156,65 +150,51 @@ const HomeScreen = () => {
 
       <ScrollArea className="h-[calc(100vh-100px)]">
         <div className="p-6 space-y-6 pb-24">
-          {/* Search Bar */}
+          {/* Search */}
           <div className="relative">
             <Input
               type="text"
               placeholder="Search plots..."
-              className="rounded-full pl-10 pr-4 shadow-lg glass border-0"
+              className="pl-10 rounded-xl"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
           </div>
 
-          {/* Dynamic Status Overview */}
+          {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="glass border-0 shadow-xl">
+            <Card>
               <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
-                  {onlinePlots}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300 flex items-center justify-center">
+                <div className="text-2xl font-bold text-green-600 mb-1">{onlinePlots}</div>
+                <div className="text-sm text-gray-600 flex items-center justify-center">
                   <Wifi className="w-4 h-4 mr-1" />
                   Online Plots
                 </div>
               </CardContent>
             </Card>
-            
-            <Card className="glass border-0 shadow-xl">
+            <Card>
               <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                  {avgMoisture}%
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">
-                  Avg Moisture
-                </div>
+                <div className="text-2xl font-bold text-blue-600 mb-1">{avgMoisture}%</div>
+                <div className="text-sm text-gray-600">Avg Moisture</div>
               </CardContent>
             </Card>
-            
-            <Card className="glass border-0 shadow-xl">
+            <Card>
               <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-2">
-                  {avgHealth}%
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">
-                  Avg Health
-                </div>
+                <div className="text-2xl font-bold text-orange-600 mb-1">{avgHealth}%</div>
+                <div className="text-sm text-gray-600">Avg Health</div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Plots Grid */}
+          {/* Plots */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Your Plots ({filteredPlots.length})
-              </h2>
-            </div>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Your Plots ({filteredPlots.length})
+            </h2>
             
             {filteredPlots.length === 0 ? (
-              <Card className="glass border-0 shadow-xl">
+              <Card>
                 <CardContent className="p-12 text-center">
                   <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
                     <span className="text-3xl">🌱</span>
@@ -224,15 +204,12 @@ const HomeScreen = () => {
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300 mb-6">
                     {searchQuery 
-                      ? `No plots match "${searchQuery}". Try adjusting your search.`
-                      : 'Create your first plot to start monitoring your garden.'
+                      ? `No plots match "${searchQuery}"`
+                      : 'Create your first plot to start monitoring your garden'
                     }
                   </p>
                   {!searchQuery && (
-                    <Button 
-                      onClick={() => navigate("/add-plot")}
-                      className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white btn-modern"
-                    >
+                    <Button onClick={() => navigate("/add-plot")} className="bg-green-600 hover:bg-green-700">
                       <Plus className="w-4 h-4 mr-2" />
                       Add Your First Plot
                     </Button>
@@ -247,55 +224,16 @@ const HomeScreen = () => {
               </div>
             )}
           </div>
-
-          {/* Dynamic Analytics Preview */}
-          <Card className="glass border-0 shadow-xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Weekly Summary</h3>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => navigate("/app/analytics")}
-                  className="text-indigo-600 hover:text-indigo-700"
-                >
-                  View Analytics
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-1">
-                    {Math.round(totalWaterUsed)}L
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">Water Used</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">
-                    {waterSavings}%
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">Water Saved</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-1">
-                    {filteredPlots.length}
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">Active Plots</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </ScrollArea>
 
-      {/* Floating Action Button */}
-      <div className="fixed bottom-6 left-6 right-6 z-30">
+      {/* FAB */}
+      <div className="fixed bottom-6 right-6">
         <Button
           onClick={() => navigate("/add-plot")}
-          className="w-full h-16 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold text-lg rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 border-0 btn-modern"
+          className="w-14 h-14 bg-green-600 hover:bg-green-700 rounded-full shadow-lg"
         >
-          <Plus className="w-6 h-6 mr-3" />
-          Add New Plot
+          <Plus className="w-6 h-6" />
         </Button>
       </div>
     </div>
