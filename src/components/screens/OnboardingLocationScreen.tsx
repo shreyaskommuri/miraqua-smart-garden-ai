@@ -43,7 +43,7 @@ const OnboardingLocationScreen = () => {
   };
 
   const handleNext = () => {
-    navigate('/onboarding/settings', {
+    navigate('/onboarding/advanced-settings', {
       state: { ...plotData, latitude, longitude, address }
     });
   };
