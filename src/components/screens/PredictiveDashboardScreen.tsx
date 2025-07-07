@@ -72,7 +72,7 @@ const PredictiveDashboardScreen = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-16 lg:pt-0 lg:pl-64">
+      <div className="min-h-screen bg-gray-50">
         <div className="p-4 space-y-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-48 bg-gray-200 rounded-lg animate-pulse"></div>
@@ -83,10 +83,10 @@ const PredictiveDashboardScreen = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16 lg:pt-0 lg:pl-64">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-16 lg:top-0 z-30">
-        <div className="px-4 py-4">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header - Fixed positioning with proper spacing */}
+      <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-30">
+        <div className="px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Button 
@@ -114,7 +114,7 @@ const PredictiveDashboardScreen = () => {
         </div>
       </header>
 
-      <ScrollArea className="h-[calc(100vh-140px)]">
+      <ScrollArea className="h-[calc(100vh-80px)]">
         <div className="p-4 space-y-6">
           {/* Schedule Toggle */}
           <Card className="border-0 shadow-lg">
