@@ -4,19 +4,23 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { I18nProvider } from './contexts/I18nContext';
 import AppNavigator from './components/navigation/AppNavigator';
-import ErrorBoundary from './components/ErrorBoundary';
+import ErrorBoundaryProvider from './components/ui/ErrorBoundaryProvider';
+import NetworkStatus from './components/ui/NetworkStatus';
+import { logger } from './services/logger';
 
 function App() {
   useEffect(() => {
+    logger.info('Miraqua application starting');
+    
     // Register service worker for PWA functionality
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
           .then((registration) => {
-            console.log('SW registered: ', registration);
+            logger.info('Service Worker registered successfully', { registration });
           })
           .catch((registrationError) => {
-            console.log('SW registration failed: ', registrationError);
+            logger.error('Service Worker registration failed', registrationError);
           });
       });
     }
@@ -35,15 +39,16 @@ function App() {
   }, []);
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundaryProvider>
       <BrowserRouter>
         <ThemeProvider>
           <I18nProvider>
             <AppNavigator />
+            <NetworkStatus />
           </I18nProvider>
         </ThemeProvider>
       </BrowserRouter>
-    </ErrorBoundary>
+    </ErrorBoundaryProvider>
   );
 }
 
