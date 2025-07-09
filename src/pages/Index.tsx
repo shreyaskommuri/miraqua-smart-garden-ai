@@ -5,18 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Droplets, Thermometer, Sun, Calendar, MessageSquare, Plus, Bell, User, Settings, TrendingUp, MapPin, Clock, Play } from "lucide-react";
+import { Droplets, Thermometer, Sun, Calendar, MessageSquare, Plus, Bell, User, Settings, TrendingUp, MapPin, Clock, Play, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import OnboardingFlow from "@/components/OnboardingFlow";
 import PlotCard from "@/components/PlotCard";
 import ChatInterface from "@/components/ChatInterface";
 import { GlobalStatsPanel } from "@/components/ui/GlobalStatsPanel";
 import { NotificationInbox } from "@/components/ui/NotificationInbox";
+import { MobileNavigation } from "@/components/ui/MobileNavigation";
 
 const Index = () => {
   const navigate = useNavigate();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [plots, setPlots] = useState([
     {
       id: 1,
@@ -137,6 +139,14 @@ const Index = () => {
         <div className="px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden"
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                 <Droplets className="w-4 h-4 text-white" />
               </div>
@@ -398,6 +408,12 @@ const Index = () => {
       {showChat && (
         <ChatInterface onClose={() => setShowChat(false)} />
       )}
+
+      {/* Mobile Navigation */}
+      <MobileNavigation 
+        isOpen={isMobileMenuOpen} 
+        onClose={() => setIsMobileMenuOpen(false)} 
+      />
     </div>
   );
 };
