@@ -50,7 +50,7 @@ class ApiService {
     return this.request<T>(endpoint, { ...options, method: 'DELETE' });
   }
 
-  private async request<T>(endpoint: string, options: RequestInit): Promise<T> {
+  async request<T>(endpoint: string, options: RequestInit): Promise<T> {
     try {
       const response = await fetch(`${this.baseUrl}/${endpoint}`, options);
 
