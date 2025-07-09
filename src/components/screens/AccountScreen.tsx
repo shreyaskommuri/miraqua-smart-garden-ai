@@ -498,7 +498,7 @@ const AccountScreen = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Notification Settings */}
-              <div onClick={() => navigate('/notifications')} className="cursor-pointer">
+              <div onClick={() => navigate('/notification-settings')} className="cursor-pointer">
                 <div className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
                   <div className="flex items-center space-x-3">
                     <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
