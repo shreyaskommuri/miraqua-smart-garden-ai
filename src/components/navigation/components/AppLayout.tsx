@@ -8,7 +8,7 @@ interface AppLayoutProps {
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => (
-  <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+  <div className="flex h-screen bg-background">
     <AdvancedNavigation />
     <div className="flex-1 overflow-hidden lg:ml-64">
       <NetworkStatus />
