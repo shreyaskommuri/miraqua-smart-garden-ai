@@ -1,6 +1,6 @@
 
 import React, { ReactNode } from 'react';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { logger } from '@/services/logger';
 
 interface ErrorBoundaryProviderProps {
@@ -39,3 +39,5 @@ export const ErrorBoundaryProvider: React.FC<ErrorBoundaryProviderProps> = ({ ch
     </ErrorBoundary>
   );
 };
+
+export default ErrorBoundaryProvider;

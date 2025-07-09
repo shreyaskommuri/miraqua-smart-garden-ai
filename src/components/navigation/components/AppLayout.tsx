@@ -1,7 +1,7 @@
 
 import React from "react";
 import AdvancedNavigation from "@/components/navigation/AdvancedNavigation";
-import { NetworkStatus } from "@/components/ui/NetworkStatus";
+import NetworkStatus from "@/components/ui/NetworkStatus";
 
 interface AppLayoutProps {
   children: React.ReactNode;

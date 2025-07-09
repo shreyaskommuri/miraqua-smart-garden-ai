@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { I18nProvider } from './contexts/I18nContext';
 import AppNavigator from './components/navigation/AppNavigator';
-import ErrorBoundaryProvider from './components/ui/ErrorBoundaryProvider';
+import { ErrorBoundaryProvider } from './components/ui/ErrorBoundaryProvider';
 import NetworkStatus from './components/ui/NetworkStatus';
 import { logger } from './services/logger';
 

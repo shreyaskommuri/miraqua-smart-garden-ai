@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowLeft, Bell, Smartphone, Mail, Clock, Loader2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface NotificationSettings {
   quiet_hours_enabled: boolean;
@@ -68,7 +69,8 @@ const NotificationSettingsScreen = () => {
         description: "Your notification preferences have been updated.",
       });
       
-      navigate(-1);
+      // Navigate back to dashboard instead of previous page
+      navigate("/dashboard");
     } catch (err) {
       setError("Failed to save settings");
       toast({
@@ -85,6 +87,11 @@ const NotificationSettingsScreen = () => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 
+  const handleBack = () => {
+    // Navigate back to dashboard instead of -1 to avoid welcome page
+    navigate("/dashboard");
+  };
+
   useEffect(() => {
     fetchSettings();
   }, []);
@@ -95,7 +102,7 @@ const NotificationSettingsScreen = () => {
         <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
           <div className="px-4 py-4">
             <div className="flex items-center space-x-3">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+              <Button variant="ghost" size="sm" onClick={handleBack}>
                 <ArrowLeft className="w-4 h-4" />
               </Button>
               <h1 className="text-lg font-bold">Notifications</h1>
@@ -118,7 +125,7 @@ const NotificationSettingsScreen = () => {
         <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
           <div className="px-4 py-4">
             <div className="flex items-center space-x-3">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+              <Button variant="ghost" size="sm" onClick={handleBack}>
                 <ArrowLeft className="w-4 h-4" />
               </Button>
               <h1 className="text-lg font-bold">Notification Settings</h1>
@@ -145,7 +152,7 @@ const NotificationSettingsScreen = () => {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="px-4 py-4">
           <div className="flex items-center space-x-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+            <Button variant="ghost" size="sm" onClick={handleBack}>
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <h1 className="text-lg font-bold">Notification Settings</h1>

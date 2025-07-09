@@ -1,93 +1,58 @@
+import { useState, useCallback } from 'react';
+import { apiService } from '@/services/apiService';
+import { ApiError } from '@/services/apiService';
 
-import { useState, useEffect } from 'react';
-import { apiService, ApiError } from '@/services/apiService';
-import { logger } from '@/services/logger';
-
-interface UseApiState<T> {
-  data: T | null;
-  loading: boolean;
-  error: ApiError | null;
+interface RequestOptions {
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  headers?: { [key: string]: string };
+  body?: any;
 }
 
-interface UseApiOptions {
-  immediate?: boolean;
-  onSuccess?: (data: any) => void;
-  onError?: (error: ApiError) => void;
-}
+export const useApi = <T>(endpoint: string) => {
+  const [data, setData] = useState<T | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<ApiError | null>(null);
 
-export function useApi<T>(
-  apiCall: () => Promise<T>,
-  options: UseApiOptions = {}
-): UseApiState<T> & { refetch: () => Promise<void> } {
-  const { immediate = true, onSuccess, onError } = options;
-  
-  const [state, setState] = useState<UseApiState<T>>({
-    data: null,
-    loading: false,
-    error: null,
-  });
+  const fetchData = useCallback(
+    async (options: RequestOptions = {}) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const result = await apiService.request<T>(endpoint, options);
+        setData(result);
+        return result;
+      } catch (err: any) {
+        setError(err instanceof ApiError ? err : new ApiError('An unexpected error occurred'));
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [endpoint]
+  );
 
-  const execute = async () => {
-    setState(prev => ({ ...prev, loading: true, error: null }));
-    
-    try {
-      const data = await apiCall();
-      setState({ data, loading: false, error: null });
-      onSuccess?.(data);
-    } catch (error) {
-      const apiError = error as ApiError;
-      setState({ data: null, loading: false, error: apiError });
-      logger.error('API call failed', apiError);
-      onError?.(apiError);
-    }
-  };
+  const mutate = useCallback(
+    async (payload: any, options: RequestOptions = {}) => {
+      setIsLoading(true);
+      setError(null);
 
-  useEffect(() => {
-    if (immediate) {
-      execute();
-    }
-  }, [immediate]);
+      try {
+        const result = await apiService.request<T>(endpoint, {
+          ...options,
+          method: options.method || 'POST',
+          body: payload,
+        });
+        setData(result);
+        return result;
+      } catch (err: any) {
+        setError(err instanceof ApiError ? err : new ApiError('An unexpected error occurred'));
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [endpoint]
+  );
 
-  return {
-    ...state,
-    refetch: execute,
-  };
-}
-
-export function useMutation<T, P = any>(
-  apiCall: (params: P) => Promise<T>,
-  options: UseApiOptions = {}
-): {
-  mutate: (params: P) => Promise<void>;
-  loading: boolean;
-  error: ApiError | null;
-  data: T | null;
-} {
-  const { onSuccess, onError } = options;
-  
-  const [state, setState] = useState<UseApiState<T>>({
-    data: null,
-    loading: false,
-    error: null,
-  });
-
-  const mutate = async (params: P) => {
-    setState(prev => ({ ...prev, loading: true, error: null }));
-    
-    try {
-      const data = await apiCall(params);
-      setState({ data, loading: false, error: null });
-      onSuccess?.(data);
-    } catch (error) {
-      const apiError = error as ApiError;
-      setState({ data: null, loading: false, error: apiError });
-      logger.error('API mutation failed', apiError);
-      onError?.(apiError);
-    }
-  };
-
-  return {
-    mutate,
-    ...state,
-  };
-}
+  return { data, isLoading, error, fetchData, mutate };
+};
