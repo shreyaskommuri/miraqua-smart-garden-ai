@@ -1,166 +1,126 @@
 
-import { config } from '@/config/environment';
+import { environment } from '@/config/environment';
 import { logger } from './logger';
-import { Plot, WeatherData, SensorReading, Device } from './mockDataService';
 
-export interface ApiError {
-  message: string;
-  status: number;
-  code?: string;
+interface ApiResponse<T = any> {
+  data: T;
+  success: boolean;
+  message?: string;
+}
+
+interface RequestOptions extends RequestInit {
+  timeout?: number;
 }
 
 class ApiService {
   private baseURL: string;
-  private authToken: string | null = null;
+  private defaultTimeout: number = 10000;
 
   constructor() {
-    this.baseURL = config.API_BASE_URL;
+    this.baseURL = environment.apiUrl;
   }
 
-  setAuthToken(token: string | null) {
-    this.authToken = token;
-  }
-
-  private async makeRequest<T>(
+  private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`;
+    options: RequestOptions = {}
+  ): Promise<ApiResponse<T>> {
+    const { timeout = this.defaultTimeout, ...fetchOptions } = options;
     
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    };
-
-    if (this.authToken) {
-      headers.Authorization = `Bearer ${this.authToken}`;
-    }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
-      logger.debug(`API Request: ${options.method || 'GET'} ${url}`);
-      
+      const url = `${this.baseURL}${endpoint}`;
+      logger.info('API Request', { method: options.method || 'GET', url });
+
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...((fetchOptions.headers as Record<string, string>) || {})
+      };
+
+      // Add auth token if available
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(url, {
-        ...options,
+        ...fetchOptions,
         headers,
+        signal: controller.signal,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const error: ApiError = {
-          message: errorData.message || `HTTP ${response.status}: ${response.statusText}`,
-          status: response.status,
-          code: errorData.code,
-        };
-        logger.error(`API Error: ${error.message}`, error);
-        throw error;
-      }
+      clearTimeout(timeoutId);
 
       const data = await response.json();
-      logger.debug(`API Response: ${url}`, data);
-      return data;
-    } catch (error) {
-      if (error instanceof Error && error.name === 'TypeError') {
-        // Network error
-        const networkError: ApiError = {
-          message: 'Network error - please check your connection',
-          status: 0,
-        };
-        logger.error('Network error', error);
-        throw networkError;
+
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
       }
-      throw error;
+
+      logger.info('API Response', { url, status: response.status });
+      return data;
+
+    } catch (error) {
+      clearTimeout(timeoutId);
+      
+      if (error instanceof Error) {
+        logger.error('API Error', { endpoint, error: error.message });
+        throw error;
+      }
+      
+      throw new Error('Unknown API error occurred');
     }
   }
 
-  // Plot endpoints
-  async getPlots(): Promise<Plot[]> {
-    return this.makeRequest<Plot[]>('/plots');
+  // CRUD Operations
+  async get<T>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, { ...options, method: 'GET' });
   }
 
-  async getPlot(id: string): Promise<Plot> {
-    return this.makeRequest<Plot>(`/plots/${id}`);
-  }
-
-  async createPlot(plotData: Partial<Plot>): Promise<Plot> {
-    return this.makeRequest<Plot>('/plots', {
+  async post<T>(endpoint: string, data?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      ...options,
       method: 'POST',
-      body: JSON.stringify(plotData),
+      body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async updatePlot(id: string, plotData: Partial<Plot>): Promise<Plot> {
-    return this.makeRequest<Plot>(`/plots/${id}`, {
+  async put<T>(endpoint: string, data?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      ...options,
       method: 'PUT',
-      body: JSON.stringify(plotData),
+      body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async deletePlot(id: string): Promise<void> {
-    return this.makeRequest<void>(`/plots/${id}`, {
-      method: 'DELETE',
-    });
+  async delete<T>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, { ...options, method: 'DELETE' });
   }
 
-  // Weather endpoints
-  async getWeatherData(plotId?: string): Promise<WeatherData> {
-    const endpoint = plotId ? `/weather/${plotId}` : '/weather';
-    return this.makeRequest<WeatherData>(endpoint);
+  // Specific API endpoints
+  async getPlots() {
+    return this.get('/plots');
   }
 
-  // Sensor endpoints
-  async getSensorReadings(plotId: string): Promise<SensorReading[]> {
-    return this.makeRequest<SensorReading[]>(`/plots/${plotId}/sensors`);
+  async getPlot(id: string) {
+    return this.get(`/plots/${id}`);
   }
 
-  // Device endpoints
-  async getDevices(): Promise<Device[]> {
-    return this.makeRequest<Device[]>('/devices');
+  async getSensorData(plotId: string) {
+    return this.get(`/plots/${plotId}/sensors`);
   }
 
-  async getDevicesByPlot(plotId: string): Promise<Device[]> {
-    return this.makeRequest<Device[]>(`/plots/${plotId}/devices`);
+  async getWeatherData(lat: number, lon: number) {
+    return this.get(`/weather?lat=${lat}&lon=${lon}`);
   }
 
-  async controlDevice(deviceId: string, action: string, params?: any): Promise<void> {
-    return this.makeRequest<void>(`/devices/${deviceId}/control`, {
-      method: 'POST',
-      body: JSON.stringify({ action, params }),
-    });
+  async updateWateringSchedule(plotId: string, schedule: any) {
+    return this.put(`/plots/${plotId}/schedule`, schedule);
   }
 
-  // Irrigation endpoints
-  async waterPlot(plotId: string, duration?: number): Promise<void> {
-    return this.makeRequest<void>(`/plots/${plotId}/water`, {
-      method: 'POST',
-      body: JSON.stringify({ duration }),
-    });
-  }
-
-  // Authentication endpoints
-  async login(email: string, password: string): Promise<{ token: string; user: any }> {
-    const response = await this.makeRequest<{ token: string; user: any }>('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    });
-    
-    this.setAuthToken(response.token);
-    return response;
-  }
-
-  async logout(): Promise<void> {
-    await this.makeRequest<void>('/auth/logout', {
-      method: 'POST',
-    });
-    this.setAuthToken(null);
-  }
-
-  async refreshToken(): Promise<{ token: string }> {
-    const response = await this.makeRequest<{ token: string }>('/auth/refresh', {
-      method: 'POST',
-    });
-    
-    this.setAuthToken(response.token);
-    return response;
+  async triggerWatering(plotId: string, duration: number) {
+    return this.post(`/plots/${plotId}/water`, { duration });
   }
 }
 

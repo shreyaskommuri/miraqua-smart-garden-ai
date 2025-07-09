@@ -1,77 +1,94 @@
+import { environment } from '@/config/environment';
 
-import { config } from '@/config/environment';
-
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 interface LogEntry {
+  timestamp: string;
   level: LogLevel;
   message: string;
   data?: any;
-  timestamp: string;
-  userId?: string;
+  stack?: string;
 }
 
 class Logger {
-  private isDevelopment = config.APP_ENV === 'development';
-  private enableLogging = config.ENABLE_LOGGING;
+  private logs: LogEntry[] = [];
+  private maxLogs = 1000;
 
   private formatMessage(level: LogLevel, message: string, data?: any): LogEntry {
     return {
+      timestamp: new Date().toISOString(),
       level,
       message,
       data,
-      timestamp: new Date().toISOString(),
-      userId: this.getCurrentUserId(),
+      stack: level === 'error' ? new Error().stack : undefined
     };
   }
 
-  private getCurrentUserId(): string | undefined {
-    // This will be implemented when authentication is added
-    return undefined;
+  private addLog(entry: LogEntry) {
+    this.logs.push(entry);
+    
+    // Keep only the last maxLogs entries
+    if (this.logs.length > this.maxLogs) {
+      this.logs = this.logs.slice(-this.maxLogs);
+    }
+
+    // Console output in development
+    if (environment.isDevelopment) {
+      const consoleMethod = entry.level === 'error' ? 'error' : 
+                           entry.level === 'warn' ? 'warn' : 'log';
+      console[consoleMethod](`[${entry.level.toUpperCase()}] ${entry.message}`, entry.data || '');
+    }
+
+    // Send to external logging service in production
+    if (environment.isProduction && entry.level === 'error') {
+      this.sendToExternalService(entry);
+    }
   }
 
-  private shouldLog(level: LogLevel): boolean {
-    if (!this.enableLogging) return false;
-    if (this.isDevelopment) return true;
-    return level !== 'debug';
+  private async sendToExternalService(entry: LogEntry) {
+    try {
+      // Replace with your actual logging service endpoint
+      await fetch('/api/logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry)
+      });
+    } catch (error) {
+      // Fallback: store in localStorage for later retry
+      const storedLogs = JSON.parse(localStorage.getItem('pending_logs') || '[]');
+      storedLogs.push(entry);
+      localStorage.setItem('pending_logs', JSON.stringify(storedLogs.slice(-50)));
+    }
   }
 
   debug(message: string, data?: any) {
-    if (this.shouldLog('debug')) {
-      const entry = this.formatMessage('debug', message, data);
-      console.log(`[DEBUG] ${entry.message}`, entry.data || '');
-    }
+    this.addLog(this.formatMessage('debug', message, data));
   }
 
   info(message: string, data?: any) {
-    if (this.shouldLog('info')) {
-      const entry = this.formatMessage('info', message, data);
-      console.log(`[INFO] ${entry.message}`, entry.data || '');
-    }
+    this.addLog(this.formatMessage('info', message, data));
   }
 
   warn(message: string, data?: any) {
-    if (this.shouldLog('warn')) {
-      const entry = this.formatMessage('warn', message, data);
-      console.warn(`[WARN] ${entry.message}`, entry.data || '');
-    }
+    this.addLog(this.formatMessage('warn', message, data));
   }
 
-  error(message: string, error?: any) {
-    if (this.shouldLog('error')) {
-      const entry = this.formatMessage('error', message, error);
-      console.error(`[ERROR] ${entry.message}`, entry.error || '');
-      
-      // In production, send to error tracking service
-      if (config.APP_ENV === 'production' && config.SENTRY_DSN) {
-        this.sendToErrorTracking(entry);
-      }
-    }
+  error(message: string, data?: any) {
+    const entry = this.formatMessage('error', message, data);
+    this.addLog(entry);
   }
 
-  private sendToErrorTracking(entry: LogEntry) {
-    // Implementation for Sentry or other error tracking service
-    // This would be implemented when setting up error tracking
+  getLogs(level?: LogLevel): LogEntry[] {
+    return level ? this.logs.filter(log => log.level === level) : this.logs;
+  }
+
+  clearLogs() {
+    this.logs = [];
+  }
+
+  // Export logs for debugging
+  exportLogs(): string {
+    return JSON.stringify(this.logs, null, 2);
   }
 }
 
