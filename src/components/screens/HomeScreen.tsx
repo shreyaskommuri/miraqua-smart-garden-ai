@@ -11,6 +11,7 @@ import { HomeStats } from "@/components/home/HomeStats";
 import { PlotsGrid } from "@/components/home/PlotsGrid";
 import { LoadingScreen } from "@/components/home/LoadingScreen";
 import { ErrorScreen } from "@/components/home/ErrorScreen";
+import { MobileNavigation } from "@/components/ui/MobileNavigation";
 
 const HomeScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,6 +19,7 @@ const HomeScreen = () => {
   const [error, setError] = useState("");
   const [plots, setPlots] = useState<Plot[]>([]);
   const [retryCount, setRetryCount] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -72,7 +74,11 @@ const HomeScreen = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <HomeHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <HomeHeader 
+        searchQuery={searchQuery} 
+        onSearchChange={setSearchQuery} 
+        onMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      />
 
       <ScrollArea className="h-[calc(100vh-100px)]">
         <div className="p-6 space-y-6 pb-24">
@@ -97,6 +103,12 @@ const HomeScreen = () => {
           <Plus className="w-6 h-6" />
         </Button>
       </div>
+
+      {/* Mobile Navigation */}
+      <MobileNavigation 
+        isOpen={isMobileMenuOpen} 
+        onClose={() => setIsMobileMenuOpen(false)} 
+      />
     </div>
   );
 };

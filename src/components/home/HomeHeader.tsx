@@ -8,17 +8,20 @@ import {
   Bell,
   BarChart3,
   Settings,
-  Search
+  Search,
+  Menu
 } from "lucide-react";
 
 interface HomeHeaderProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
+  onMenuToggle?: () => void;
 }
 
 export const HomeHeader: React.FC<HomeHeaderProps> = ({
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  onMenuToggle
 }) => {
   const navigate = useNavigate();
 
@@ -29,6 +32,16 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
+              {/* Hamburger Menu Button */}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={onMenuToggle}
+                className="lg:hidden"
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
+              
               <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
                 <span className="text-2xl">🌱</span>
               </div>
