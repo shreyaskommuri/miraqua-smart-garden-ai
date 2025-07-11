@@ -1,10 +1,10 @@
 
 const environment = {
-  isDevelopment: process.env.NODE_ENV === 'development',
-  isProduction: process.env.NODE_ENV === 'production',
-  apiUrl: process.env.VITE_API_URL || 'http://localhost:3000/api',
-  websocketUrl: process.env.VITE_WEBSOCKET_URL || 'ws://localhost:3000/ws',
-  enableLogging: process.env.VITE_ENABLE_LOGGING === 'true' || process.env.NODE_ENV === 'development'
+  isDevelopment: import.meta.env.MODE === 'development',
+  isProduction: import.meta.env.MODE === 'production',
+  apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  websocketUrl: import.meta.env.VITE_WEBSOCKET_URL || 'ws://localhost:3000/ws',
+  enableLogging: import.meta.env.VITE_ENABLE_LOGGING === 'true' || import.meta.env.MODE === 'development'
 };
 
 export { environment };
