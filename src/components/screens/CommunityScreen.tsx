@@ -108,70 +108,85 @@ const CommunityScreen = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      <header className="bg-white/90 backdrop-blur-sm border-b border-green-200 sticky top-0 z-40">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Header */}
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
         <div className="px-4 py-4">
           <div className="flex items-center space-x-3">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div>
-              <h1 className="text-lg font-bold text-green-900">Community</h1>
-              <p className="text-sm text-green-700">Connect with fellow gardeners</p>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">Community</h1>
+              <p className="text-sm text-green-600 dark:text-green-400">Connect with fellow gardeners</p>
             </div>
           </div>
         </div>
       </header>
 
-      <ScrollArea className="h-[calc(100vh-80px)]">
-        <div className="p-4">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="sticky top-20 z-30 bg-white/95 backdrop-blur-sm -mx-4 px-4 py-2 border-b">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="feed">Feed</TabsTrigger>
-                <TabsTrigger value="challenges">Challenges</TabsTrigger>
-                <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
-              </TabsList>
+      <div className="bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-80px)]">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          {/* Tabs Navigation */}
+          <div className="bg-white dark:bg-gray-800 px-4 py-4 border-b border-gray-100 dark:border-gray-700">
+            <div className="flex space-x-2">
+              <TabsTrigger 
+                value="feed" 
+                className="flex-1 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:border-b-2 data-[state=active]:border-green-500 rounded-none pb-3 font-medium"
+              >
+                Feed
+              </TabsTrigger>
+              <TabsTrigger 
+                value="challenges" 
+                className="flex-1 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:border-b-2 data-[state=active]:border-green-500 rounded-none pb-3 font-medium"
+              >
+                Challenges
+              </TabsTrigger>
+              <TabsTrigger 
+                value="leaderboard" 
+                className="flex-1 data-[state=active]:bg-green-500 data-[state=active]:text-white rounded-lg px-4 py-2 font-medium"
+              >
+                Leaderboard
+              </TabsTrigger>
             </div>
+          </div>
 
-            <div className="mt-6 space-y-4">
-              <TabsContent value="feed" className="space-y-4">
+          <ScrollArea className="h-[calc(100vh-160px)]">
+            <div className="p-4 space-y-4">
+              <TabsContent value="feed" className="space-y-4 mt-0">
                 {communityData.feed.map((post: any) => (
-                  <Card key={post.id} className="border-green-200 bg-white/80 backdrop-blur-sm">
+                  <Card key={post.id} className="border-0 shadow-sm bg-white dark:bg-gray-800">
                     <CardContent className="p-4">
                       <div className="flex items-start space-x-3 mb-3">
                         <Avatar className="w-10 h-10">
                           <AvatarImage src={post.user.avatar} />
-                          <AvatarFallback>{post.user.name[0]}</AvatarFallback>
+                          <AvatarFallback className="bg-green-100 text-green-700">{post.user.name[0]}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <div className="font-medium text-gray-900">{post.user.name}</div>
-                          <div className="text-sm text-gray-500">{post.timeAgo}</div>
+                          <div className="font-medium text-gray-900 dark:text-white">{post.user.name}</div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">{post.timeAgo}</div>
                         </div>
                       </div>
                       
-                      <p className="text-gray-800 mb-3">{post.content}</p>
+                      <p className="text-gray-800 dark:text-gray-200 mb-3">{post.content}</p>
                       
                       {post.image && (
-                        <img 
-                          src={post.image} 
-                          alt="Post content" 
-                          className="w-full h-48 object-cover rounded-lg mb-3"
-                        />
+                        <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3 flex items-center justify-center">
+                          <Camera className="w-8 h-8 text-gray-400" />
+                        </div>
                       )}
                       
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
-                          <Button variant="ghost" size="sm" className="text-gray-600">
+                          <Button variant="ghost" size="sm" className="text-gray-600 dark:text-gray-400 hover:text-red-500">
                             <Heart className="w-4 h-4 mr-1" />
                             {post.likes}
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-gray-600">
+                          <Button variant="ghost" size="sm" className="text-gray-600 dark:text-gray-400">
                             <MessageSquare className="w-4 h-4 mr-1" />
                             {post.comments}
                           </Button>
                         </div>
-                        <Button variant="ghost" size="sm" className="text-gray-600">
+                        <Button variant="ghost" size="sm" className="text-gray-600 dark:text-gray-400">
                           <Share className="w-4 h-4" />
                         </Button>
                       </div>
@@ -180,32 +195,36 @@ const CommunityScreen = () => {
                 ))}
               </TabsContent>
 
-              <TabsContent value="challenges" className="space-y-4">
+              <TabsContent value="challenges" className="space-y-4 mt-0">
                 {communityData.challenges.map((challenge: any) => (
-                  <Card key={challenge.id} className="border-blue-200 bg-blue-50">
-                    <CardHeader>
-                      <CardTitle className="flex items-center justify-between">
+                  <Card key={challenge.id} className="border-0 shadow-sm bg-white dark:bg-gray-800">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <Target className="w-5 h-5 text-blue-600" />
-                          <span>{challenge.title}</span>
+                          <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                            <Target className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-lg text-gray-900 dark:text-white">{challenge.title}</CardTitle>
+                          </div>
                         </div>
-                        <Badge className={challenge.joined ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
-                          {challenge.joined ? 'Joined' : 'Available'}
+                        <Badge className={challenge.joined ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}>
+                          {challenge.joined ? "Joined" : "Available"}
                         </Badge>
-                      </CardTitle>
+                      </div>
                     </CardHeader>
-                    <CardContent>
-                      <p className="text-gray-700 mb-4">{challenge.description}</p>
+                    <CardContent className="pt-0">
+                      <p className="text-gray-600 dark:text-gray-300 mb-4">{challenge.description}</p>
                       
                       {challenge.joined && (
                         <div className="mb-4">
                           <div className="flex justify-between text-sm mb-2">
-                            <span>Progress</span>
-                            <span>{challenge.progress}%</span>
+                            <span className="text-gray-600 dark:text-gray-400">Progress</span>
+                            <span className="font-medium text-blue-600 dark:text-blue-400">{challenge.progress}%</span>
                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                             <div 
-                              className="bg-blue-600 h-2 rounded-full"
+                              className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                               style={{ width: `${challenge.progress}%` }}
                             />
                           </div>
@@ -213,18 +232,21 @@ const CommunityScreen = () => {
                       )}
                       
                       <div className="flex items-center justify-between">
-                        <div className="text-sm text-gray-600">
-                          <div>{challenge.participants} participants</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          <div className="flex items-center space-x-1 mb-1">
+                            <Users className="w-3 h-3" />
+                            <span>{challenge.participants} participants</span>
+                          </div>
                           <div>{challenge.daysLeft} days left</div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-medium text-blue-600">{challenge.reward}</div>
+                          <div className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">{challenge.reward}</div>
                           <Button 
                             size="sm" 
-                            className={challenge.joined ? 'bg-gray-300' : 'bg-blue-600 hover:bg-blue-700'}
+                            className={challenge.joined ? "bg-gray-300 text-gray-700" : "bg-blue-600 hover:bg-blue-700 text-white"}
                             disabled={challenge.joined}
                           >
-                            {challenge.joined ? 'Joined' : 'Join Challenge'}
+                            {challenge.joined ? "Joined" : "Join Challenge"}
                           </Button>
                         </div>
                       </div>
@@ -233,36 +255,41 @@ const CommunityScreen = () => {
                 ))}
               </TabsContent>
 
-              <TabsContent value="leaderboard" className="space-y-4">
-                <Card className="border-yellow-200 bg-yellow-50">
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Trophy className="w-5 h-5 text-yellow-600" />
+              <TabsContent value="leaderboard" className="space-y-4 mt-0">
+                <Card className="border-0 shadow-sm bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-800">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-white">
+                      <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
+                        <Trophy className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
+                      </div>
                       <span>Top Gardeners</span>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     <div className="space-y-3">
                       {communityData.leaderboard.map((user: any, index: number) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg">
+                        <div key={index} className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
                           <div className="flex items-center space-x-3">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
-                              user.rank === 1 ? 'bg-yellow-500' : 
-                              user.rank === 2 ? 'bg-gray-400' : 
-                              user.rank === 3 ? 'bg-orange-500' : 'bg-gray-300'
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg ${
+                              user.rank === 1 ? "bg-gradient-to-r from-yellow-400 to-yellow-500" : 
+                              user.rank === 2 ? "bg-gradient-to-r from-gray-400 to-gray-500" : 
+                              user.rank === 3 ? "bg-gradient-to-r from-orange-400 to-orange-500" : "bg-gray-300"
                             }`}>
                               {user.rank}
                             </div>
                             <div>
-                              <div className="font-medium">{user.name}</div>
-                              <Badge variant="outline" className="text-xs">
+                              <div className="font-semibold text-gray-900 dark:text-white text-lg">{user.name}</div>
+                              <Badge 
+                                variant="secondary" 
+                                className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                              >
                                 {user.badge}
                               </Badge>
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="font-bold text-blue-600">{user.points}</div>
-                            <div className="text-xs text-gray-500">points</div>
+                            <div className="font-bold text-2xl text-blue-600 dark:text-blue-400">{user.points}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">points</div>
                           </div>
                         </div>
                       ))}
@@ -271,9 +298,9 @@ const CommunityScreen = () => {
                 </Card>
               </TabsContent>
             </div>
-          </Tabs>
-        </div>
-      </ScrollArea>
+          </ScrollArea>
+        </Tabs>
+      </div>
     </div>
   );
 };
