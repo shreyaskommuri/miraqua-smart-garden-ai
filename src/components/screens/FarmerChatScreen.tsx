@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Send, Bot, User, Mic, Camera, Droplets, Thermometer, Sun, MapPin, Leaf } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -27,6 +28,7 @@ const FarmerChatScreen = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [selectedPlot, setSelectedPlot] = useState<PlotData | null>(null);
+  const [selectedPlotId, setSelectedPlotId] = useState<string>("general");
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -35,6 +37,42 @@ const FarmerChatScreen = () => {
       time: "now"
     }
   ]);
+
+  // Mock plot data
+  const mockPlots: PlotData[] = [
+    {
+      id: 1,
+      name: "Backyard Garden",
+      crop: "Tomatoes",
+      moisture: 65,
+      temperature: 78,
+      sunlight: 85,
+      status: "healthy",
+      nextWatering: "Tomorrow 6:00 AM",
+      location: "North Side",
+      waterUsage: 120,
+      sensorStatus: "online",
+      batteryLevel: 78,
+      soilPh: 6.8,
+      lastWatered: "Yesterday"
+    },
+    {
+      id: 2,
+      name: "Herb Garden",
+      crop: "Basil",
+      moisture: 45,
+      temperature: 75,
+      sunlight: 70,
+      status: "needs attention",
+      nextWatering: "Today 4:00 PM",
+      location: "Kitchen Window",
+      waterUsage: 45,
+      sensorStatus: "online",
+      batteryLevel: 65,
+      soilPh: 7.2,
+      lastWatered: "2 days ago"
+    }
+  ];
 
   useEffect(() => {
     // Check if we have plot data from navigation
@@ -59,16 +97,26 @@ const FarmerChatScreen = () => {
   }, []);
 
   const quickActions = selectedPlot ? [
-    `Water ${selectedPlot.name}`,
-    `Skip watering`,
-    `Check health`,
-    `Adjust schedule`
+    "Water now",
+    "Skip watering", 
+    "Check health",
+    "Adjust"
   ] : [
     "Water plants",
     "Skip watering", 
     "Plant health",
-    "Adjust schedule"
+    "Adjust"
   ];
+
+  const handlePlotSelection = (value: string) => {
+    setSelectedPlotId(value);
+    if (value === "general") {
+      setSelectedPlot(null);
+    } else {
+      const plot = mockPlots.find(p => p.id.toString() === value);
+      setSelectedPlot(plot || null);
+    }
+  };
 
   const handleSendMessage = () => {
     if (message.trim()) {
@@ -151,15 +199,30 @@ const FarmerChatScreen = () => {
 
       {/* Quick Actions */}
       <div className="bg-white border-b border-gray-100 p-4 flex-shrink-0">
-        <p className="text-sm text-gray-600 mb-3">Quick actions:</p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-sm text-gray-600">Quick actions:</p>
+          <Select value={selectedPlotId} onValueChange={handlePlotSelection}>
+            <SelectTrigger className="w-40 h-8 text-xs">
+              <SelectValue placeholder="Select plot" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="general">General Question</SelectItem>
+              {mockPlots.map((plot) => (
+                <SelectItem key={plot.id} value={plot.id.toString()}>
+                  {plot.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <div className="grid grid-cols-4 gap-2">
-          {quickActions.slice(0, 4).map((action, index) => (
+          {quickActions.map((action, index) => (
             <Button
               key={index}
               variant="outline"
               size="sm"
               onClick={() => setMessage(action)}
-              className="text-xs h-8 px-2"
+              className="text-xs h-8 px-1"
             >
               {action}
             </Button>
