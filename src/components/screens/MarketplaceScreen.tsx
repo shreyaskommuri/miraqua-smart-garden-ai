@@ -22,7 +22,7 @@ import {
   TrendingUp,
   Leaf
 } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 const MarketplaceScreen = () => {
   const navigate = useNavigate();
