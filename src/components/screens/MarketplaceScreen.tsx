@@ -240,85 +240,89 @@ const MarketplaceScreen = () => {
           {/* Products */}
           <div className="space-y-4">
             {filteredProducts.map((product) => (
-              <Card key={product.id} className="border-0 shadow-sm bg-white hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  <div className="flex space-x-4">
-                    <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-blue-100 rounded-xl flex-shrink-0 flex items-center justify-center">
-                      <Leaf className="w-8 h-8 text-green-600" />
-                    </div>
-                    
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <div className="flex items-center space-x-2 mb-1">
-                            <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                            {product.bestseller && (
-                              <Badge className="bg-orange-100 text-orange-800 text-xs">
-                                Bestseller
-                              </Badge>
-                            )}
-                            {product.savings && (
-                              <Badge className="bg-red-100 text-red-800 text-xs">
-                                -{product.savings}%
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-600 mb-2">{product.description}</p>
-                          
-                          <div className="flex items-center space-x-2 mb-2">
-                            <div className="flex items-center">
-                              <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                              <span className="text-sm text-gray-600 ml-1">
-                                {product.rating} ({product.reviews})
-                              </span>
-                            </div>
-                          </div>
+               <Card key={product.id} className="border-0 shadow-sm bg-white hover:shadow-md transition-shadow">
+                 <CardContent className="p-4">
+                   <div className="space-y-4">
+                     {/* Product Header */}
+                     <div className="flex space-x-4">
+                       <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-blue-100 rounded-xl flex-shrink-0 flex items-center justify-center">
+                         <Leaf className="w-8 h-8 text-green-600" />
+                       </div>
+                       
+                       <div className="flex-1 min-w-0">
+                         <div className="flex items-start justify-between mb-2">
+                           <div className="flex-1 min-w-0">
+                             <div className="flex items-center space-x-2 mb-1 flex-wrap">
+                               <h3 className="font-semibold text-gray-900 text-base leading-tight">{product.name}</h3>
+                               {product.bestseller && (
+                                 <Badge className="bg-orange-100 text-orange-800 text-xs flex-shrink-0">
+                                   Bestseller
+                                 </Badge>
+                               )}
+                               {product.savings && (
+                                 <Badge className="bg-red-100 text-red-800 text-xs flex-shrink-0">
+                                   -{product.savings}%
+                                 </Badge>
+                               )}
+                             </div>
+                             <p className="text-sm text-gray-600 mb-2 leading-relaxed">{product.description}</p>
+                             
+                             <div className="flex items-center space-x-2 mb-2">
+                               <div className="flex items-center">
+                                 <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                                 <span className="text-sm text-gray-600 ml-1">
+                                   {product.rating} ({product.reviews})
+                                 </span>
+                               </div>
+                             </div>
+                           </div>
+                         </div>
+                       </div>
+                     </div>
 
-                          {/* Features */}
-                          <div className="flex flex-wrap gap-1 mb-3">
-                            {product.features?.slice(0, 2).map((feature: string, idx: number) => (
-                              <Badge key={idx} variant="outline" className="text-xs">
-                                {feature}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <div className="text-lg font-bold text-green-600">
-                            ${product.price}
-                          </div>
-                          {product.originalPrice && (
-                            <div className="text-sm text-gray-400 line-through">
-                              ${product.originalPrice}
-                            </div>
-                          )}
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          <Badge 
-                            className={product.inStock 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                            }
-                          >
-                            {product.inStock ? 'In Stock' : 'Out of Stock'}
-                          </Badge>
-                          <Button 
-                            size="sm"
-                            disabled={!product.inStock}
-                            onClick={() => addToCart(product)}
-                            className="bg-green-500 hover:bg-green-600 rounded-xl"
-                          >
-                            <ShoppingCart className="w-4 h-4 mr-1" />
-                            Add to Cart
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                     {/* Features */}
+                     <div className="flex flex-wrap gap-2">
+                       {product.features?.slice(0, 3).map((feature: string, idx: number) => (
+                         <Badge key={idx} variant="outline" className="text-xs">
+                           {feature}
+                         </Badge>
+                       ))}
+                     </div>
+                     
+                     {/* Price and Actions */}
+                     <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                       <div className="flex items-center space-x-2">
+                         <div className="text-lg font-bold text-green-600">
+                           ${product.price}
+                         </div>
+                         {product.originalPrice && (
+                           <div className="text-sm text-gray-400 line-through">
+                             ${product.originalPrice}
+                           </div>
+                         )}
+                       </div>
+                       
+                       <div className="flex items-center space-x-2">
+                         <Badge 
+                           className={product.inStock 
+                             ? 'bg-green-100 text-green-800' 
+                             : 'bg-red-100 text-red-800'
+                           }
+                         >
+                           {product.inStock ? 'In Stock' : 'Out of Stock'}
+                         </Badge>
+                         <Button 
+                           size="sm"
+                           disabled={!product.inStock}
+                           onClick={() => addToCart(product)}
+                           className="bg-green-500 hover:bg-green-600 rounded-xl flex-shrink-0"
+                         >
+                           <ShoppingCart className="w-4 h-4 mr-1" />
+                           Add
+                         </Button>
+                       </div>
+                     </div>
+                   </div>
                 </CardContent>
               </Card>
             ))}
