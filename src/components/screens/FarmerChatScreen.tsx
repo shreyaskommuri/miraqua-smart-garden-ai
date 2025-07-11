@@ -200,29 +200,29 @@ const FarmerChatScreen = () => {
       {/* Quick Actions */}
       <div className="bg-white border-b border-gray-100 p-4 flex-shrink-0">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm text-gray-600">Quick actions:</p>
+          <p className="text-sm font-medium text-gray-700">Quick actions:</p>
           <Select value={selectedPlotId} onValueChange={handlePlotSelection}>
-            <SelectTrigger className="w-40 h-8 text-xs">
+            <SelectTrigger className="w-44 h-9 text-xs bg-white border-gray-200 hover:bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-green-500">
               <SelectValue placeholder="Select plot" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="general">General Question</SelectItem>
+            <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+              <SelectItem value="general" className="hover:bg-gray-50 focus:bg-gray-50">General Question</SelectItem>
               {mockPlots.map((plot) => (
-                <SelectItem key={plot.id} value={plot.id.toString()}>
+                <SelectItem key={plot.id} value={plot.id.toString()} className="hover:bg-gray-50 focus:bg-gray-50">
                   {plot.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-3">
           {quickActions.map((action, index) => (
             <Button
               key={index}
               variant="outline"
               size="sm"
               onClick={() => setMessage(action)}
-              className="text-xs h-8 px-1"
+              className="text-xs h-9 px-3 bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 font-medium"
             >
               {action}
             </Button>
