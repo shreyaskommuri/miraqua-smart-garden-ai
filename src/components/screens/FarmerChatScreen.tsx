@@ -161,42 +161,6 @@ const FarmerChatScreen = () => {
 
   return (
     <div className="h-full bg-gray-50 flex flex-col">
-      {/* Selected Plot Info */}
-      {selectedPlot && (
-        <div className="bg-green-50 border-b border-green-100 p-4 flex-shrink-0">
-          <Card className="border-green-200 bg-white">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Leaf className="w-5 h-5 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{selectedPlot.name}</h3>
-                  <p className="text-sm text-gray-600">{selectedPlot.crop} • {selectedPlot.location}</p>
-                  <div className="flex items-center space-x-4 mt-1">
-                    <div className="flex items-center space-x-1">
-                      <Droplets className="w-3 h-3 text-blue-500" />
-                      <span className="text-xs text-gray-600">{selectedPlot.moisture}%</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Thermometer className="w-3 h-3 text-orange-500" />
-                      <span className="text-xs text-gray-600">{selectedPlot.temperature}°F</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Sun className="w-3 h-3 text-yellow-500" />
-                      <span className="text-xs text-gray-600">{selectedPlot.sunlight}%</span>
-                    </div>
-                  </div>
-                </div>
-                <Badge className={`${selectedPlot.status === 'healthy' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
-                  {selectedPlot.status === 'healthy' ? 'Healthy' : 'Attention'}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
       {/* Quick Actions */}
       <div className="bg-white border-b border-gray-100 p-4 flex-shrink-0">
         <div className="flex items-center justify-between mb-3">
