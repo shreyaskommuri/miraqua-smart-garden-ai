@@ -128,26 +128,17 @@ const CommunityScreen = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Tabs Navigation */}
           <div className="bg-white dark:bg-gray-800 px-4 py-4 border-b border-gray-100 dark:border-gray-700">
-            <div className="flex space-x-2">
-              <TabsTrigger 
-                value="feed" 
-                className="flex-1 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:border-b-2 data-[state=active]:border-green-500 rounded-none pb-3 font-medium"
-              >
+            <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-700">
+              <TabsTrigger value="feed" className="font-medium">
                 Feed
               </TabsTrigger>
-              <TabsTrigger 
-                value="challenges" 
-                className="flex-1 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:border-b-2 data-[state=active]:border-green-500 rounded-none pb-3 font-medium"
-              >
+              <TabsTrigger value="challenges" className="font-medium">
                 Challenges
               </TabsTrigger>
-              <TabsTrigger 
-                value="leaderboard" 
-                className="flex-1 data-[state=active]:bg-green-500 data-[state=active]:text-white rounded-lg px-4 py-2 font-medium"
-              >
+              <TabsTrigger value="leaderboard" className="font-medium">
                 Leaderboard
               </TabsTrigger>
-            </div>
+            </TabsList>
           </div>
 
           <ScrollArea className="h-[calc(100vh-160px)]">
