@@ -27,17 +27,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40">
         <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">🌱</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900 dark:text-white">My Gardens</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Manage and monitor your plots</p>
-              </div>
-            </div>
-            
+          <div className="flex items-center justify-end">
             <div className="flex items-center space-x-2">
               <Button variant="ghost" size="sm">
                 <Bell className="w-4 h-4" />
