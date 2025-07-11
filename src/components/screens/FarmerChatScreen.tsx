@@ -116,7 +116,7 @@ const FarmerChatScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
 
       {/* Selected Plot Info */}
       {selectedPlot && (
