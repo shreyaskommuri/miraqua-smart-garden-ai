@@ -32,57 +32,56 @@ const CommunityScreen = () => {
 
   const fetchCommunityData = async () => {
     setLoading(true);
-    setTimeout(() => {
-      setCommunityData({
-        challenges: [
-          {
-            id: 1,
-            title: 'Summer Water Saver',
-            description: 'Reduce water usage by 20% this month',
-            participants: 234,
-            daysLeft: 12,
-            reward: '50 points',
-            progress: 65,
-            joined: true
-          },
-          {
-            id: 2,
-            title: 'Green Thumb Challenge',
-            description: 'Grow 3 different vegetables',
-            participants: 189,
-            daysLeft: 25,
-            reward: 'Expert Badge',
-            progress: 33,
-            joined: false
-          }
-        ],
-        feed: [
-          {
-            id: 1,
-            user: { name: 'Sarah Chen', avatar: '/placeholder.svg' },
-            content: 'Just harvested my first tomatoes of the season! 🍅',
-            image: '/placeholder.svg',
-            likes: 24,
-            comments: 8,
-            timeAgo: '2h ago'
-          },
-          {
-            id: 2,
-            user: { name: 'Mike Rodriguez', avatar: '/placeholder.svg' },
-            content: 'My smart irrigation system saved 30% water this week!',
-            likes: 15,
-            comments: 5,
-            timeAgo: '4h ago'
-          }
-        ],
-        leaderboard: [
-          { rank: 1, name: 'GreenThumb_Pro', points: 2340, badge: 'Expert' },
-          { rank: 2, name: 'PlantWhisperer', points: 2180, badge: 'Master' },
-          { rank: 3, name: 'EcoGardener', points: 1950, badge: 'Advanced' }
-        ]
-      });
-      setLoading(false);
-    }, 1000);
+    // Remove the artificial delay
+    setCommunityData({
+      challenges: [
+        {
+          id: 1,
+          title: 'Summer Water Saver',
+          description: 'Reduce water usage by 20% this month',
+          participants: 234,
+          daysLeft: 12,
+          reward: '50 points',
+          progress: 65,
+          joined: true
+        },
+        {
+          id: 2,
+          title: 'Green Thumb Challenge',
+          description: 'Grow 3 different vegetables',
+          participants: 189,
+          daysLeft: 25,
+          reward: 'Expert Badge',
+          progress: 33,
+          joined: false
+        }
+      ],
+      feed: [
+        {
+          id: 1,
+          user: { name: 'Sarah Chen', avatar: '/placeholder.svg' },
+          content: 'Just harvested my first tomatoes of the season! 🍅',
+          image: '/placeholder.svg',
+          likes: 24,
+          comments: 8,
+          timeAgo: '2h ago'
+        },
+        {
+          id: 2,
+          user: { name: 'Mike Rodriguez', avatar: '/placeholder.svg' },
+          content: 'My smart irrigation system saved 30% water this week!',
+          likes: 15,
+          comments: 5,
+          timeAgo: '4h ago'
+        }
+      ],
+      leaderboard: [
+        { rank: 1, name: 'GreenThumb_Pro', points: 2340, badge: 'Expert' },
+        { rank: 2, name: 'PlantWhisperer', points: 2180, badge: 'Master' },
+        { rank: 3, name: 'EcoGardener', points: 1950, badge: 'Advanced' }
+      ]
+    });
+    setLoading(false);
   };
 
   if (loading) {
