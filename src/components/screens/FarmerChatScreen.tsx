@@ -157,14 +157,14 @@ const FarmerChatScreen = () => {
       {/* Quick Actions */}
       <div className="bg-white border-b border-gray-100 p-4">
         <p className="text-sm text-gray-600 mb-3">Quick actions:</p>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-4 gap-2">
           {quickActions.slice(0, 4).map((action, index) => (
             <Button
               key={index}
               variant="outline"
               size="sm"
               onClick={() => setMessage(action)}
-              className="text-xs h-8"
+              className="text-xs h-8 px-2"
             >
               {action}
             </Button>
@@ -173,7 +173,7 @@ const FarmerChatScreen = () => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-20">
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -208,36 +208,36 @@ const FarmerChatScreen = () => {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Garden Status Summary */}
-      <div className="bg-white border-t border-gray-100 p-4">
-        <Card className="border-green-200 bg-green-50">
-          <CardContent className="p-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Droplets className="w-4 h-4 text-green-600" />
-                <div>
-                  <p className="text-sm font-medium text-green-900">
-                    {selectedPlot ? `${selectedPlot.name} Status` : 'Garden Status'}
-                  </p>
-                  <p className="text-xs text-green-700">
-                    {selectedPlot 
-                      ? `${selectedPlot.status} • Next watering: ${selectedPlot.nextWatering}`
-                      : 'All plots monitored • AI optimization active'
-                    }
-                  </p>
+        
+        {/* Garden Status Summary at bottom of messages */}
+        <div className="mt-6">
+          <Card className="border-green-200 bg-green-50">
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Droplets className="w-4 h-4 text-green-600" />
+                  <div>
+                    <p className="text-sm font-medium text-green-900">
+                      {selectedPlot ? `${selectedPlot.name} Status` : 'Garden Status'}
+                    </p>
+                    <p className="text-xs text-green-700">
+                      {selectedPlot 
+                        ? `${selectedPlot.status} • Next watering: ${selectedPlot.nextWatering}`
+                        : 'All plots monitored • AI optimization active'
+                      }
+                    </p>
+                  </div>
                 </div>
+                <Badge className="bg-green-100 text-green-700 border-green-200">
+                  {selectedPlot?.status === 'healthy' ? 'Optimal' : 'Monitoring'}
+                </Badge>
               </div>
-              <Badge className="bg-green-100 text-green-700 border-green-200">
-                {selectedPlot?.status === 'healthy' ? 'Optimal' : 'Monitoring'}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
-      {/* Input Area */}
+      {/* Input Area - Fixed at bottom */}
       <div className="bg-white border-t border-gray-200 p-4">
         <div className="flex items-center space-x-3">
           <Button variant="outline" size="sm" className="w-10 h-10 p-0">
