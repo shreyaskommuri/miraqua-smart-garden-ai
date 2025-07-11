@@ -116,11 +116,10 @@ const FarmerChatScreen = () => {
   };
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
-
+    <div className="h-full bg-gray-50 flex flex-col">
       {/* Selected Plot Info */}
       {selectedPlot && (
-        <div className="bg-green-50 border-b border-green-100 p-4">
+        <div className="bg-green-50 border-b border-green-100 p-4 flex-shrink-0">
           <Card className="border-green-200 bg-white">
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
@@ -155,7 +154,7 @@ const FarmerChatScreen = () => {
       )}
 
       {/* Quick Actions */}
-      <div className="bg-white border-b border-gray-100 p-4">
+      <div className="bg-white border-b border-gray-100 p-4 flex-shrink-0">
         <p className="text-sm text-gray-600 mb-3">Quick actions:</p>
         <div className="grid grid-cols-4 gap-2">
           {quickActions.slice(0, 4).map((action, index) => (
@@ -172,8 +171,8 @@ const FarmerChatScreen = () => {
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-20">
+      {/* Messages - Scrollable Area */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -238,7 +237,7 @@ const FarmerChatScreen = () => {
       </div>
 
       {/* Input Area - Fixed at bottom */}
-      <div className="bg-white border-t border-gray-200 p-4">
+      <div className="bg-white border-t border-gray-200 p-4 flex-shrink-0">
         <div className="flex items-center space-x-3">
           <Button variant="outline" size="sm" className="w-10 h-10 p-0">
             <Camera className="w-4 h-4" />
