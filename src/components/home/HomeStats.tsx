@@ -33,7 +33,7 @@ export const HomeStats: React.FC<HomeStatsProps> = ({ plots }) => {
   const healthStatus = getHealthStatus(avgHealth);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
+    <div className="grid grid-cols-3 gap-4 animate-fade-in">
       {/* Online Plots */}
       <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 hover:shadow-xl transition-all duration-300 hover-scale">
         <CardContent className="p-6 text-center">
