@@ -74,26 +74,24 @@ const HomeScreen = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="sticky top-0 z-10">
+      <div className="sticky top-0 z-20 bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <HomeHeader 
           searchQuery={searchQuery} 
           onSearchChange={setSearchQuery}
         />
       </div>
 
-      <ScrollArea className="h-[calc(100vh-280px)]">
-        <div className="p-6 space-y-6 pb-24">
-          <HomeStats plots={filteredPlots} />
+      <div className="p-6 space-y-6 pb-24">
+        <HomeStats plots={filteredPlots} />
 
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Your Plots ({filteredPlots.length})
-            </h2>
-            
-            <PlotsGrid plots={filteredPlots} searchQuery={searchQuery} />
-          </div>
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            Your Plots ({filteredPlots.length})
+          </h2>
+          
+          <PlotsGrid plots={filteredPlots} searchQuery={searchQuery} />
         </div>
-      </ScrollArea>
+      </div>
 
       {/* FAB */}
       <div className="fixed bottom-6 right-6">
