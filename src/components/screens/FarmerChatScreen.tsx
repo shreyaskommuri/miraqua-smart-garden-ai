@@ -59,19 +59,15 @@ const FarmerChatScreen = () => {
   }, []);
 
   const quickActions = selectedPlot ? [
-    `Water ${selectedPlot.name} now`,
-    `Skip next watering for ${selectedPlot.name}`,
-    `Check ${selectedPlot.crop} health`,
-    `Optimize ${selectedPlot.name} schedule`,
-    "Weather impact analysis",
-    `${selectedPlot.crop} care tips`
+    `Water ${selectedPlot.name}`,
+    `Skip watering`,
+    `Check health`,
+    `Adjust schedule`
   ] : [
-    "Water my plants now",
-    "Skip next watering",
-    "Plant health check",
-    "Adjust schedule",
-    "Weather impact",
-    "Fertilizer advice"
+    "Water plants",
+    "Skip watering", 
+    "Plant health",
+    "Adjust schedule"
   ];
 
   const handleSendMessage = () => {
