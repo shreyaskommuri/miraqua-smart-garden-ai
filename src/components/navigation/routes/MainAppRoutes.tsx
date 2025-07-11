@@ -17,6 +17,9 @@ import PlotDetailsScreen from "@/components/screens/PlotDetailsScreen";
 import PlotSettingsScreen from "@/components/screens/PlotSettingsScreen";
 import SpecificDayScreen from "@/components/screens/SpecificDayScreen";
 import CalendarScreen from "@/components/screens/CalendarScreen";
+import AddPlotScreen from "@/components/screens/AddPlotScreen";
+import NotificationPreferencesScreen from "@/components/screens/NotificationPreferencesScreen";
+import HelpScreen from "@/components/screens/HelpScreen";
 
 export const mainAppRoutes = (
   <>
@@ -107,6 +110,24 @@ export const mainAppRoutes = (
     <Route path="/app/calendar/:plotId" element={
       <AppLayout>
         <CalendarScreen />
+      </AppLayout>
+    } />
+    
+    <Route path="/add-plot" element={
+      <AppLayout>
+        <AddPlotScreen />
+      </AppLayout>
+    } />
+    
+    <Route path="/notification-settings" element={
+      <AppLayout>
+        <NotificationPreferencesScreen />
+      </AppLayout>
+    } />
+    
+    <Route path="/help" element={
+      <AppLayout>
+        <HelpScreen />
       </AppLayout>
     } />
   </>
