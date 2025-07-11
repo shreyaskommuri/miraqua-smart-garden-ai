@@ -84,37 +84,7 @@ const PredictiveDashboardScreen = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header - Fixed positioning with proper spacing */}
-      <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-30">
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => navigate(-1)}
-                className="lg:hidden"
-              >
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">Predictive Irrigation</h1>
-                <p className="text-sm text-gray-600">14-day AI-powered forecast</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm">
-                <RefreshCw className="w-4 h-4" />
-              </Button>
-              <Button variant="ghost" size="sm">
-                <Settings className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <ScrollArea className="h-[calc(100vh-80px)]">
+      <ScrollArea className="h-[calc(100vh-0px)]">
         <div className="p-4 space-y-6">
           {/* Schedule Toggle */}
           <Card className="border-0 shadow-lg">

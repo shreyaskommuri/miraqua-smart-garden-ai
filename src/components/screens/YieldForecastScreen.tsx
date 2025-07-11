@@ -63,16 +63,6 @@ const YieldForecastScreen = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
-          <div className="px-4 py-4">
-            <div className="flex items-center space-x-3">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <h1 className="text-lg font-bold">Yield Forecast</h1>
-            </div>
-          </div>
-        </header>
         <div className="p-4 space-y-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-32 bg-gray-200 rounded-xl animate-pulse"></div>
@@ -84,26 +74,7 @@ const YieldForecastScreen = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
-        <div className="px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">Yield Forecast</h1>
-                <p className="text-sm text-gray-600">AI-powered harvest predictions</p>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" onClick={fetchForecastData} className="rounded-xl">
-              <RefreshCw className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <ScrollArea className="h-[calc(100vh-80px)]">
+      <ScrollArea className="h-[calc(100vh-0px)]">
         <div className="p-4 space-y-6">
           {/* Current Season Overview */}
           <Card className="border-0 shadow-sm bg-green-500 text-white">

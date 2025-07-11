@@ -56,38 +56,9 @@ const MapOverviewScreen = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Fixed Header */}
-      <header className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 fixed top-0 left-0 right-0 z-40 shadow-sm">
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="p-2">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <div>
-                <h1 className="text-lg font-bold text-gray-900 dark:text-white">Map Overview</h1>
-                <p className="text-xs text-gray-600 dark:text-gray-400">{plots.length} plots</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-3">
-              {/* Offline indicator */}
-              {!isOnline && (
-                <Badge variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-200">
-                  Offline ({getPendingActionsCount()} pending)
-                </Badge>
-              )}
-              
-              {/* Presence indicator */}
-              <PresenceIndicator plotId={selectedPlot?.id?.toString()} />
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Scrollable Content */}
       <ScrollArea className="h-screen">
-        <div className="pt-16 pb-24 px-4">
+        <div className="pt-0 pb-24 px-4">
           <div className="space-y-4">
             {/* Interactive Map */}
             <InteractiveMap 

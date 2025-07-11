@@ -147,16 +147,6 @@ const MarketplaceScreen = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
-          <div className="px-4 py-4">
-            <div className="flex items-center space-x-3">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <h1 className="text-lg font-bold">Smart Equipment</h1>
-            </div>
-          </div>
-        </header>
         <div className="p-4 space-y-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-32 bg-gray-200 rounded-xl animate-pulse"></div>
@@ -168,33 +158,7 @@ const MarketplaceScreen = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
-        <div className="px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">Smart Equipment Store</h1>
-                <p className="text-sm text-gray-600">Professional irrigation & monitoring solutions</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" className="relative">
-                <ShoppingCart className="w-4 h-4" />
-                {cart.length > 0 && (
-                  <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-green-500 text-white text-xs flex items-center justify-center">
-                    {cart.length}
-                  </Badge>
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <ScrollArea className="h-[calc(100vh-80px)]">
+      <ScrollArea className="h-[calc(100vh-0px)]">
         <div className="p-4 space-y-6">
           {/* Promotional Banner */}
           <Card className="border-0 shadow-sm bg-gradient-to-r from-green-500 to-blue-500 text-white">

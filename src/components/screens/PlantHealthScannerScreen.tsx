@@ -84,21 +84,7 @@ const PlantHealthScannerScreen = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
-        <div className="px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">Plant Health Scanner</h1>
-              <p className="text-sm text-gray-600">AI-powered plant diagnosis</p>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <ScrollArea className="h-[calc(100vh-80px)]">
+      <ScrollArea className="h-[calc(100vh-0px)]">
         <div className="p-4 space-y-6">
           {!uploadedImage ? (
             <Card className="border-0 shadow-sm bg-white">
