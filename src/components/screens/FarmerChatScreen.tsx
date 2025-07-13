@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Send, Bot, User, Mic, Camera, Droplets, Thermometer, Sun, MapPin, Leaf } from "lucide-react";
+import { ArrowLeft, Send, Bot, User, Mic, Camera, Droplets, Thermometer, Sun, MapPin, Leaf, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface PlotData {
@@ -27,6 +27,7 @@ interface PlotData {
 const FarmerChatScreen = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
+  const [showGardenStatus, setShowGardenStatus] = useState(true);
   const [selectedPlot, setSelectedPlot] = useState<PlotData | null>(null);
   const [selectedPlotId, setSelectedPlotId] = useState<string>("general");
   const [messages, setMessages] = useState([
@@ -230,33 +231,6 @@ const FarmerChatScreen = () => {
             </div>
           </div>
         ))}
-        
-        {/* Garden Status Summary */}
-        <div className="mt-6">
-          <div className="bg-gray-900 text-white rounded-lg p-4 shadow-lg border border-gray-700">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                  <Droplets className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-base font-semibold text-white mb-1">
-                    {selectedPlot ? `${selectedPlot.name} Status` : 'Garden Status'}
-                  </h3>
-                  <p className="text-sm text-gray-300">
-                    {selectedPlot 
-                      ? `${selectedPlot.status.charAt(0).toUpperCase() + selectedPlot.status.slice(1)} • Next watering: ${selectedPlot.nextWatering}`
-                      : 'All plots monitored • AI optimization active'
-                    }
-                  </p>
-                </div>
-              </div>
-              <Badge className="bg-green-600 text-white border-green-500 px-3 py-1 text-sm font-medium hover:bg-green-700">
-                {selectedPlot?.status === 'healthy' ? 'Optimal' : 'Monitoring'}
-              </Badge>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Input Area - Fixed at bottom */}
@@ -290,6 +264,45 @@ const FarmerChatScreen = () => {
           </div>
         </div>
       </div>
+
+      {/* Garden Status - Fixed at bottom like Lovable notification */}
+      {showGardenStatus && (
+        <div className="fixed bottom-4 left-4 right-4 z-50">
+          <div className="bg-gray-900 text-white rounded-lg p-4 shadow-lg border border-gray-700">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                  <Droplets className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-white mb-1">
+                    {selectedPlot ? `${selectedPlot.name} Status` : 'Garden Status'}
+                  </h3>
+                  <p className="text-sm text-gray-300">
+                    {selectedPlot 
+                      ? `${selectedPlot.status.charAt(0).toUpperCase() + selectedPlot.status.slice(1)} • Next watering: ${selectedPlot.nextWatering}`
+                      : 'All plots monitored • AI optimization active'
+                    }
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Badge className="bg-green-600 text-white border-green-500 px-3 py-1 text-sm font-medium hover:bg-green-700">
+                  {selectedPlot?.status === 'healthy' ? 'Optimal' : 'Monitoring'}
+                </Badge>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-gray-400 hover:text-white p-1 h-6 w-6"
+                  onClick={() => setShowGardenStatus(false)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
