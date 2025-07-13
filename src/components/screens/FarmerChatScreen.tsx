@@ -233,24 +233,26 @@ const FarmerChatScreen = () => {
         
         {/* Garden Status Summary at bottom of messages */}
         <div className="mt-6">
-          <Card className="border-green-200 bg-green-50">
-            <CardContent className="p-3">
+          <Card className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 shadow-sm">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Droplets className="w-4 h-4 text-green-600" />
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <Droplets className="w-5 h-5 text-green-600" />
+                  </div>
                   <div>
-                    <p className="text-sm font-medium text-green-900">
+                    <h3 className="text-base font-semibold text-green-900 mb-1">
                       {selectedPlot ? `${selectedPlot.name} Status` : 'Garden Status'}
-                    </p>
-                    <p className="text-xs text-green-700">
+                    </h3>
+                    <p className="text-sm text-green-700 font-medium">
                       {selectedPlot 
-                        ? `${selectedPlot.status} • Next watering: ${selectedPlot.nextWatering}`
+                        ? `${selectedPlot.status.charAt(0).toUpperCase() + selectedPlot.status.slice(1)} • Next watering: ${selectedPlot.nextWatering}`
                         : 'All plots monitored • AI optimization active'
                       }
                     </p>
                   </div>
                 </div>
-                <Badge className="bg-green-100 text-green-700 border-green-200">
+                <Badge className="bg-green-100 text-green-700 border-green-200 px-3 py-1 text-sm font-medium">
                   {selectedPlot?.status === 'healthy' ? 'Optimal' : 'Monitoring'}
                 </Badge>
               </div>
