@@ -6,6 +6,7 @@ import { I18nProvider } from './contexts/I18nContext';
 import AppNavigator from './components/navigation/AppNavigator';
 import { ErrorBoundaryProvider } from './components/ui/ErrorBoundaryProvider';
 import NetworkStatus from './components/ui/NetworkStatus';
+import { Toaster } from './components/ui/toaster';
 import { logger } from './services/logger';
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
           <I18nProvider>
             <AppNavigator />
             <NetworkStatus />
+            <Toaster />
           </I18nProvider>
         </ThemeProvider>
       </BrowserRouter>
