@@ -14,6 +14,8 @@ import ReportsScreen from "@/components/screens/ReportsScreen";
 import SensorManagementScreen from "@/components/screens/SensorManagementScreen";
 import UserProfileScreen from "@/components/screens/UserProfileScreen";
 import WeatherForecastScreen from "@/components/screens/WeatherForecastScreen";
+import TermsOfServiceScreen from "@/components/screens/TermsOfServiceScreen";
+import PrivacyPolicyScreen from "@/components/screens/PrivacyPolicyScreen";
 
 export const standaloneRoutes = (
   <>
@@ -30,5 +32,7 @@ export const standaloneRoutes = (
     <Route path="/sensor-management" element={<SensorManagementScreen />} />
     <Route path="/user-profile" element={<UserProfileScreen />} />
     <Route path="/weather-forecast" element={<WeatherForecastScreen />} />
+    <Route path="/terms" element={<TermsOfServiceScreen />} />
+    <Route path="/privacy" element={<PrivacyPolicyScreen />} />
   </>
 );
