@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Send, Bot, User, Mic, Camera, Droplets, Thermometer, Sun, MapPin, Leaf, X } from "lucide-react";
+import { ArrowLeft, Send, Bot, User, Mic, Camera, Droplets, Thermometer, Sun, MapPin, Leaf } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 
 interface PlotData {
   id: number;
@@ -27,9 +26,7 @@ interface PlotData {
 
 const FarmerChatScreen = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [message, setMessage] = useState("");
-  const [showNotification, setShowNotification] = useState(true);
   const [selectedPlot, setSelectedPlot] = useState<PlotData | null>(null);
   const [selectedPlotId, setSelectedPlotId] = useState<string>("general");
   const [messages, setMessages] = useState([
@@ -163,42 +160,7 @@ const FarmerChatScreen = () => {
   };
 
   return (
-    <div className="h-full bg-gray-50 flex flex-col relative">
-      {/* Dark Notification Toast */}
-      {showNotification && (
-        <div className="absolute top-4 left-4 right-4 z-50">
-          <div className="bg-gray-900 text-white rounded-lg p-4 shadow-lg border border-gray-700">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <h4 className="font-medium text-sm mb-1">AI Assistant (Beta) costs adapt to task complexity</h4>
-                <p className="text-gray-300 text-xs">Advanced plant diagnostics and personalized irrigation recommendations</p>
-              </div>
-              <div className="flex items-center space-x-2 ml-4">
-                <Button 
-                  size="sm" 
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 h-7"
-                  onClick={() => {
-                    toast({
-                      title: "AI Features",
-                      description: "Premium AI diagnostics help optimize your garden's health and water usage.",
-                    });
-                  }}
-                >
-                  Read more
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-gray-400 hover:text-white p-1 h-6 w-6"
-                  onClick={() => setShowNotification(false)}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+    <div className="h-full bg-gray-50 flex flex-col">
       {/* Quick Actions */}
       <div className="bg-white border-b border-gray-100 p-4 flex-shrink-0">
         <div className="flex items-center justify-between mb-3">
@@ -269,33 +231,31 @@ const FarmerChatScreen = () => {
           </div>
         ))}
         
-        {/* Garden Status Summary at bottom of messages */}
+        {/* Garden Status Summary */}
         <div className="mt-6">
-          <Card className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <Droplets className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-green-900 mb-1">
-                      {selectedPlot ? `${selectedPlot.name} Status` : 'Garden Status'}
-                    </h3>
-                    <p className="text-sm text-green-700 font-medium">
-                      {selectedPlot 
-                        ? `${selectedPlot.status.charAt(0).toUpperCase() + selectedPlot.status.slice(1)} • Next watering: ${selectedPlot.nextWatering}`
-                        : 'All plots monitored • AI optimization active'
-                      }
-                    </p>
-                  </div>
+          <div className="bg-gray-900 text-white rounded-lg p-4 shadow-lg border border-gray-700">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                  <Droplets className="w-5 h-5 text-white" />
                 </div>
-                <Badge className="bg-green-100 text-green-700 border-green-200 px-3 py-1 text-sm font-medium">
-                  {selectedPlot?.status === 'healthy' ? 'Optimal' : 'Monitoring'}
-                </Badge>
+                <div>
+                  <h3 className="text-base font-semibold text-white mb-1">
+                    {selectedPlot ? `${selectedPlot.name} Status` : 'Garden Status'}
+                  </h3>
+                  <p className="text-sm text-gray-300">
+                    {selectedPlot 
+                      ? `${selectedPlot.status.charAt(0).toUpperCase() + selectedPlot.status.slice(1)} • Next watering: ${selectedPlot.nextWatering}`
+                      : 'All plots monitored • AI optimization active'
+                    }
+                  </p>
+                </div>
               </div>
-            </CardContent>
-          </Card>
+              <Badge className="bg-green-600 text-white border-green-500 px-3 py-1 text-sm font-medium hover:bg-green-700">
+                {selectedPlot?.status === 'healthy' ? 'Optimal' : 'Monitoring'}
+              </Badge>
+            </div>
+          </div>
         </div>
       </div>
 
