@@ -10,6 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import { 
   ArrowLeft, 
   Settings, 
@@ -27,11 +32,14 @@ import {
   AlertTriangle,
   Camera,
   Edit3,
-  Calendar,
+  Calendar as CalendarIcon,
   Target,
   Plus,
   Check,
-  X
+  X,
+  Layers,
+  Ruler,
+  Scissors
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -39,8 +47,15 @@ interface PlotData {
   id: string;
   name: string;
   cropType: string;
-  location: { lat: number; lng: number };
-  plantedDate: string;
+  variety: string;
+  zoneNumber: string;
+  location: string;
+  coordinates: { lat: number; lng: number };
+  area: number;
+  soilType: string;
+  irrigationMethod: string;
+  plantingDate: Date;
+  expectedHarvest: Date;
   autoWatering: boolean;
   smartScheduling: boolean;
   notifications: boolean;
@@ -62,8 +77,15 @@ const PlotSettingsScreen = () => {
     id: plotId || '1',
     name: "Tomato Garden",
     cropType: "cherry-tomatoes",
-    location: { lat: 37.7749, lng: -122.4194 },
-    plantedDate: "2024-05-15",
+    variety: "Sweet 100",
+    zoneNumber: "A-1",
+    location: "Backyard Plot A",
+    coordinates: { lat: 37.7749, lng: -122.4194 },
+    area: 25,
+    soilType: "loamy",
+    irrigationMethod: "drip",
+    plantingDate: new Date("2024-05-15"),
+    expectedHarvest: new Date("2024-08-15"),
     autoWatering: true,
     smartScheduling: true,
     notifications: true,
@@ -91,6 +113,23 @@ const PlotSettingsScreen = () => {
     { value: "cucumbers", label: "Cucumbers" },
     { value: "spinach", label: "Spinach" },
     { value: "kale", label: "Kale" }
+  ];
+
+  const soilTypes = [
+    { value: "loamy", label: "Loamy" },
+    { value: "sandy", label: "Sandy" },
+    { value: "clay", label: "Clay" },
+    { value: "silty", label: "Silty" },
+    { value: "peaty", label: "Peaty" },
+    { value: "chalky", label: "Chalky" }
+  ];
+
+  const irrigationMethods = [
+    { value: "drip", label: "Drip Irrigation" },
+    { value: "sprinkler", label: "Sprinkler System" },
+    { value: "soaker", label: "Soaker Hose" },
+    { value: "manual", label: "Manual Watering" },
+    { value: "mist", label: "Misting System" }
   ];
 
   const handleBackNavigation = () => {
@@ -202,7 +241,7 @@ const PlotSettingsScreen = () => {
   };
 
   const getDaysPlanted = () => {
-    const planted = new Date(plotData.plantedDate);
+    const planted = plotData.plantingDate;
     const now = new Date();
     return Math.floor((now.getTime() - planted.getTime()) / (1000 * 60 * 60 * 24));
   };
@@ -302,50 +341,209 @@ const PlotSettingsScreen = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="plotName">Plot Name</Label>
-                    <Input
-                      id="plotName"
-                      value={plotData.name}
-                      onChange={(e) => handleFieldChange('name', e.target.value)}
-                      className="rounded-xl border-gray-200 dark:border-gray-600 focus:border-green-300 dark:focus:border-green-500"
-                      placeholder="Enter plot name"
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="plotName">Plot Name</Label>
+                      <Input
+                        id="plotName"
+                        value={plotData.name}
+                        onChange={(e) => handleFieldChange('name', e.target.value)}
+                        className="rounded-xl border-gray-200 dark:border-gray-600 focus:border-green-300 dark:focus:border-green-500"
+                        placeholder="Enter plot name"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="zoneNumber">Zone Number</Label>
+                      <Input
+                        id="zoneNumber"
+                        value={plotData.zoneNumber}
+                        onChange={(e) => handleFieldChange('zoneNumber', e.target.value)}
+                        className="rounded-xl border-gray-200 dark:border-gray-600 focus:border-green-300 dark:focus:border-green-500"
+                        placeholder="e.g., A-1, Zone 3"
+                      />
+                    </div>
                   </div>
                   
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="cropType">Crop Type</Label>
+                      <Select value={plotData.cropType} onValueChange={(value) => handleFieldChange('cropType', value)}>
+                        <SelectTrigger className="rounded-xl border-gray-200 dark:border-gray-600">
+                          <SelectValue placeholder="Select crop type" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg z-50">
+                          {cropTypes.map((crop) => (
+                            <SelectItem key={crop.value} value={crop.value}>
+                              {crop.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="variety">Variety</Label>
+                      <Input
+                        id="variety"
+                        value={plotData.variety}
+                        onChange={(e) => handleFieldChange('variety', e.target.value)}
+                        className="rounded-xl border-gray-200 dark:border-gray-600 focus:border-green-300 dark:focus:border-green-500"
+                        placeholder="e.g., Sweet 100, Roma"
+                      />
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="cropType">Crop Type</Label>
-                    <Select value={plotData.cropType} onValueChange={(value) => handleFieldChange('cropType', value)}>
-                      <SelectTrigger className="rounded-xl border-gray-200 dark:border-gray-600">
-                        <SelectValue placeholder="Select crop type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {cropTypes.map((crop) => (
-                          <SelectItem key={crop.value} value={crop.value}>
-                            {crop.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="location">Location Description</Label>
+                    <Input
+                      id="location"
+                      value={plotData.location}
+                      onChange={(e) => handleFieldChange('location', e.target.value)}
+                      className="rounded-xl border-gray-200 dark:border-gray-600 focus:border-green-300 dark:focus:border-green-500"
+                      placeholder="e.g., Backyard Plot A, Greenhouse Section 2"
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 rounded-2xl">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                        <span className="font-medium text-blue-900 dark:text-blue-100">Location</span>
-                      </div>
-                      <p className="text-blue-700 dark:text-blue-300 text-sm">
-                        {plotData.location.lat.toFixed(4)}, {plotData.location.lng.toFixed(4)}
-                      </p>
+                    <div className="space-y-2">
+                      <Label htmlFor="latitude">Latitude</Label>
+                      <Input
+                        id="latitude"
+                        type="number"
+                        step="0.0001"
+                        value={plotData.coordinates.lat}
+                        onChange={(e) => handleFieldChange('coordinates', { ...plotData.coordinates, lat: parseFloat(e.target.value) || 0 })}
+                        className="rounded-xl border-gray-200 dark:border-gray-600 focus:border-green-300 dark:focus:border-green-500"
+                        placeholder="37.7749"
+                      />
                     </div>
-                    <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 rounded-2xl">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <Calendar className="w-5 h-5 text-green-600 dark:text-green-400" />
-                        <span className="font-medium text-green-900 dark:text-green-100">Planted</span>
-                      </div>
-                      <p className="text-green-700 dark:text-green-300 text-sm">{getDaysPlanted()} days ago</p>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="longitude">Longitude</Label>
+                      <Input
+                        id="longitude"
+                        type="number"
+                        step="0.0001"
+                        value={plotData.coordinates.lng}
+                        onChange={(e) => handleFieldChange('coordinates', { ...plotData.coordinates, lng: parseFloat(e.target.value) || 0 })}
+                        className="rounded-xl border-gray-200 dark:border-gray-600 focus:border-green-300 dark:focus:border-green-500"
+                        placeholder="-122.4194"
+                      />
                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="area">Area (sq ft)</Label>
+                      <Input
+                        id="area"
+                        type="number"
+                        min="1"
+                        value={plotData.area}
+                        onChange={(e) => handleFieldChange('area', parseFloat(e.target.value) || 0)}
+                        className="rounded-xl border-gray-200 dark:border-gray-600 focus:border-green-300 dark:focus:border-green-500"
+                        placeholder="25"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="soilType">Soil Type</Label>
+                      <Select value={plotData.soilType} onValueChange={(value) => handleFieldChange('soilType', value)}>
+                        <SelectTrigger className="rounded-xl border-gray-200 dark:border-gray-600">
+                          <SelectValue placeholder="Select soil type" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg z-50">
+                          {soilTypes.map((soil) => (
+                            <SelectItem key={soil.value} value={soil.value}>
+                              {soil.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="irrigationMethod">Irrigation Method</Label>
+                      <Select value={plotData.irrigationMethod} onValueChange={(value) => handleFieldChange('irrigationMethod', value)}>
+                        <SelectTrigger className="rounded-xl border-gray-200 dark:border-gray-600">
+                          <SelectValue placeholder="Select method" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg z-50">
+                          {irrigationMethods.map((method) => (
+                            <SelectItem key={method.value} value={method.value}>
+                              {method.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Planting Date</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal rounded-xl border-gray-200 dark:border-gray-600",
+                              !plotData.plantingDate && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {plotData.plantingDate ? format(plotData.plantingDate, "PPP") : <span>Pick a date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg z-50" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={plotData.plantingDate}
+                            onSelect={(date) => date && handleFieldChange('plantingDate', date)}
+                            initialFocus
+                            className="p-3 pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Expected Harvest</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal rounded-xl border-gray-200 dark:border-gray-600",
+                              !plotData.expectedHarvest && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {plotData.expectedHarvest ? format(plotData.expectedHarvest, "PPP") : <span>Pick a date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg z-50" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={plotData.expectedHarvest}
+                            onSelect={(date) => date && handleFieldChange('expectedHarvest', date)}
+                            initialFocus
+                            className="p-3 pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 rounded-2xl">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <CalendarIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      <span className="font-medium text-green-900 dark:text-green-100">Planted {getDaysPlanted()} days ago</span>
+                    </div>
+                    <p className="text-green-700 dark:text-green-300 text-sm">
+                      Expected harvest: {format(plotData.expectedHarvest, "MMMM d, yyyy")}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
