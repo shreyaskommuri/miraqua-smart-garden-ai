@@ -6,13 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, Settings, Droplets, Thermometer, Sparkles, Leaf } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { CalendarIcon, ArrowLeft, ArrowRight, Settings, Droplets, Thermometer, Sparkles, Leaf } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const OnboardingAdvancedSettingsScreen = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const plotData = location.state;
-  const [plantedDate, setPlantedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [plantedDate, setPlantedDate] = useState<Date>(new Date());
   const [plantedAge, setPlantedAge] = useState(0); // Age in months when planted
   const [soilPH, setSoilPH] = useState([6.5]);
   const [soilType, setSoilType] = useState("");
@@ -55,7 +59,7 @@ const OnboardingAdvancedSettingsScreen = () => {
   ];
 
   useEffect(() => {
-    if (plantedDate !== new Date().toISOString().split('T')[0] || plantedAge !== 0 || soilPH[0] !== 6.5 || soilType) {
+    if (plantedDate.toDateString() !== new Date().toDateString() || plantedAge !== 0 || soilPH[0] !== 6.5 || soilType) {
       setShowImpact(true);
     }
   }, [plantedDate, plantedAge, soilPH, soilType]);
@@ -64,7 +68,7 @@ const OnboardingAdvancedSettingsScreen = () => {
     navigate("/onboarding/complete", {
       state: { 
         ...plotData, 
-        plantedDate,
+        plantedDate: plantedDate.toISOString().split('T')[0],
         plantedAge,
         soilPH: soilPH[0], 
         soilType,
@@ -152,12 +156,30 @@ const OnboardingAdvancedSettingsScreen = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>When was it planted?</Label>
-                <input
-                  type="date"
-                  value={plantedDate}
-                  onChange={(e) => setPlantedDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal rounded-xl",
+                        !plantedDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {plantedDate ? format(plantedDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={plantedDate}
+                      onSelect={(date) => date && setPlantedDate(date)}
+                      disabled={(date) => date > new Date()}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div className="space-y-2">
                 <Label>Age when planted (months)</Label>

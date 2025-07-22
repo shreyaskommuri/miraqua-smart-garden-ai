@@ -25,7 +25,7 @@ const OnboardingCompleteScreen = () => {
         navigate('/onboarding/location');
         break;
       case 'settings':
-        navigate('/onboarding/advanced-settings');
+        navigate('/onboarding/settings');
         break;
     }
   };
@@ -164,8 +164,12 @@ const OnboardingCompleteScreen = () => {
                     <span className="font-medium capitalize">{plotData.soilType || "loam"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Root Depth:</span>
-                    <span className="font-medium">{plotData.rootDepth || 12}"</span>
+                    <span className="text-gray-600">Planted:</span>
+                    <span className="font-medium">{plotData.plantedDate || "Today"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Age when planted:</span>
+                    <span className="font-medium">{plotData.plantedAge || 0} months</span>
                   </div>
                   {plotData.soilPH && (
                     <div className="flex justify-between">
