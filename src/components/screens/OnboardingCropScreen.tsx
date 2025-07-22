@@ -1,88 +1,129 @@
-
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, ArrowRight, Leaf, CheckCircle2 } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, ArrowRight, Search, Leaf, Sparkles, Clock, Droplets } from "lucide-react";
 
 const OnboardingCropScreen = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const plotData = location.state;
+
   const [plotName, setPlotName] = useState("");
-  const [cropType, setCropType] = useState("");
+  const [selectedCrop, setSelectedCrop] = useState("");
   const [customCropName, setCustomCropName] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const crops = [
     { 
-      id: "grass", 
-      name: "Grass/Lawn", 
-      icon: "🌱", 
-      description: "Full sun, regular watering",
-      waterFrequency: "Daily",
-      difficulty: "Easy"
-    },
-    { 
       id: "tomatoes", 
       name: "Tomatoes", 
-      icon: "🍅", 
-      description: "Full sun, high water needs",
-      waterFrequency: "Daily",
-      difficulty: "Easy"
+      emoji: "🍅", 
+      season: "Spring/Summer", 
+      difficulty: "Beginner",
+      wateringFreq: "Daily",
+      benefits: "High yield, easy to grow",
+      popular: true
     },
     { 
       id: "lettuce", 
       name: "Lettuce", 
-      icon: "🥬", 
-      description: "Partial shade, moderate water",
-      waterFrequency: "Every 2 days",
-      difficulty: "Easy"
-    },
-    { 
-      id: "peppers", 
-      name: "Peppers", 
-      icon: "🫑", 
-      description: "Full sun, moderate water",
-      waterFrequency: "Every 2-3 days",
-      difficulty: "Medium"
+      emoji: "🥬", 
+      season: "Spring/Fall", 
+      difficulty: "Beginner",
+      wateringFreq: "Every 2 days",
+      benefits: "Fast growing, low maintenance"
     },
     { 
       id: "herbs", 
       name: "Herbs", 
-      icon: "🌿", 
-      description: "Full sun, low water needs",
-      waterFrequency: "Every 3-4 days",
-      difficulty: "Easy"
+      emoji: "🌿", 
+      season: "Year-round", 
+      difficulty: "Beginner",
+      wateringFreq: "Every 2-3 days",
+      benefits: "Continuous harvest, aromatic",
+      popular: true
     },
     { 
       id: "carrots", 
       name: "Carrots", 
-      icon: "🥕", 
-      description: "Full sun, deep soil",
-      waterFrequency: "Every 2 days",
-      difficulty: "Medium"
+      emoji: "🥕", 
+      season: "Spring/Fall", 
+      difficulty: "Beginner",
+      wateringFreq: "Every 2 days",
+      benefits: "Root vegetable, stores well"
+    },
+    { 
+      id: "peppers", 
+      name: "Peppers", 
+      emoji: "🌶️", 
+      season: "Summer", 
+      difficulty: "Intermediate",
+      wateringFreq: "Daily",
+      benefits: "Heat-loving, colorful varieties"
+    },
+    { 
+      id: "strawberries", 
+      name: "Strawberries", 
+      emoji: "🍓", 
+      season: "Spring/Summer", 
+      difficulty: "Intermediate",
+      wateringFreq: "Daily",
+      benefits: "Perennial, sweet fruit",
+      popular: true
+    },
+    { 
+      id: "broccoli", 
+      name: "Broccoli", 
+      emoji: "🥦", 
+      season: "Spring/Fall", 
+      difficulty: "Intermediate",
+      wateringFreq: "Daily",
+      benefits: "Nutritious, cool-weather crop"
     },
     { 
       id: "beans", 
       name: "Beans", 
-      icon: "🫘", 
-      description: "Full sun, climbing support",
-      waterFrequency: "Daily",
-      difficulty: "Easy"
+      emoji: "🫘", 
+      season: "Spring/Summer", 
+      difficulty: "Beginner",
+      wateringFreq: "Every 2 days",
+      benefits: "Nitrogen-fixing, protein-rich"
     },
     { 
-      id: "other", 
+      id: "custom", 
       name: "Other/Custom", 
-      icon: "🌾", 
-      description: "Custom crop type",
-      waterFrequency: "Variable",
-      difficulty: "Variable"
+      emoji: "✨", 
+      season: "Variable", 
+      difficulty: "Variable",
+      wateringFreq: "Custom",
+      benefits: "Tailored to your needs"
     }
   ];
+
+  // Filter crops based on search
+  const filteredCrops = crops.filter(crop => 
+    crop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    crop.difficulty.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    crop.season.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Popular crops for recommendations
+  const popularCrops = crops.filter(crop => crop.popular);
+
+  useEffect(() => {
+    if (selectedCrop && selectedCrop !== 'custom') {
+      setShowPreview(true);
+    } else {
+      setShowPreview(false);
+    }
+  }, [selectedCrop]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -91,15 +132,13 @@ const OnboardingCropScreen = () => {
       newErrors.plotName = "Plot name is required";
     } else if (plotName.length < 2) {
       newErrors.plotName = "Plot name must be at least 2 characters";
-    } else if (plotName.length > 50) {
-      newErrors.plotName = "Plot name must be less than 50 characters";
     }
     
-    if (!cropType) {
-      newErrors.cropType = "Please select a crop type";
+    if (!selectedCrop) {
+      newErrors.selectedCrop = "Please select a crop type";
     }
     
-    if (cropType === "other" && !customCropName.trim()) {
+    if (selectedCrop === "custom" && !customCropName.trim()) {
       newErrors.customCropName = "Please enter a custom crop name";
     }
     
@@ -108,49 +147,24 @@ const OnboardingCropScreen = () => {
   };
 
   const handleNext = async () => {
-    // Auto-capitalize custom crop name
-    if (cropType === "other" && customCropName.trim()) {
-      const capitalizedName = customCropName.trim()
-        .toLowerCase()
-        .replace(/\b\w/g, l => l.toUpperCase());
-      setCustomCropName(capitalizedName);
-    }
-    
-    if (!validateForm()) {
-      toast({
-        title: "Please fix the errors",
-        description: "Check the form for any validation errors",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsLoading(true);
     
     try {
-      // Simulate API call or processing
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      const selectedCrop = crops.find(crop => crop.id === cropType);
-      
-      navigate('/onboarding/location', { 
+      navigate('/onboarding/location', {
         state: { 
-          plotName: plotName.trim(), 
-          cropType,
-          cropDetails: selectedCrop
+          ...plotData, 
+          plotName: plotName.trim(),
+          selectedCrop,
+          customCropName: selectedCrop === 'custom' ? customCropName : '',
+          cropDetails: crops.find(crop => crop.id === selectedCrop)
         }
       });
-
-      toast({
-        title: "Great choice!",
-        description: `${selectedCrop?.name} selected for ${plotName}`,
-      });
     } catch (error) {
-      toast({
-        title: "Something went wrong",
-        description: "Please try again",
-        variant: "destructive",
-      });
+      console.error('Error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -160,20 +174,19 @@ const OnboardingCropScreen = () => {
     navigate('/welcome');
   };
 
-  const isFormValid = plotName.trim().length >= 2 && plotName.trim().length <= 50 && cropType;
+  const isFormValid = plotName.trim().length >= 2 && selectedCrop && (selectedCrop !== 'custom' || customCropName.trim());
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-50">
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={handleBackNavigation}
-              className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
-              disabled={isLoading}
+              className="p-2"
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
@@ -188,191 +201,240 @@ const OnboardingCropScreen = () => {
         {/* Progress Bar */}
         <div className="px-6 pb-4">
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full transition-all duration-500 ease-out"
-              style={{ width: '25%' }}
-            ></div>
+            <div className="bg-primary h-2 rounded-full w-1/4 transition-all duration-300"></div>
           </div>
         </div>
       </header>
 
-      <ScrollArea className="h-[calc(100vh-140px)]">
-        <div className="px-6 py-6 space-y-8 pb-32">
-          {/* Intro */}
-          <div className="text-center animate-fade-in">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <Leaf className="w-10 h-10 text-white" />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Let's Create Your Garden Plot</h2>
-            <p className="text-gray-600 text-lg leading-relaxed max-w-md mx-auto">
-              Tell us what you're growing and we'll create a personalized watering schedule
-            </p>
+      <div className="px-6 py-6 space-y-8 pb-32">
+        {/* Intro */}
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <Leaf className="w-8 h-8 text-white" />
           </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">Let's set up your garden plot</h2>
+          <p className="text-gray-600">Give your plot a name and choose what you're growing for personalized care</p>
+        </div>
 
-          {/* Plot Name Card */}
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl flex items-center space-x-2">
-                <span>Plot Name</span>
-                {plotName.trim().length >= 2 && <CheckCircle2 className="w-5 h-5 text-green-500" />}
+        {/* Quick Recommendations */}
+        {!selectedCrop && (
+          <Card className="border-0 shadow-sm bg-gradient-to-r from-primary/5 to-accent/5">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center space-x-2">
+                <Sparkles className="w-5 h-5 text-primary" />
+                <span>Popular for beginners</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <Label htmlFor="plotName" className="text-gray-700 font-medium">
-                  Give your plot a memorable name
-                </Label>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {popularCrops.map((crop) => (
+                  <Button
+                    key={crop.id}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedCrop(crop.id)}
+                    className="rounded-full border-primary/20 hover:bg-primary/10"
+                  >
+                    <span className="mr-1">{crop.emoji}</span>
+                    {crop.name}
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Plot Name */}
+        <Card className="border-0 shadow-sm bg-white">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg">Plot Name</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Label htmlFor="plotName">Give your plot a memorable name</Label>
+              <Input
+                id="plotName"
+                placeholder="e.g., Backyard Garden, Herb Corner, Tomato Paradise"
+                value={plotName}
+                onChange={(e) => {
+                  setPlotName(e.target.value);
+                  if (errors.plotName) {
+                    setErrors(prev => ({ ...prev, plotName: '' }));
+                  }
+                }}
+                className={`rounded-xl ${errors.plotName ? 'border-red-500' : ''}`}
+                maxLength={50}
+              />
+              {errors.plotName && (
+                <p className="text-sm text-red-600">{errors.plotName}</p>
+              )}
+              <p className="text-xs text-gray-500">{plotName.length}/50 characters</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Search */}
+        <Card className="border-0 shadow-sm bg-white">
+          <CardContent className="p-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Search crops (e.g., tomatoes, beginner, summer)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 rounded-xl border-gray-200 focus:border-primary"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Crop Selection */}
+        <Card className="border-0 shadow-sm bg-white">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg">Choose your crop</CardTitle>
+            <p className="text-sm text-gray-600">
+              {filteredCrops.length} crop{filteredCrops.length !== 1 ? 's' : ''} available
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 gap-3">
+              {filteredCrops.map((crop) => (
+                <Card
+                  key={crop.id}
+                  className={`cursor-pointer transition-all duration-300 border-0 shadow-sm ${
+                    selectedCrop === crop.id
+                      ? "bg-primary/10 ring-2 ring-primary shadow-lg transform scale-[1.02]"
+                      : "bg-white hover:shadow-md hover:bg-gray-50"
+                  }`}
+                  onClick={() => setSelectedCrop(crop.id)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="text-3xl">{crop.emoji}</div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-semibold text-gray-900">{crop.name}</h3>
+                          {crop.popular && (
+                            <Badge className="bg-primary/10 text-primary border-primary/20">
+                              Popular
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          <Badge 
+                            variant="outline" 
+                            className={`text-xs ${crop.difficulty === 'Beginner' ? 'border-success text-success' : 
+                                                   crop.difficulty === 'Intermediate' ? 'border-warning text-warning' : 
+                                                   'border-destructive text-destructive'}`}
+                          >
+                            {crop.difficulty}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs border-blue-200 text-blue-700">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {crop.season}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs border-cyan-200 text-cyan-700">
+                            <Droplets className="w-3 h-3 mr-1" />
+                            {crop.wateringFreq}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-600">{crop.benefits}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Custom Crop Input */}
+        {selectedCrop === 'custom' && (
+          <Card className="border-0 shadow-sm bg-white animate-fade-in">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg">Custom Crop</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label htmlFor="customCropName">Enter your crop name</Label>
                 <Input
-                  id="plotName"
-                  placeholder="e.g., Backyard Garden, Herb Corner, Tomato Paradise"
-                  value={plotName}
+                  id="customCropName"
+                  placeholder="e.g., sunflowers, kale, etc."
+                  value={customCropName}
                   onChange={(e) => {
-                    setPlotName(e.target.value);
-                    if (errors.plotName) {
-                      setErrors(prev => ({ ...prev, plotName: '' }));
+                    setCustomCropName(e.target.value);
+                    if (errors.customCropName) {
+                      setErrors(prev => ({ ...prev, customCropName: '' }));
                     }
                   }}
-                  className={`rounded-xl h-12 text-lg transition-all duration-200 ${
-                    errors.plotName 
-                      ? "border-red-500 focus:border-red-500 focus:ring-red-200" 
-                      : plotName.trim().length >= 2 
-                        ? "border-green-500 focus:border-green-500 focus:ring-green-200"
-                        : "border-gray-200 focus:border-blue-500 focus:ring-blue-200"
-                  }`}
-                  maxLength={50}
-                  disabled={isLoading}
+                  className={`rounded-xl ${errors.customCropName ? 'border-red-500' : ''}`}
                 />
-                {errors.plotName ? (
-                  <p className="text-sm text-red-600 flex items-center space-x-1">
-                    <span>⚠️</span>
-                    <span>{errors.plotName}</span>
-                  </p>
-                ) : (
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span>Choose something you'll remember easily</span>
-                    <span>{plotName.length}/50 characters</span>
-                  </div>
+                {errors.customCropName && (
+                  <p className="text-sm text-red-600">{errors.customCropName}</p>
                 )}
               </div>
             </CardContent>
           </Card>
+        )}
 
-          {/* Crop Selection Card */}
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl flex items-center space-x-2">
-                <span>What are you growing?</span>
-                {cropType && <CheckCircle2 className="w-5 h-5 text-green-500" />}
+        {/* Smart Preview */}
+        {showPreview && selectedCrop !== 'custom' && (
+          <Card className="border-0 shadow-lg bg-gradient-to-r from-primary/5 to-accent/5 animate-fade-in">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center space-x-2">
+                <Sparkles className="w-5 h-5 text-primary" />
+                <span>Smart irrigation preview</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                {crops.map((crop) => (
-                  <Card
-                    key={crop.id}
-                    className={`cursor-pointer transition-all duration-300 border-2 hover:shadow-lg transform hover:-translate-y-1 ${
-                      cropType === crop.id
-                        ? "bg-gradient-to-br from-green-50 to-green-100 border-green-500 shadow-lg ring-2 ring-green-200"
-                        : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-md"
-                    }`}
-                    onClick={() => {
-                      if (!isLoading) {
-                        setCropType(crop.id);
-                        if (errors.cropType) {
-                          setErrors(prev => ({ ...prev, cropType: '' }));
-                        }
-                      }
-                    }}
-                  >
-                    <CardContent className="p-4 text-center">
-                      <div className="text-3xl mb-3">{crop.icon}</div>
-                      <h3 className="font-semibold text-gray-900 mb-2">{crop.name}</h3>
-                      <p className="text-xs text-gray-600 mb-2">{crop.description}</p>
-                      <div className="space-y-1">
-                        <div className="text-xs text-blue-600 font-medium">
-                          💧 {crop.waterFrequency}
-                        </div>
-                        <div className="text-xs text-purple-600 font-medium">
-                          📊 {crop.difficulty}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-                
-              {/* Custom crop input field */}
-              {cropType === "other" && (
-                <div className="mt-6">
-                  <Label htmlFor="customCrop" className="text-sm font-medium text-gray-700">
-                    Enter your crop name
-                  </Label>
-                  <Input
-                    id="customCrop"
-                    value={customCropName}
-                    onChange={(e) => setCustomCropName(e.target.value)}
-                    placeholder="e.g., sunflowers, kale, etc."
-                    className={`mt-2 ${errors.customCropName ? "border-red-500" : ""}`}
-                  />
-                  {errors.customCropName && (
-                    <p className="mt-1 text-sm text-red-600">{errors.customCropName}</p>
-                  )}
-                </div>
-              )}
-              
-              {errors.cropType && (
-                <p className="text-sm text-red-600 flex items-center space-x-1">
-                  <span>⚠️</span>
-                  <span>{errors.cropType}</span>
-                </p>
-              )}
-
-              {cropType && (
-                <div className="p-4 bg-green-50 rounded-xl border border-green-200 animate-fade-in">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-600" />
-                    <span className="font-medium text-green-900">Great Choice!</span>
+            <CardContent>
+              {(() => {
+                const crop = crops.find(c => c.id === selectedCrop);
+                return (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg">
+                      <span className="text-sm font-medium">Watering schedule</span>
+                      <span className="text-sm text-primary font-semibold">{crop?.wateringFreq}</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg">
+                      <span className="text-sm font-medium">Best growing season</span>
+                      <span className="text-sm text-primary font-semibold">{crop?.season}</span>
+                    </div>
+                    <div className="p-3 bg-white rounded-lg">
+                      <p className="text-sm text-gray-600">
+                        🎯 <strong>Pro tip:</strong> We'll automatically adjust watering based on weather, soil moisture, and your {crop?.name.toLowerCase()} growth stage.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-sm text-green-800">
-                    {crops.find(c => c.id === cropType)?.name} is perfect for smart irrigation. 
-                    We'll optimize watering based on weather and soil conditions.
-                  </p>
-                </div>
-              )}
+                );
+              })()}
             </CardContent>
           </Card>
-        </div>
-      </ScrollArea>
+        )}
+      </div>
 
-      {/* Next Button - Fixed */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 p-6 shadow-lg">
+      {/* Next Button */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-6">
         <Button
           onClick={handleNext}
           disabled={!isFormValid || isLoading}
-          className={`w-full h-14 font-semibold rounded-xl text-lg transition-all duration-300 ${
+          className={`w-full h-12 font-medium rounded-xl transition-all duration-200 ${
             isFormValid && !isLoading
-              ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              ? "bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl"
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
           }`}
         >
           {isLoading ? (
             <div className="flex items-center space-x-2">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
               <span>Processing...</span>
             </div>
           ) : (
-            <div className="flex items-center justify-center space-x-2">
-              <span>Next: Choose Location</span>
-              <ArrowRight className="w-5 h-5" />
-            </div>
+            <>
+              Next: Choose Location
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </>
           )}
         </Button>
-        
-        {!isFormValid && (
-          <p className="text-center text-sm text-gray-500 mt-2">
-            Complete all fields to continue
-          </p>
-        )}
       </div>
     </div>
   );

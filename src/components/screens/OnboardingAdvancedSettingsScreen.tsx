@@ -1,32 +1,80 @@
 
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, Settings, Droplets, Thermometer } from "lucide-react";
+import { ArrowLeft, ArrowRight, Settings, Droplets, Thermometer, Sparkles, Leaf } from "lucide-react";
 
 const OnboardingAdvancedSettingsScreen = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const plotData = location.state;
   const [rootDepth, setRootDepth] = useState([12]);
   const [soilPH, setSoilPH] = useState([6.5]);
   const [soilType, setSoilType] = useState("");
+  const [showImpact, setShowImpact] = useState(false);
 
   const soilTypes = [
-    { id: "clay", name: "Clay", drainage: "Poor", retention: "High" },
-    { id: "sandy", name: "Sandy", drainage: "Excellent", retention: "Low" },
-    { id: "loam", name: "Loam", drainage: "Good", retention: "Medium" },
-    { id: "silt", name: "Silt", drainage: "Fair", retention: "High" }
+    { 
+      id: "clay", 
+      name: "Clay", 
+      drainage: "Poor", 
+      retention: "High",
+      description: "Rich in nutrients, retains moisture well",
+      waterAdjust: "+30% frequency"
+    },
+    { 
+      id: "sandy", 
+      name: "Sandy", 
+      drainage: "Excellent", 
+      retention: "Low",
+      description: "Drains quickly, needs frequent watering",
+      waterAdjust: "+50% frequency"
+    },
+    { 
+      id: "loam", 
+      name: "Loam", 
+      drainage: "Good", 
+      retention: "Medium",
+      description: "Perfect balance of drainage and retention",
+      waterAdjust: "Standard schedule",
+      recommended: true
+    },
+    { 
+      id: "silt", 
+      name: "Silt", 
+      drainage: "Fair", 
+      retention: "High",
+      description: "Fine particles, compacts easily",
+      waterAdjust: "+20% frequency"
+    }
   ];
 
+  useEffect(() => {
+    if (rootDepth[0] !== 12 || soilPH[0] !== 6.5 || soilType) {
+      setShowImpact(true);
+    }
+  }, [rootDepth, soilPH, soilType]);
+
   const handleContinue = () => {
-    navigate("/onboarding/complete");
+    navigate("/onboarding/complete", {
+      state: { 
+        ...plotData, 
+        rootDepth: rootDepth[0], 
+        soilPH: soilPH[0], 
+        soilType,
+        isAdvancedSetup: true 
+      }
+    });
   };
 
   const handleSkip = () => {
-    navigate("/onboarding/complete");
+    navigate("/onboarding/complete", {
+      state: { ...plotData, isAdvancedSetup: false }
+    });
   };
 
   const getDrainageColor = (drainage: string) => {
@@ -83,11 +131,11 @@ const OnboardingAdvancedSettingsScreen = () => {
 
         {/* Intro */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
             <Settings className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Fine-tune Your Garden</h2>
-          <p className="text-gray-600">Optional settings for even better results</p>
+          <p className="text-gray-600">Precision settings for maximum efficiency (optional but recommended)</p>
         </div>
 
         {/* Root Depth */}
@@ -157,24 +205,37 @@ const OnboardingAdvancedSettingsScreen = () => {
             <CardTitle className="text-lg">Soil Type</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               {soilTypes.map((soil) => (
                 <Card
                   key={soil.id}
-                  className={`cursor-pointer transition-all duration-200 border-0 shadow-sm ${
+                  className={`cursor-pointer transition-all duration-300 border-0 shadow-sm ${
                     soilType === soil.id
-                      ? "bg-purple-50 ring-2 ring-purple-500"
-                      : "bg-white hover:shadow-md"
+                      ? "bg-primary/10 ring-2 ring-primary transform scale-[1.02]"
+                      : "bg-white hover:shadow-md hover:bg-gray-50"
                   }`}
                   onClick={() => setSoilType(soil.id)}
                 >
-                  <CardContent className="p-4 text-center">
-                    <h3 className="font-semibold text-gray-900 mb-2">{soil.name}</h3>
-                    <div className="space-y-1">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-gray-900">{soil.name}</h3>
+                      {soil.recommended && (
+                        <Badge className="bg-primary/10 text-primary border-primary/20">
+                          Recommended
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600 mb-3">{soil.description}</p>
+                    <div className="flex flex-wrap gap-2">
                       <Badge className={`text-xs ${getDrainageColor(soil.drainage)}`}>
                         {soil.drainage} drainage
                       </Badge>
-                      <p className="text-xs text-gray-500">{soil.retention} retention</p>
+                      <Badge variant="outline" className="text-xs">
+                        {soil.retention} retention
+                      </Badge>
+                      <Badge variant="outline" className="text-xs border-primary/20 text-primary">
+                        {soil.waterAdjust}
+                      </Badge>
                     </div>
                   </CardContent>
                 </Card>
@@ -183,12 +244,42 @@ const OnboardingAdvancedSettingsScreen = () => {
           </CardContent>
         </Card>
 
+        {/* Smart Impact Preview */}
+        {showImpact && (
+          <Card className="border-0 shadow-lg bg-gradient-to-r from-primary/5 to-accent/5 animate-fade-in">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center space-x-2">
+                <Sparkles className="w-5 h-5 text-primary" />
+                <span>Precision irrigation impact</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-white rounded-lg">
+                  <span className="text-sm font-medium">Water efficiency</span>
+                  <span className="text-sm text-primary font-semibold">+25% more efficient</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-white rounded-lg">
+                  <span className="text-sm font-medium">Plant health</span>
+                  <span className="text-sm text-success font-semibold">Optimal growth</span>
+                </div>
+                <div className="p-3 bg-white rounded-lg">
+                  <p className="text-sm text-gray-600">
+                    🎯 <strong>Smart adjustment:</strong> Your custom settings will reduce water waste by 25% while maximizing plant health.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Action Buttons */}
         <div className="space-y-3">
           <Button
             onClick={handleContinue}
-            className="w-full h-12 bg-purple-500 hover:bg-purple-600 text-white font-medium rounded-xl"
+            className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
           >
+            <Leaf className="w-4 h-4 mr-2" />
             Complete Setup
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
@@ -196,9 +287,9 @@ const OnboardingAdvancedSettingsScreen = () => {
           <Button
             onClick={handleSkip}
             variant="outline"
-            className="w-full h-10 border-gray-300 text-gray-700 rounded-xl"
+            className="w-full h-10 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors duration-200"
           >
-            Skip Advanced Settings
+            Use Smart Defaults Instead
           </Button>
         </div>
       </div>
