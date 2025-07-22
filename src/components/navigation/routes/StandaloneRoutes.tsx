@@ -19,7 +19,7 @@ import PrivacyPolicyScreen from "@/components/screens/PrivacyPolicyScreen";
 
 export const standaloneRoutes = (
   <>
-    <Route path="/dashboard" element={<Index />} />
+    
     <Route path="/add-plot" element={<AddPlotScreen />} />
     <Route path="/collaboration" element={<CollaborationScreen />} />
     <Route path="/device-control" element={<DeviceControlScreen />} />

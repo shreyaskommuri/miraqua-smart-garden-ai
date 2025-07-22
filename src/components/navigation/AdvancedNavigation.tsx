@@ -38,7 +38,7 @@ interface NavItem {
 }
 
 const navigationItems: NavItem[] = [
-  { id: 'home', label: 'Dashboard', icon: Home, path: '/app/home' },
+  { id: 'home', label: 'Home', icon: Home, path: '/app/home' },
   { 
     id: 'analytics', 
     label: 'AI Analytics', 

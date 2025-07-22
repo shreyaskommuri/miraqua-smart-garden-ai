@@ -69,8 +69,8 @@ const NotificationSettingsScreen = () => {
         description: "Your notification preferences have been updated.",
       });
       
-      // Navigate back to dashboard instead of previous page
-      navigate("/dashboard");
+      // Navigate back to home instead of previous page
+      navigate("/app/home");
     } catch (err) {
       setError("Failed to save settings");
       toast({
@@ -88,8 +88,8 @@ const NotificationSettingsScreen = () => {
   };
 
   const handleBack = () => {
-    // Navigate back to dashboard instead of -1 to avoid welcome page
-    navigate("/dashboard");
+    // Navigate back to home instead of -1 to avoid welcome page
+    navigate("/app/home");
   };
 
   useEffect(() => {
