@@ -13,7 +13,7 @@ const OnboardingAdvancedSettingsScreen = () => {
   const location = useLocation();
   const plotData = location.state;
   const [plantedDate, setPlantedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [plantedAge, setPlantedAge] = useState(0); // Age in days when planted
+  const [plantedAge, setPlantedAge] = useState(0); // Age in months when planted
   const [soilPH, setSoilPH] = useState([6.5]);
   const [soilType, setSoilType] = useState("");
   const [showImpact, setShowImpact] = useState(false);
@@ -160,14 +160,14 @@ const OnboardingAdvancedSettingsScreen = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Age when planted (days)</Label>
+                <Label>Age when planted (months)</Label>
                 <input
                   type="number"
                   value={plantedAge}
                   onChange={(e) => setPlantedAge(parseInt(e.target.value) || 0)}
                   min="0"
-                  max="365"
-                  placeholder="0"
+                  max="12"
+                  placeholder="0 (seedling)"
                   className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
