@@ -236,30 +236,30 @@ const AnomalyAlertsScreen = () => {
                     anomaly.resolved ? 'opacity-60' : ''
                   }`}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
+                  <CardContent className="p-4">
+                    <div className="flex items-start space-x-3">
                       {/* Icon */}
                       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${
                         anomaly.severity === 'critical' ? 'bg-red-100' :
                         anomaly.severity === 'warning' ? 'bg-yellow-100' : 'bg-blue-100'
                       }`}>
-                        <Icon className={`w-6 h-6 ${
+                        <Icon className={`w-5 h-5 ${
                           anomaly.severity === 'critical' ? 'text-red-600' :
                           anomaly.severity === 'warning' ? 'text-yellow-600' : 'text-blue-600'
                         }`} />
                       </div>
                       
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 overflow-hidden">
                         {/* Header with title and badge */}
-                        <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-start justify-between gap-3 mb-1">
                           <div className="min-w-0 flex-1">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-1">{anomaly.title}</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 truncate">{anomaly.title}</h3>
                             {anomaly.plotName && (
-                              <p className="text-sm text-gray-600">{anomaly.plotName}</p>
+                              <p className="text-sm text-gray-600 truncate">{anomaly.plotName}</p>
                             )}
                           </div>
                           <Badge 
-                            className={`ml-3 px-3 py-1 text-sm font-medium rounded-full border-0 ${
+                            className={`flex-shrink-0 px-2 py-1 text-xs font-medium rounded-full border-0 ${
                               anomaly.severity === 'critical' ? 'bg-red-100 text-red-700' :
                               anomaly.severity === 'warning' ? 'bg-yellow-100 text-yellow-700' : 
                               'bg-blue-100 text-blue-700'
@@ -270,24 +270,24 @@ const AnomalyAlertsScreen = () => {
                         </div>
                         
                         {/* Description */}
-                        <p className="text-gray-700 mb-4 leading-relaxed">{anomaly.description}</p>
+                        <p className="text-gray-700 mb-3 text-sm leading-relaxed break-words">{anomaly.description}</p>
                         
                         {/* Footer with time and actions */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2 text-sm text-gray-500">
-                            <Clock className="w-4 h-4" />
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center space-x-1 text-xs text-gray-500 flex-shrink-0">
+                            <Clock className="w-3 h-3" />
                             <span>{getTimeAgo(anomaly.timestamp)}</span>
                           </div>
                           
-                          <div className="flex items-center space-x-3">
+                          <div className="flex items-center space-x-2 flex-shrink-0">
                             {!anomaly.acknowledged && !anomaly.resolved && (
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleAcknowledge(anomaly.id)}
-                                className="h-8 px-3 text-sm border-gray-300 hover:bg-gray-50"
+                                className="h-7 px-2 text-xs border-gray-300 hover:bg-gray-50"
                               >
-                                <Check className="w-4 h-4 mr-1" />
+                                <Check className="w-3 h-3 mr-1" />
                                 Acknowledge
                               </Button>
                             )}
@@ -295,9 +295,9 @@ const AnomalyAlertsScreen = () => {
                               <Button
                                 size="sm"
                                 onClick={() => handleResolve(anomaly.id)}
-                                className="h-8 px-3 text-sm bg-green-600 hover:bg-green-700 text-white"
+                                className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 text-white"
                               >
-                                <Check className="w-4 h-4 mr-1" />
+                                <Check className="w-3 h-3 mr-1" />
                                 Mark Resolved
                               </Button>
                             )}
@@ -306,7 +306,7 @@ const AnomalyAlertsScreen = () => {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => navigate(`/app/plot/${anomaly.plotId}`)}
-                                className="h-8 px-3 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                className="h-7 px-2 text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                               >
                                 View Plot
                               </Button>
