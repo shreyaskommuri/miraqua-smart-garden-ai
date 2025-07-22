@@ -226,12 +226,12 @@ export const getDevices = async (): Promise<Device[]> => {
 
 export const waterPlot = async (plotId: string): Promise<boolean> => {
   await new Promise(resolve => setTimeout(resolve, 1000));
-  console.log(`Watering plot ${plotId}`);
+  // Watering plot operation
   return true;
 };
 
 export const updatePlotSettings = async (plotId: string, settings: Partial<Plot>): Promise<boolean> => {
   await new Promise(resolve => setTimeout(resolve, 800));
-  console.log(`Updating plot ${plotId} settings:`, settings);
+  // Updating plot settings
   return true;
 };

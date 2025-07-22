@@ -72,18 +72,13 @@ const ExportReportsScreen = () => {
       generatedAt: new Date().toISOString()
     };
 
-    console.log('Generating report:', reportData);
-    
     // In production, this would trigger actual report generation
     if (format === 'pdf') {
       // Generate PDF with embedded map snapshots
-      console.log('Generating PDF with map snapshots...');
     } else if (format === 'csv') {
       // Generate CSV export
-      console.log('Generating CSV export...');
     } else {
       // Generate JSON export
-      console.log('Generating JSON export...');
     }
 
     setIsGenerating(false);

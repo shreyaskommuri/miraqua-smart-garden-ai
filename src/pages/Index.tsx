@@ -107,7 +107,7 @@ const Index = () => {
   };
 
   const handleWaterNow = (plotId: number) => {
-    console.log(`Watering plot ${plotId}`);
+    // Water plot functionality
     // Update plot status after watering
     setPlots(prev => prev.map(plot => 
       plot.id === plotId 

@@ -61,7 +61,7 @@ const PredictiveDashboardScreen = () => {
         
         setData(mockData);
       } catch (error) {
-        console.error('Failed to fetch predictive data:', error);
+        // Error handled silently
       } finally {
         setLoading(false);
       }

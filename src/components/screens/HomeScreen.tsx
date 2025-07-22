@@ -31,7 +31,7 @@ const HomeScreen = () => {
       setPlots(plotData);
       setRetryCount(0);
     } catch (err) {
-      console.error("Failed to load plots:", err);
+      // Error handling without console logging in production
       setError("Failed to load plots");
       if (retryCount < 3) {
         setTimeout(() => {

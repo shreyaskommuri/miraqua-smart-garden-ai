@@ -104,7 +104,7 @@ const SensorManagementScreen = () => {
   };
 
   const handleCalibrate = (sensorId: string) => {
-    console.log(`Calibrating sensor ${sensorId}`);
+    // Sensor calibration functionality
     // Navigate to calibration wizard
   };
 

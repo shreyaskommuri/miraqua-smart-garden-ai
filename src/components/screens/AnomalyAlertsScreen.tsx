@@ -108,7 +108,7 @@ const AnomalyAlertsScreen = () => {
         
         setAnomalies(mockAnomalies);
       } catch (error) {
-        console.error('Failed to fetch anomalies:', error);
+        // Error handling without console logging in production
       } finally {
         setLoading(false);
       }

@@ -127,7 +127,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
       category: 'Quick Actions',
       keywords: ['water', 'all', 'plots', 'irrigation'],
       action: () => {
-        console.log('Watering all plots...');
+        // Water all plots functionality
         alert('Watering all plots started!');
       }
     },
@@ -139,7 +139,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
       category: 'Quick Actions',
       keywords: ['notifications', 'alerts', 'messages'],
       action: () => {
-        console.log('Opening notifications...');
+        // Open notifications functionality
         // In a real app, this might open a notifications panel
       }
     }

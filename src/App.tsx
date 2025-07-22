@@ -8,6 +8,7 @@ import { ErrorBoundaryProvider } from './components/ui/ErrorBoundaryProvider';
 import NetworkStatus from './components/ui/NetworkStatus';
 import { Toaster } from './components/ui/toaster';
 import { logger } from './services/logger';
+import './utils/errorHandling';
 
 function App() {
   useEffect(() => {

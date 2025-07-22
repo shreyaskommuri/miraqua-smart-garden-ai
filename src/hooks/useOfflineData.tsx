@@ -66,9 +66,9 @@ export const useOfflineData = () => {
         
         // Mark as synced
         action.synced = true;
-        console.log('Synced offline action:', action);
+        // Synced offline action
       } catch (error) {
-        console.error('Failed to sync action:', action, error);
+        // Failed to sync action
       }
     }
 

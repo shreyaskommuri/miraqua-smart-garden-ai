@@ -29,7 +29,7 @@ export const MiniMap: React.FC<MiniMapProps> = ({
     try {
       await navigator.clipboard.writeText(coords);
     } catch (err) {
-      console.error('Failed to copy coordinates:', err);
+      // Error copying coordinates
     }
   };
 

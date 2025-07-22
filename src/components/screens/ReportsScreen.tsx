@@ -98,7 +98,7 @@ const ReportsScreen = () => {
 
   const downloadReport = (reportId: string) => {
     // Simulate download
-    console.log(`Downloading report ${reportId}`);
+    // Download report functionality
   };
 
   const getReportIcon = (type: string) => {

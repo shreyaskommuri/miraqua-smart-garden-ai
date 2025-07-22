@@ -33,7 +33,7 @@ export const VoiceCommand: React.FC<VoiceCommandProps> = ({ isListening, onToggl
     {
       patterns: ['water all plots', 'start watering', 'water everything'],
       action: () => {
-        console.log('Voice command: Water all plots');
+        // Water all plots command
         // In production, this would trigger actual watering
         speak('Starting to water all plots now');
         return 'Watering all plots';
@@ -44,7 +44,7 @@ export const VoiceCommand: React.FC<VoiceCommandProps> = ({ isListening, onToggl
       action: (transcript: string) => {
         const plotMatch = transcript.match(/(tomato|herb|pepper|lettuce)/i);
         const plotName = plotMatch ? plotMatch[1] : 'selected plot';
-        console.log(`Voice command: Water ${plotName}`);
+        // Water specific plot command
         speak(`Starting to water ${plotName} now`);
         return `Watering ${plotName}`;
       }
@@ -92,7 +92,7 @@ export const VoiceCommand: React.FC<VoiceCommandProps> = ({ isListening, onToggl
     {
       patterns: ['stop watering', 'pause watering', 'turn off water'],
       action: () => {
-        console.log('Voice command: Stop watering');
+        // Stop watering command
         speak('Stopping all watering activities');
         return 'Stopping watering';
       }
@@ -133,7 +133,7 @@ export const VoiceCommand: React.FC<VoiceCommandProps> = ({ isListening, onToggl
 
   useEffect(() => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      console.log('Speech recognition not supported');
+      // Speech recognition not supported
       return;
     }
 
@@ -145,7 +145,7 @@ export const VoiceCommand: React.FC<VoiceCommandProps> = ({ isListening, onToggl
     recognitionRef.current.lang = 'en-US';
 
     recognitionRef.current.onstart = () => {
-      console.log('Voice recognition started');
+      // Voice recognition started
     };
 
     recognitionRef.current.onresult = (event: any) => {
@@ -172,12 +172,12 @@ export const VoiceCommand: React.FC<VoiceCommandProps> = ({ isListening, onToggl
     };
 
     recognitionRef.current.onerror = (event: any) => {
-      console.error('Speech recognition error:', event.error);
+      // Speech recognition error
       onToggleListening();
     };
 
     recognitionRef.current.onend = () => {
-      console.log('Voice recognition ended');
+      // Voice recognition ended
       if (isListening) {
         // Restart recognition if we're still supposed to be listening
         setTimeout(() => {
@@ -201,7 +201,7 @@ export const VoiceCommand: React.FC<VoiceCommandProps> = ({ isListening, onToggl
         try {
           recognitionRef.current.start();
         } catch (error) {
-          console.error('Error starting recognition:', error);
+          // Error starting recognition
         }
       } else {
         recognitionRef.current.stop();

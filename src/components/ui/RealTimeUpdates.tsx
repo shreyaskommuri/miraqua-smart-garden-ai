@@ -30,8 +30,8 @@ export const RealTimeProvider: React.FC<RealTimeProviderProps> = ({ children }) 
     // In production, this would connect to your WebSocket server
     // For demo purposes, we'll simulate with a mock connection
     const mockWs = {
-      send: (data: string) => console.log('Mock WS send:', data),
-      close: () => console.log('Mock WS closed'),
+      send: (data: string) => {/* Mock WS send */},
+      close: () => {/* Mock WS closed */},
       readyState: WebSocket.OPEN
     };
 

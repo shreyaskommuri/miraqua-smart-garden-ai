@@ -33,12 +33,23 @@ const CalendarScreen = () => {
   const [selectedDate, setSelectedDate] = useState<string | null>(
     searchParams.get('date') || null
   );
-  const [scheduleData, setScheduleData] = useState<any>({});
-  const [editingSchedule, setEditingSchedule] = useState<any>(null);
+  const [scheduleData, setScheduleData] = useState<Record<string, ScheduleEntry>>({});
+  const [editingSchedule, setEditingSchedule] = useState<ScheduleEntry | null>(null);
+
+  interface ScheduleSlot {
+    time: string;
+    volume: number;
+  }
+
+  interface ScheduleEntry {
+    morning: ScheduleSlot | null;
+    afternoon: ScheduleSlot | null;
+    evening: ScheduleSlot | null;
+  }
 
   // Mock schedule data
-  const generateScheduleData = () => {
-    const data: any = {};
+  const generateScheduleData = (): Record<string, ScheduleEntry> => {
+    const data: Record<string, ScheduleEntry> = {};
     const today = new Date();
     
     for (let i = -10; i < 30; i++) {
@@ -98,18 +109,18 @@ const CalendarScreen = () => {
     });
   };
 
-  const getTotalVolume = (schedule: any) => {
+  const getTotalVolume = (schedule: ScheduleEntry | null) => {
     if (!schedule) return 0;
     return (schedule.morning?.volume || 0) + (schedule.afternoon?.volume || 0) + (schedule.evening?.volume || 0);
   };
 
   const handleDateSelect = (dateStr: string) => {
     setSelectedDate(dateStr);
-    const existing = scheduleData[dateStr] || {};
+    const existing = scheduleData[dateStr];
     setEditingSchedule({
-      morning: existing.morning || { time: '06:00', volume: 10 },
-      afternoon: existing.afternoon || { time: '14:00', volume: 5 },
-      evening: existing.evening || { time: '18:00', volume: 3 }
+      morning: existing?.morning || { time: '06:00', volume: 10 },
+      afternoon: existing?.afternoon || { time: '14:00', volume: 5 },
+      evening: existing?.evening || { time: '18:00', volume: 3 }
     });
   };
 
@@ -260,18 +271,18 @@ const CalendarScreen = () => {
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-600">Volume</span>
-                          <span className="text-lg font-bold text-blue-600">
-                            {editingSchedule.morning.volume}L
-                          </span>
+                           <span className="text-lg font-bold text-blue-600">
+                             {editingSchedule.morning?.volume || 0}L
+                           </span>
                         </div>
-                        <Slider
-                          value={[editingSchedule.morning.volume]}
-                          onValueChange={(value) => 
-                            setEditingSchedule(prev => ({
-                              ...prev,
-                              morning: { ...prev.morning, volume: value[0] }
-                            }))
-                          }
+                         <Slider
+                           value={[editingSchedule.morning?.volume || 0]}
+                           onValueChange={(value) => 
+                             setEditingSchedule(prev => ({
+                               ...prev!,
+                               morning: { ...(prev!.morning || { time: '06:00', volume: 0 }), volume: value[0] }
+                             }))
+                           }
                           max={30}
                           min={0}
                           step={1}
@@ -289,18 +300,18 @@ const CalendarScreen = () => {
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-600">Volume</span>
-                          <span className="text-lg font-bold text-blue-600">
-                            {editingSchedule.afternoon.volume}L
-                          </span>
+                           <span className="text-lg font-bold text-blue-600">
+                             {editingSchedule.afternoon?.volume || 0}L
+                           </span>
                         </div>
-                        <Slider
-                          value={[editingSchedule.afternoon.volume]}
-                          onValueChange={(value) => 
-                            setEditingSchedule(prev => ({
-                              ...prev,
-                              afternoon: { ...prev.afternoon, volume: value[0] }
-                            }))
-                          }
+                         <Slider
+                           value={[editingSchedule.afternoon?.volume || 0]}
+                           onValueChange={(value) => 
+                             setEditingSchedule(prev => ({
+                               ...prev!,
+                               afternoon: { ...(prev!.afternoon || { time: '14:00', volume: 0 }), volume: value[0] }
+                             }))
+                           }
                           max={20}
                           min={0}
                           step={1}
@@ -318,18 +329,18 @@ const CalendarScreen = () => {
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-600">Volume</span>
-                          <span className="text-lg font-bold text-blue-600">
-                            {editingSchedule.evening.volume}L
-                          </span>
+                           <span className="text-lg font-bold text-blue-600">
+                             {editingSchedule.evening?.volume || 0}L
+                           </span>
                         </div>
-                        <Slider
-                          value={[editingSchedule.evening.volume]}
-                          onValueChange={(value) => 
-                            setEditingSchedule(prev => ({
-                              ...prev,
-                              evening: { ...prev.evening, volume: value[0] }
-                            }))
-                          }
+                         <Slider
+                           value={[editingSchedule.evening?.volume || 0]}
+                           onValueChange={(value) => 
+                             setEditingSchedule(prev => ({
+                               ...prev!,
+                               evening: { ...(prev!.evening || { time: '18:00', volume: 0 }), volume: value[0] }
+                             }))
+                           }
                           max={15}
                           min={0}
                           step={1}

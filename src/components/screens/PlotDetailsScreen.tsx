@@ -69,7 +69,7 @@ const PlotDetailsScreen = () => {
     setError("");
     
     try {
-      console.log(`Fetching plot data for plot: ${plotId}`);
+      // Fetching plot data
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 800));
@@ -166,9 +166,9 @@ const PlotDetailsScreen = () => {
         ]
       });
 
-      console.log('Plot data loaded successfully:', currentPlot);
+      // Plot data loaded successfully
     } catch (err) {
-      console.error('Error loading plot data:', err);
+      // Error loading plot data
       setError("Failed to load plot details");
     } finally {
       setLoading(false);

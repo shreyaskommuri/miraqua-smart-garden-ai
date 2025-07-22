@@ -24,7 +24,7 @@ const SignInScreen = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
       navigate("/app/home");
     } catch (err) {
-      console.error("Sign in error:", err);
+      // Sign in error handled
     } finally {
       setIsLoading(false);
     }
@@ -36,7 +36,7 @@ const SignInScreen = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       navigate("/app/home");
     } catch (err) {
-      console.error(`${provider} sign in error:`, err);
+      // Social sign in error handled
     } finally {
       setIsLoading(false);
     }

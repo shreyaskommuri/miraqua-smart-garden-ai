@@ -19,15 +19,22 @@ class Analytics {
     if (!this.enabled) return;
     
     try {
-      // In production, this would send to your analytics service
-      console.log('Analytics Event:', { name, properties, timestamp: new Date().toISOString() });
-      
-      // For now, store in sessionStorage for tracking
+      // Store analytics events for later processing
       const events = JSON.parse(sessionStorage.getItem('analytics_events') || '[]');
       events.push({ name, properties, timestamp: new Date().toISOString() });
-      sessionStorage.setItem('analytics_events', JSON.stringify(events.slice(-100))); // Keep last 100 events
+      sessionStorage.setItem('analytics_events', JSON.stringify(events.slice(-100)));
+      
+      // Send to analytics service in production
+      if (import.meta.env.PROD) {
+        // Replace with your actual analytics endpoint
+        fetch('/api/analytics', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, properties, timestamp: new Date().toISOString() })
+        }).catch(() => {}); // Silently fail analytics
+      }
     } catch (error) {
-      console.warn('Analytics tracking failed:', error);
+      // Silently fail analytics tracking
     }
   }
 

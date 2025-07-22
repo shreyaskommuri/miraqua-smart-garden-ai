@@ -100,7 +100,7 @@ const DeviceControlScreen = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
     } catch (error) {
-      console.error("Failed to toggle device:", error);
+      // Error handling without console logging in production
     }
   };
 

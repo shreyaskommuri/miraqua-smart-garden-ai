@@ -113,7 +113,7 @@ const MapOverviewScreen = () => {
                     </Button>
                     <Button 
                       variant="outline"
-                      onClick={() => console.log('Water now:', selectedPlot.id)}
+                      onClick={() => {/* Water now action */}}
                       className="px-4 text-sm"
                     >
                       Water Now

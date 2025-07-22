@@ -144,9 +144,9 @@ const PlotSettingsScreen = () => {
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1000));
         // Data would be loaded here
-        console.log('Plot data loaded for plot:', plotId);
+        // Plot data loaded
       } catch (error) {
-        console.error('Failed to load plot data:', error);
+        // Failed to load plot data
         toast({
           title: "Error",
           description: "Failed to load plot settings",
@@ -171,7 +171,7 @@ const PlotSettingsScreen = () => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      console.log('Saving plot settings:', plotData);
+      // Saving plot settings
       
       toast({
         title: "✅ Settings saved",
@@ -179,7 +179,7 @@ const PlotSettingsScreen = () => {
       });
       setHasChanges(false);
     } catch (err) {
-      console.error('Save error:', err);
+      // Save error handled
       toast({
         title: "Error",
         description: "Failed to save settings. Please try again.",
