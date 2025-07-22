@@ -13,10 +13,19 @@ const OnboardingCropScreen = () => {
   const navigate = useNavigate();
   const [plotName, setPlotName] = useState("");
   const [cropType, setCropType] = useState("");
+  const [customCropName, setCustomCropName] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
 
   const crops = [
+    { 
+      id: "grass", 
+      name: "Grass/Lawn", 
+      icon: "🌱", 
+      description: "Full sun, regular watering",
+      waterFrequency: "Daily",
+      difficulty: "Easy"
+    },
     { 
       id: "tomatoes", 
       name: "Tomatoes", 
@@ -64,6 +73,14 @@ const OnboardingCropScreen = () => {
       description: "Full sun, climbing support",
       waterFrequency: "Daily",
       difficulty: "Easy"
+    },
+    { 
+      id: "other", 
+      name: "Other/Custom", 
+      icon: "🌾", 
+      description: "Custom crop type",
+      waterFrequency: "Variable",
+      difficulty: "Variable"
     }
   ];
 
