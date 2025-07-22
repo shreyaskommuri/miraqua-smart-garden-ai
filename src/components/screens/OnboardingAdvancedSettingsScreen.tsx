@@ -12,7 +12,8 @@ const OnboardingAdvancedSettingsScreen = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const plotData = location.state;
-  const [rootDepth, setRootDepth] = useState([12]);
+  const [plantedDate, setPlantedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [plantedAge, setPlantedAge] = useState(0); // Age in days when planted
   const [soilPH, setSoilPH] = useState([6.5]);
   const [soilType, setSoilType] = useState("");
   const [showImpact, setShowImpact] = useState(false);
@@ -54,16 +55,17 @@ const OnboardingAdvancedSettingsScreen = () => {
   ];
 
   useEffect(() => {
-    if (rootDepth[0] !== 12 || soilPH[0] !== 6.5 || soilType) {
+    if (plantedDate !== new Date().toISOString().split('T')[0] || plantedAge !== 0 || soilPH[0] !== 6.5 || soilType) {
       setShowImpact(true);
     }
-  }, [rootDepth, soilPH, soilType]);
+  }, [plantedDate, plantedAge, soilPH, soilType]);
 
   const handleContinue = () => {
     navigate("/onboarding/complete", {
       state: { 
         ...plotData, 
-        rootDepth: rootDepth[0], 
+        plantedDate,
+        plantedAge,
         soilPH: soilPH[0], 
         soilType,
         isAdvancedSetup: true 
@@ -138,32 +140,42 @@ const OnboardingAdvancedSettingsScreen = () => {
           <p className="text-gray-600">Precision settings for maximum efficiency (optional but recommended)</p>
         </div>
 
-        {/* Root Depth */}
+        {/* Crop Age */}
         <Card className="border-0 shadow-sm bg-white mb-6">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg flex items-center space-x-2">
-              <Droplets className="w-5 h-5 text-blue-600" />
-              <span>Root Depth</span>
+              <Leaf className="w-5 h-5 text-green-600" />
+              <span>Crop Age & Growth</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <Label className="text-gray-700">Planting depth (inches)</Label>
-                <Badge variant="outline">{rootDepth[0]}"</Badge>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>When was it planted?</Label>
+                <input
+                  type="date"
+                  value={plantedDate}
+                  onChange={(e) => setPlantedDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
+                />
               </div>
-              <Slider
-                value={rootDepth}
-                onValueChange={setRootDepth}
-                max={24}
-                min={4}
-                step={1}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-gray-500">
-                <span>Shallow (4")</span>
-                <span>Deep (24")</span>
+              <div className="space-y-2">
+                <Label>Age when planted (days)</Label>
+                <input
+                  type="number"
+                  value={plantedAge}
+                  onChange={(e) => setPlantedAge(parseInt(e.target.value) || 0)}
+                  min="0"
+                  max="365"
+                  placeholder="0"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
+                />
               </div>
+            </div>
+            <div className="p-3 bg-primary/5 rounded-lg">
+              <p className="text-sm text-gray-600">
+                💡 <strong>Smart root depth:</strong> We'll automatically calculate optimal root depth based on crop age and type for precision watering.
+              </p>
             </div>
           </CardContent>
         </Card>
