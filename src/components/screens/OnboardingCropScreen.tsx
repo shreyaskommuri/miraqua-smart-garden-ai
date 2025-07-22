@@ -99,11 +99,23 @@ const OnboardingCropScreen = () => {
       newErrors.cropType = "Please select a crop type";
     }
     
+    if (cropType === "other" && !customCropName.trim()) {
+      newErrors.customCropName = "Please enter a custom crop name";
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleNext = async () => {
+    // Auto-capitalize custom crop name
+    if (cropType === "other" && customCropName.trim()) {
+      const capitalizedName = customCropName.trim()
+        .toLowerCase()
+        .replace(/\b\w/g, l => l.toUpperCase());
+      setCustomCropName(capitalizedName);
+    }
+    
     if (!validateForm()) {
       toast({
         title: "Please fix the errors",
@@ -288,6 +300,25 @@ const OnboardingCropScreen = () => {
                   </Card>
                 ))}
               </div>
+                
+              {/* Custom crop input field */}
+              {cropType === "other" && (
+                <div className="mt-6">
+                  <Label htmlFor="customCrop" className="text-sm font-medium text-gray-700">
+                    Enter your crop name
+                  </Label>
+                  <Input
+                    id="customCrop"
+                    value={customCropName}
+                    onChange={(e) => setCustomCropName(e.target.value)}
+                    placeholder="e.g., sunflowers, kale, etc."
+                    className={`mt-2 ${errors.customCropName ? "border-red-500" : ""}`}
+                  />
+                  {errors.customCropName && (
+                    <p className="mt-1 text-sm text-red-600">{errors.customCropName}</p>
+                  )}
+                </div>
+              )}
               
               {errors.cropType && (
                 <p className="text-sm text-red-600 flex items-center space-x-1">
