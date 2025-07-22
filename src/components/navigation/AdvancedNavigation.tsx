@@ -197,7 +197,7 @@ const AdvancedNavigation = () => {
                 {isOnline ? "Online" : "Offline"}
               </span>
             </div>
-            <Button variant="ghost" size="sm" className="relative p-2">
+            <Button variant="ghost" size="sm" className="relative p-2" onClick={() => handleNavigation('/notification-settings')}>
               <Bell className="w-4 h-4" />
               <Badge className="absolute -top-1 -right-1 bg-red-500 text-white w-4 h-4 text-xs rounded-full flex items-center justify-center">
                 3
