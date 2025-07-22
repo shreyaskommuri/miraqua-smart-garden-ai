@@ -105,10 +105,10 @@ const AdvancedNavigation = () => {
       <div key={item.id} className={cn("w-full", isSubItem && "ml-4")}>
         <div
           className={cn(
-            "flex items-center justify-between w-full px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer group",
+            "flex items-center justify-between w-full px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer group focus-ring",
             active 
-              ? "bg-green-600 text-white" 
-              : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800",
+              ? "bg-primary text-primary-foreground shadow-sm" 
+              : "text-foreground hover:bg-accent hover:text-accent-foreground",
             isSubItem && "py-2 text-sm"
           )}
           onClick={() => {
@@ -123,19 +123,19 @@ const AdvancedNavigation = () => {
             <div className={cn(
               "p-1.5 rounded-md transition-all duration-200",
               active 
-                ? "bg-white/20" 
-                : "bg-gray-100 group-hover:bg-white dark:bg-gray-800 dark:group-hover:bg-gray-700",
+                ? "bg-primary-foreground/20" 
+                : "bg-muted group-hover:bg-background",
               isSubItem && "p-1"
             )}>
               <Icon className={cn(
                 "w-4 h-4 transition-colors duration-200",
-                active ? "text-white" : "text-gray-600 group-hover:text-gray-900 dark:text-gray-400",
+                active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground",
                 isSubItem && "w-3.5 h-3.5"
               )} />
             </div>
             <span className={cn(
               "font-medium transition-colors duration-200",
-              active ? "text-white" : "text-gray-700 group-hover:text-gray-900 dark:text-gray-300"
+              active ? "text-primary-foreground" : "text-foreground"
             )}>
               {item.label}
             </span>
@@ -179,8 +179,8 @@ const AdvancedNavigation = () => {
               <Menu className="w-5 h-5" />
             </Button>
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                <Sprout className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <Sprout className="w-4 h-4 text-primary-foreground" />
               </div>
               <span className="text-lg font-bold text-gray-900 dark:text-white">Miraqua</span>
             </div>
@@ -189,7 +189,7 @@ const AdvancedNavigation = () => {
           <div className="flex items-center space-x-2">
             <div className="flex items-center space-x-1 px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
               {isOnline ? (
-                <Wifi className="w-3 h-3 text-green-500" />
+                <Wifi className="w-3 h-3 text-success" />
               ) : (
                 <WifiOff className="w-3 h-3 text-red-500" />
               )}
@@ -211,8 +211,8 @@ const AdvancedNavigation = () => {
       <div className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:border-r lg:border-gray-200 lg:bg-white lg:dark:bg-gray-900 lg:dark:border-gray-700 lg:z-40">
         <div className="flex items-center h-16 border-b border-gray-200 dark:border-gray-700 px-4">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-              <Sprout className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <Sprout className="w-4 h-4 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold text-gray-900 dark:text-white">Miraqua</span>
           </div>
@@ -253,7 +253,7 @@ const AdvancedNavigation = () => {
             <div className="flex items-center space-x-2">
               <div className={cn(
                 "w-2 h-2 rounded-full",
-                isOnline ? "bg-green-500" : "bg-red-500"
+                isOnline ? "bg-success" : "bg-destructive"
               )}></div>
               <span className="text-gray-600 dark:text-gray-400 text-xs">
                 {isOnline ? "System Online" : "Offline Mode"}
@@ -274,8 +274,8 @@ const AdvancedNavigation = () => {
           <div className="relative flex flex-col w-80 max-w-full bg-white dark:bg-gray-900 shadow-xl">
             <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                  <Sprout className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <Sprout className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <span className="text-xl font-bold text-gray-900 dark:text-white">Miraqua</span>
               </div>

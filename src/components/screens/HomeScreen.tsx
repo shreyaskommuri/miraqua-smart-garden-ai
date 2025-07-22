@@ -96,10 +96,11 @@ const HomeScreen = () => {
       </div>
 
       {/* FAB */}
-      <div className="fixed bottom-6 right-6">
+      <div className="fixed bottom-20 lg:bottom-6 right-6 z-40">
         <Button
-          onClick={() => navigate("/add-plot")}
-          className="w-14 h-14 bg-green-600 hover:bg-green-700 rounded-full shadow-lg"
+          onClick={() => navigate("/app/add-plot")}
+          className="w-14 h-14 bg-primary hover:bg-primary-dark rounded-full shadow-lg btn-modern animate-scale-in"
+          aria-label="Add new plot"
         >
           <Plus className="w-6 h-6" />
         </Button>
