@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getPlots, Plot } from "@/services/mockDataService";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { HomeHeader } from "@/components/home/HomeHeader";
 import { HomeStats } from "@/components/home/HomeStats";
 import { PlotsGrid } from "@/components/home/PlotsGrid";
 import { LoadingScreen } from "@/components/home/LoadingScreen";
 import { ErrorScreen } from "@/components/home/ErrorScreen";
+import { GlobalStatsPanel } from "@/components/ui/GlobalStatsPanel";
 
 
 const HomeScreen = () => {
@@ -22,6 +24,7 @@ const HomeScreen = () => {
   
   const navigate = useNavigate();
   const { toast } = useToast();
+  const dashboardStats = useDashboardStats(plots);
 
   const fetchData = async () => {
     setLoading(true);
@@ -80,6 +83,7 @@ const HomeScreen = () => {
       />
 
       <div className="p-6 space-y-6 pb-24">
+        <GlobalStatsPanel {...dashboardStats} />
         <HomeStats plots={filteredPlots} />
 
         <div className="space-y-4">

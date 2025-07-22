@@ -30,12 +30,41 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
   };
 
   const getCurrentWeather = () => {
-    // Mock weather data - would come from weather API
+    // Dynamic weather based on time and randomization for demo
+    const hour = new Date().getHours();
+    const isDay = hour >= 6 && hour <= 18;
+    const baseTemp = isDay ? 70 + Math.sin((hour - 6) * Math.PI / 12) * 8 : 65;
+    const temp = Math.round(baseTemp + (Math.random() - 0.5) * 6);
+    
+    const conditions = isDay 
+      ? [
+          { condition: "Sunny", icon: "☀️", chance: 0.4 },
+          { condition: "Partly Cloudy", icon: "⛅", chance: 0.3 },
+          { condition: "Clear", icon: "🌤️", chance: 0.3 }
+        ]
+      : [
+          { condition: "Clear", icon: "🌙", chance: 0.5 },
+          { condition: "Cloudy", icon: "☁️", chance: 0.3 },
+          { condition: "Cool", icon: "🌃", chance: 0.2 }
+        ];
+    
+    const random = Math.random();
+    let selectedCondition = conditions[0];
+    let cumulative = 0;
+    
+    for (const cond of conditions) {
+      cumulative += cond.chance;
+      if (random <= cumulative) {
+        selectedCondition = cond;
+        break;
+      }
+    }
+    
     return {
-      temperature: 72,
-      condition: "Sunny",
-      humidity: 65,
-      icon: "☀️"
+      temperature: temp,
+      condition: selectedCondition.condition,
+      humidity: Math.round(60 + Math.random() * 20),
+      icon: selectedCondition.icon
     };
   };
 
