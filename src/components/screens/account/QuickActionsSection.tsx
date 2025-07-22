@@ -18,7 +18,7 @@ export const QuickActionsSection = ({ profile }: QuickActionsSectionProps) => {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Notification Settings */}
-        <div onClick={() => navigate('/notification-settings')} className="cursor-pointer">
+        <div onClick={() => navigate('/app/notifications')} className="cursor-pointer">
           <div className="flex items-center justify-between p-4 hover:bg-muted/50 rounded-lg transition-colors">
             <div className="flex items-center space-x-3">
               <Bell className="w-5 h-5 text-muted-foreground" />
@@ -46,7 +46,7 @@ export const QuickActionsSection = ({ profile }: QuickActionsSectionProps) => {
         </div>
 
         {/* Help & Support */}
-        <div onClick={() => navigate('/help')} className="cursor-pointer">
+        <div onClick={() => navigate('/app/help')} className="cursor-pointer">
           <div className="flex items-center justify-between p-4 hover:bg-muted/50 rounded-lg transition-colors">
             <div className="flex items-center space-x-3">
               <HelpCircle className="w-5 h-5 text-muted-foreground" />

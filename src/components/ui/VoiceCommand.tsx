@@ -68,7 +68,7 @@ export const VoiceCommand: React.FC<VoiceCommandProps> = ({ isListening, onToggl
     {
       patterns: ['add plot', 'new plot', 'create plot'],
       action: () => {
-        navigate('/add-plot');
+        navigate('/app/add-plot');
         speak('Opening add plot wizard');
         return 'Creating new plot';
       }

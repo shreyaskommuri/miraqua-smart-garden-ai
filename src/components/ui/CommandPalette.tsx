@@ -62,7 +62,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
       icon: Plus,
       category: 'Actions',
       keywords: ['add', 'new', 'plot', 'create', 'garden'],
-      action: () => navigate('/add-plot')
+      action: () => navigate('/app/add-plot')
     },
     {
       id: 'chat',

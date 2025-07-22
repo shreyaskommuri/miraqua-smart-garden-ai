@@ -113,19 +113,19 @@ export const mainAppRoutes = (
       </AppLayout>
     } />
     
-    <Route path="/add-plot" element={
+    <Route path="/app/add-plot" element={
       <AppLayout>
         <AddPlotScreen />
       </AppLayout>
     } />
     
-    <Route path="/notification-settings" element={
+    <Route path="/app/notifications" element={
       <AppLayout>
         <NotificationPreferencesScreen />
       </AppLayout>
     } />
     
-    <Route path="/help" element={
+    <Route path="/app/help" element={
       <AppLayout>
         <HelpScreen />
       </AppLayout>

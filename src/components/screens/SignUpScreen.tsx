@@ -159,9 +159,9 @@ const SignUpScreen = () => {
 
             <p className="text-xs text-gray-500 text-center">
               By creating an account, you agree to our{" "}
-              <a href="#" className="text-green-600 hover:underline">Terms of Service</a>
+              <Link to="/terms" className="text-green-600 hover:underline">Terms of Service</Link>
               {" "}and{" "}
-              <a href="#" className="text-green-600 hover:underline">Privacy Policy</a>
+              <Link to="/privacy" className="text-green-600 hover:underline">Privacy Policy</Link>
             </p>
           </CardContent>
         </Card>

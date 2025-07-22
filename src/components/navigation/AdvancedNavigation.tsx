@@ -197,7 +197,7 @@ const AdvancedNavigation = () => {
                 {isOnline ? "Online" : "Offline"}
               </span>
             </div>
-            <Button variant="ghost" size="sm" className="relative p-2" onClick={() => handleNavigation('/notification-settings')}>
+            <Button variant="ghost" size="sm" className="relative p-2" onClick={() => handleNavigation('/app/notifications')}>
               <Bell className="w-4 h-4" />
               <Badge className="absolute -top-1 -right-1 bg-red-500 text-white w-4 h-4 text-xs rounded-full flex items-center justify-center">
                 3
@@ -230,7 +230,7 @@ const AdvancedNavigation = () => {
               <Button 
                 variant="outline" 
                 className="w-full justify-start text-left h-auto py-2"
-                onClick={() => handleNavigation('/add-plot')}
+                onClick={() => handleNavigation('/app/add-plot')}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add New Plot

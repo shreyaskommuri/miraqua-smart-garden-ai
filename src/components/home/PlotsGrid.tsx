@@ -32,7 +32,7 @@ export const PlotsGrid: React.FC<PlotsGridProps> = ({ plots, searchQuery }) => {
             }
           </p>
           {!searchQuery && (
-            <Button onClick={() => navigate("/add-plot")} className="bg-green-600 hover:bg-green-700">
+            <Button onClick={() => navigate("/app/add-plot")} className="bg-green-600 hover:bg-green-700">
               <Plus className="w-4 h-4 mr-2" />
               Add Your First Plot
             </Button>
