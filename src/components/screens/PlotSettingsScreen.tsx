@@ -295,8 +295,8 @@ const PlotSettingsScreen = () => {
         </div>
       </header>
 
-      {/* Main Content with proper top padding */}
-      <div className="pt-24 px-4 pb-8">
+      {/* Main Content with reduced top padding */}
+      <div className="pt-20 px-4 pb-8">
         <div className="max-w-4xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* Tabs Navigation */}
