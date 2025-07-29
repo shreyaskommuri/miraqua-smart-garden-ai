@@ -615,8 +615,8 @@ const PlotDetailsScreen = () => {
           {/* Action Buttons - Now positioned under Location & Environment */}
           <div className="flex space-x-4">
             <Button
-              variant="secondary"
-              className="flex-1 h-14 font-medium rounded-2xl shadow-lg"
+              variant="outline"
+              className="flex-1 h-14 bg-white/90 backdrop-blur-sm border-gray-300 hover:bg-white"
               onClick={() => navigate('/app/chat')}
             >
               <MessageCircle className="w-5 h-5 mr-2" />
