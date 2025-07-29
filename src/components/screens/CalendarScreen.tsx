@@ -170,7 +170,7 @@ const CalendarScreen = () => {
         </div>
       </header>
 
-      <div className="flex flex-col h-[calc(100vh-88px)] pt-20">
+      <div className="h-[calc(100vh-128px)] mt-16">
         {/* Calendar Section */}
         <div className="flex-1 px-6 pb-6">
           <Card className="border-0 shadow-lg rounded-2xl bg-white h-full overflow-hidden">
