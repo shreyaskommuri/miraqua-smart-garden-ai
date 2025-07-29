@@ -176,62 +176,62 @@ const CalendarScreen = () => {
 
       <div className="flex flex-col lg:flex-row h-[calc(100vh-88px)]">
         {/* Calendar Section */}
-        <div className="flex-1 p-6">
-          <Card className="border-0 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm h-full">
+        <div className="flex-1 p-4">
+          <div className="bg-white rounded-xl">
             {/* Month Navigation */}
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigateMonth('prev')}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <CardTitle className="text-xl">{monthName}</CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigateMonth('next')}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardHeader>
+            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigateMonth('prev')}
+                className="w-10 h-10 p-0 rounded-full"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+              <h2 className="text-xl font-bold text-gray-900">{monthName}</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigateMonth('next')}
+                className="w-10 h-10 p-0 rounded-full"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </Button>
+            </div>
 
-            <CardContent>
+            <div className="p-4">
               {/* Week Headers */}
-              <div className="grid grid-cols-7 gap-2 mb-4">
+              <div className="grid grid-cols-7 gap-1 mb-3">
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                  <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
+                  <div key={day} className="text-center text-sm font-semibold text-gray-600 py-2">
                     {day}
                   </div>
                 ))}
               </div>
 
               {/* Calendar Grid */}
-              <div className="grid grid-cols-7 gap-2">
+              <div className="grid grid-cols-7 gap-1">
                 {calendarDays.map((day, index) => (
                   <div
                     key={index}
                     className={`
-                      relative aspect-square rounded-lg border transition-all duration-200 cursor-pointer p-2 flex flex-col items-center justify-center hover:scale-105 active:scale-95 min-h-[80px]
+                      relative rounded-xl transition-all duration-200 cursor-pointer p-3 flex flex-col items-center justify-center min-h-[70px] active:scale-95
                       ${day.isCurrentMonth 
                         ? day.hasWatering && !day.isToday
-                          ? 'bg-blue-500 border-blue-600 text-white hover:bg-blue-600' 
-                          : 'border-gray-200 hover:border-blue-300 bg-white'
-                        : 'border-transparent bg-gray-50'
+                          ? 'bg-blue-500 text-white shadow-md' 
+                          : 'bg-gray-50 hover:bg-gray-100'
+                        : 'bg-transparent'
                       }
-                      ${day.isToday ? 'ring-2 ring-emerald-400 bg-emerald-50 border-emerald-200 text-emerald-700' : ''}
+                      ${day.isToday ? 'ring-2 ring-emerald-400 bg-emerald-50' : ''}
                       ${selectedDate === day.date ? 'ring-2 ring-blue-400 shadow-lg' : ''}
                     `}
                     onClick={() => handleDateSelect(day.date)}
                   >
                     {/* Date */}
-                    <div className={`text-lg font-semibold mb-1 ${
-                      day.isToday ? 'text-emerald-700' :
+                    <div className={`text-lg font-bold mb-1 ${
+                      day.isToday ? 'text-emerald-600' :
                       day.hasWatering && day.isCurrentMonth && !day.isToday ? 'text-white' : 
-                      day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
+                      day.isCurrentMonth ? 'text-gray-900' : 'text-gray-300'
                     }`}>
                       {day.day}
                     </div>
@@ -243,8 +243,8 @@ const CalendarScreen = () => {
                           day.isToday ? 'text-emerald-600' :
                           day.hasWatering && !day.isToday ? 'text-white' : 'text-blue-500'
                         }`} />
-                        <span className={`text-xs font-medium ${
-                          day.isToday ? 'text-emerald-700' :
+                        <span className={`text-xs font-bold ${
+                          day.isToday ? 'text-emerald-600' :
                           day.hasWatering && !day.isToday ? 'text-white' : 'text-blue-600'
                         }`}>
                           {getTotalVolume(day.schedule)}L
@@ -254,8 +254,8 @@ const CalendarScreen = () => {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Schedule Editor */}
