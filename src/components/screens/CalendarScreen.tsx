@@ -118,8 +118,8 @@ const CalendarScreen = () => {
     // Get latitude and longitude from search params or use defaults
     const latitude = parseFloat(searchParams.get('lat') || '37.7749');
     const longitude = parseFloat(searchParams.get('lon') || '-122.4194');
-    // Navigate to the specific day view instead of opening the schedule editor
-    navigate(`/app/plot/${plotId}/day/${dateStr}?lat=${latitude}&lon=${longitude}&date=${dateStr}`);
+    // Navigate to the specific day view using the correct route pattern
+    navigate(`/app/day/${plotId}/${dateStr}?lat=${latitude}&lon=${longitude}&date=${dateStr}`);
   };
 
   const saveSchedule = () => {
