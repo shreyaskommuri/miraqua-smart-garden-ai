@@ -363,7 +363,7 @@ const SpecificDayScreen = () => {
             </CardContent>
           </Card>
 
-          {/* Duration Picker */}
+          {/* Manual Watering */}
           <Card className="border-0 shadow-md">
             <CardHeader>
               <CardTitle>Manual Watering</CardTitle>
@@ -390,6 +390,25 @@ const SpecificDayScreen = () => {
             </CardContent>
           </Card>
 
+          {/* Water Now Button */}
+          <Button
+            onClick={handleWaterNow}
+            disabled={watering}
+            className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl"
+          >
+            {watering ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Watering...
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4 mr-2" />
+                Water Now ({duration[0]} min)
+              </>
+            )}
+          </Button>
+
           {/* Mini Map Preview */}
           <Card className="border-0 shadow-md">
             <CardHeader>
@@ -410,27 +429,6 @@ const SpecificDayScreen = () => {
           </Card>
         </div>
       </ScrollArea>
-
-      {/* Sticky Water Now Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
-        <Button
-          onClick={handleWaterNow}
-          disabled={watering}
-          className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium"
-        >
-          {watering ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Watering...
-            </>
-          ) : (
-            <>
-              <Play className="w-4 h-4 mr-2" />
-              Water Now ({duration[0]} min)
-            </>
-          )}
-        </Button>
-      </div>
     </div>
   );
 };
