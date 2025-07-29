@@ -370,7 +370,7 @@ const PlotDetailsScreen = () => {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => navigate(`/app/plot/${plotId}/settings`)}
-                className="w-8 h-8 p-0 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200"
+                className="w-8 h-8 p-0"
               >
                 <Settings className="w-3.5 h-3.5" />
               </Button>
