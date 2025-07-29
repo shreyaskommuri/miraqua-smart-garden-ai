@@ -69,17 +69,24 @@ const CalendarScreen = () => {
     return data;
   };
 
-  const generateNext14Days = () => {
+  const generateMonthDays = () => {
     const today = new Date();
-    const days = [];
+    const firstDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+    const lastDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+    const startDate = new Date(firstDayOfMonth);
     
-    for (let i = 0; i < 14; i++) {
-      const currentDate = new Date(today);
-      currentDate.setDate(today.getDate() + i);
-      
+    // Go back to the first Sunday of the week containing the first day of the month
+    startDate.setDate(startDate.getDate() - startDate.getDay());
+    
+    const days = [];
+    const currentDate = new Date(startDate);
+    
+    // Generate 6 weeks (42 days) to cover the full month
+    for (let i = 0; i < 42; i++) {
       const dateStr = currentDate.toISOString().split('T')[0];
       const todayStr = today.toISOString().split('T')[0];
       const isToday = dateStr === todayStr;
+      const isCurrentMonth = currentDate.getMonth() === currentMonth.getMonth();
       
       const schedule = scheduleData[dateStr];
       const hasWatering = !!schedule;
@@ -90,8 +97,11 @@ const CalendarScreen = () => {
         dayOfWeek: currentDate.toLocaleDateString('en-US', { weekday: 'short' }),
         isToday,
         hasWatering,
-        schedule
+        schedule,
+        isCurrentMonth
       });
+      
+      currentDate.setDate(currentDate.getDate() + 1);
     }
     
     return days;
@@ -125,7 +135,7 @@ const CalendarScreen = () => {
     });
   };
 
-  const calendarDays = generateNext14Days();
+  const calendarDays = generateMonthDays();
 
   useEffect(() => {
     setScheduleData(generateScheduleData());
@@ -186,73 +196,41 @@ const CalendarScreen = () => {
                 ))}
               </div>
 
-              {/* Calendar Days - Next 2 Weeks */}
-              <div className="space-y-3">
-                {/* First Week */}
-                <div className="grid grid-cols-7 gap-2">
-                  {calendarDays.slice(0, 7).map((day, index) => (
-                    <div
-                      key={`week1-${index}`}
-                      className={`
-                        relative rounded-lg border transition-all duration-200 p-2 flex flex-col items-center justify-center cursor-pointer active:scale-95 min-h-[60px]
-                        border-gray-200 hover:border-blue-300 bg-white hover:shadow-md
-                        ${day.isToday ? 'ring-2 ring-emerald-400 bg-emerald-50 border-emerald-300 shadow-lg' : ''}
-                        ${day.hasWatering && !day.isToday ? 'bg-blue-50 border-blue-200' : ''}
-                      `}
-                      onClick={() => handleDateSelect(day.date)}
-                    >
-                      {/* Date Number */}
-                      <div className={`text-lg font-bold mb-1 ${
-                        day.isToday ? 'text-emerald-600' : 'text-gray-900'
-                      }`}>
-                        {day.day}
-                      </div>
-
-                      {/* Watering Indicator */}
-                      {day.hasWatering && (
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      )}
-
-                      {/* Today Pulse Indicator */}
-                      {day.isToday && (
-                        <div className="absolute inset-0 rounded-lg ring-2 ring-emerald-400 ring-opacity-30 animate-pulse pointer-events-none" />
-                      )}
+              {/* Monthly Calendar Grid */}
+              <div className="grid grid-cols-7 gap-2">
+                {calendarDays.map((day, index) => (
+                  <div
+                    key={`day-${index}`}
+                    className={`
+                      relative rounded-lg border transition-all duration-200 p-2 flex flex-col items-center justify-center cursor-pointer active:scale-95 min-h-[50px]
+                      ${day.isCurrentMonth 
+                        ? 'border-gray-200 hover:border-blue-300 bg-white hover:shadow-md' 
+                        : 'border-gray-100 bg-gray-50 text-gray-400'
+                      }
+                      ${day.isToday ? 'ring-2 ring-emerald-400 bg-emerald-50 border-emerald-300 shadow-lg' : ''}
+                      ${day.hasWatering && !day.isToday && day.isCurrentMonth ? 'bg-blue-50 border-blue-200' : ''}
+                    `}
+                    onClick={() => handleDateSelect(day.date)}
+                  >
+                    {/* Date Number */}
+                    <div className={`text-sm font-bold mb-1 ${
+                      day.isToday ? 'text-emerald-600' : 
+                      day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
+                    }`}>
+                      {day.day}
                     </div>
-                  ))}
-                </div>
 
-                {/* Second Week */}
-                <div className="grid grid-cols-7 gap-2">
-                  {calendarDays.slice(7, 14).map((day, index) => (
-                    <div
-                      key={`week2-${index}`}
-                      className={`
-                        relative rounded-lg border transition-all duration-200 p-2 flex flex-col items-center justify-center cursor-pointer active:scale-95 min-h-[60px]
-                        border-gray-200 hover:border-blue-300 bg-white hover:shadow-md
-                        ${day.isToday ? 'ring-2 ring-emerald-400 bg-emerald-50 border-emerald-300 shadow-lg' : ''}
-                        ${day.hasWatering && !day.isToday ? 'bg-blue-50 border-blue-200' : ''}
-                      `}
-                      onClick={() => handleDateSelect(day.date)}
-                    >
-                      {/* Date Number */}
-                      <div className={`text-lg font-bold mb-1 ${
-                        day.isToday ? 'text-emerald-600' : 'text-gray-900'
-                      }`}>
-                        {day.day}
-                      </div>
+                    {/* Watering Indicator */}
+                    {day.hasWatering && day.isCurrentMonth && (
+                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                    )}
 
-                      {/* Watering Indicator */}
-                      {day.hasWatering && (
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      )}
-
-                      {/* Today Pulse Indicator */}
-                      {day.isToday && (
-                        <div className="absolute inset-0 rounded-lg ring-2 ring-emerald-400 ring-opacity-30 animate-pulse pointer-events-none" />
-                      )}
-                    </div>
-                  ))}
-                </div>
+                    {/* Today Pulse Indicator */}
+                    {day.isToday && (
+                      <div className="absolute inset-0 rounded-lg ring-2 ring-emerald-400 ring-opacity-30 animate-pulse pointer-events-none" />
+                    )}
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
