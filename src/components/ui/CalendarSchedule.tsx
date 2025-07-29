@@ -102,7 +102,10 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
     <div className={cn("space-y-4 w-full", className)}>
       <Card className="border-0 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white px-4 py-4">
+        <div 
+          className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white px-4 py-4 cursor-pointer hover:from-emerald-600 hover:to-blue-600 transition-all duration-200"
+          onClick={() => handleCalendarClick({ date: new Date().toISOString().split('T')[0] })}
+        >
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
               <Calendar className="w-4 h-4" />
