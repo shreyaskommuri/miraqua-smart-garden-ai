@@ -73,20 +73,15 @@ const CalendarScreen = () => {
     const today = new Date();
     const firstDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
     const lastDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
-    const startDate = new Date(firstDayOfMonth);
-    
-    // Go back to the first Sunday of the week containing the first day of the month
-    startDate.setDate(startDate.getDate() - startDate.getDay());
     
     const days = [];
-    const currentDate = new Date(startDate);
     
-    // Generate 6 weeks (42 days) to cover the full month
-    for (let i = 0; i < 42; i++) {
+    // Generate only the days that belong to the current month
+    for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
+      const currentDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
       const dateStr = currentDate.toISOString().split('T')[0];
       const todayStr = today.toISOString().split('T')[0];
       const isToday = dateStr === todayStr;
-      const isCurrentMonth = currentDate.getMonth() === currentMonth.getMonth();
       
       const schedule = scheduleData[dateStr];
       const hasWatering = !!schedule;
@@ -98,10 +93,8 @@ const CalendarScreen = () => {
         isToday,
         hasWatering,
         schedule,
-        isCurrentMonth
+        isCurrentMonth: true
       });
-      
-      currentDate.setDate(currentDate.getDate() + 1);
     }
     
     return days;
