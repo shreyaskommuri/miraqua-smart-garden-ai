@@ -172,7 +172,7 @@ const CalendarScreen = () => {
 
       <div className="flex flex-col h-[calc(100vh-88px)]">
         {/* Calendar Section */}
-        <div className="flex-1 p-6 pt-12">
+        <div className="flex-1 p-6">
           <Card className="border-0 shadow-lg rounded-2xl bg-white h-full overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white">
               <CardTitle className="text-xl flex items-center justify-between">
