@@ -330,7 +330,7 @@ const PlotDetailsScreen = () => {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={() => navigate(-1)}
+                onClick={() => navigate('/app/home')}
                 className="w-9 h-9 p-0 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex-shrink-0"
               >
                 <ArrowLeft className="w-4 h-4" />

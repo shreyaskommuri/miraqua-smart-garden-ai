@@ -13,7 +13,7 @@ const UserProfileScreen = () => {
       <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-30">
         <div className="px-4 py-3">
           <div className="flex items-center space-x-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/app/home')}>
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <h1 className="text-lg font-bold">User Profile</h1>
