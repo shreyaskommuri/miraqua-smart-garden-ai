@@ -616,7 +616,7 @@ const PlotDetailsScreen = () => {
           <div className="flex space-x-4">
             <Button
               variant="secondary"
-              className="flex-1 h-14 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 font-medium rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700"
+              className="flex-1 h-14 bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-800/40 text-green-800 dark:text-green-200 font-medium rounded-2xl shadow-lg border border-green-200 dark:border-green-700"
               onClick={() => navigate('/app/chat')}
             >
               <MessageCircle className="w-5 h-5 mr-2" />
