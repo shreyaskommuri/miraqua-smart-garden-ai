@@ -5,7 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
   ArrowLeft, 
   Play, 
@@ -16,7 +18,8 @@ import {
   Clock,
   Droplets,
   Loader2,
-  AlertTriangle
+  AlertTriangle,
+  Settings
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -47,6 +50,9 @@ const SpecificDayScreen = () => {
   const [error, setError] = useState("");
   const [duration, setDuration] = useState([5]);
   const [watering, setWatering] = useState(false);
+  const [editingSchedule, setEditingSchedule] = useState(false);
+  const [scheduleTime, setScheduleTime] = useState("07:00");
+  const [scheduleDuration, setScheduleDuration] = useState([5]);
 
   const latitude = parseFloat(searchParams.get('lat') || '37.7749');
   const longitude = parseFloat(searchParams.get('lon') || '-122.4194');
@@ -77,6 +83,10 @@ const SpecificDayScreen = () => {
           volume: 15
         }
       });
+      
+      // Initialize edit state with current values
+      setScheduleTime("07:00");
+      setScheduleDuration([5]);
     } catch (err) {
       setError("Couldn't load day details");
     } finally {
@@ -105,6 +115,42 @@ const SpecificDayScreen = () => {
       });
     } finally {
       setWatering(false);
+    }
+  };
+
+  const handleScheduleUpdate = async () => {
+    try {
+      // Convert 24h format to 12h format for display
+      const timeObj = new Date(`2000-01-01T${scheduleTime}`);
+      const displayTime = timeObj.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit', 
+        hour12: true 
+      });
+
+      // Update the dayData with new schedule
+      setDayData(prev => prev ? {
+        ...prev,
+        scheduledWatering: {
+          ...prev.scheduledWatering,
+          time: displayTime,
+          duration: scheduleDuration[0],
+          volume: Math.round(scheduleDuration[0] * 3) // 3L per minute estimate
+        }
+      } : null);
+
+      setEditingSchedule(false);
+      
+      toast({
+        title: "Schedule updated",
+        description: `Watering scheduled for ${displayTime} (${scheduleDuration[0]} min)`,
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to update schedule",
+        variant: "destructive",
+      });
     }
   };
 
@@ -224,10 +270,62 @@ const SpecificDayScreen = () => {
           {/* Scheduled Watering */}
           <Card className="border-0 shadow-md bg-blue-50">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Clock className="w-5 h-5 text-blue-600" />
-                <span>Scheduled Watering</span>
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center space-x-2">
+                  <Clock className="w-5 h-5 text-blue-600" />
+                  <span>Scheduled Watering</span>
+                </CardTitle>
+                <Dialog open={editingSchedule} onOpenChange={setEditingSchedule}>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <Settings className="w-4 h-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Edit Watering Schedule</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-6 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="schedule-time">Time</Label>
+                        <Input
+                          id="schedule-time"
+                          type="time"
+                          value={scheduleTime}
+                          onChange={(e) => setScheduleTime(e.target.value)}
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <Label>Duration (minutes)</Label>
+                          <span className="text-lg font-bold text-blue-600">{scheduleDuration[0]} min</span>
+                        </div>
+                        <Slider
+                          value={scheduleDuration}
+                          onValueChange={setScheduleDuration}
+                          max={30}
+                          min={1}
+                          step={1}
+                          className="w-full"
+                        />
+                        <div className="flex justify-between text-xs text-gray-500">
+                          <span>1 min</span>
+                          <span>30 min</span>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button onClick={handleScheduleUpdate} className="flex-1">
+                          Save Changes
+                        </Button>
+                        <Button variant="outline" onClick={() => setEditingSchedule(false)} className="flex-1">
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
