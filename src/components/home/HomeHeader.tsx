@@ -111,9 +111,6 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
                 <p className="text-gray-600 dark:text-gray-300">
                   Your gardens are looking great today
                 </p>
-                {isOnline && (
-                  <Wifi className="w-4 h-4 text-success" />
-                )}
               </div>
             </div>
             
