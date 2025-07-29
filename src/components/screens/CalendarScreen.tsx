@@ -164,6 +164,18 @@ const CalendarScreen = () => {
         {/* Calendar Section */}
         <div className="flex-1 p-6">
           <Card className="border-0 shadow-lg rounded-2xl bg-white h-full overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white">
+              <CardTitle className="text-xl flex items-center space-x-3">
+                <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                  <Calendar className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold">Calendar</h3>
+                  <p className="text-emerald-100 text-sm">Tap dates for details</p>
+                </div>
+              </CardTitle>
+            </CardHeader>
+
             <CardContent className="p-4">
               {/* Week Headers */}
               <div className="grid grid-cols-7 gap-1 mb-3">
