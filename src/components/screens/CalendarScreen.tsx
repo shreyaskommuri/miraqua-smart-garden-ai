@@ -215,30 +215,37 @@ const CalendarScreen = () => {
                   <div
                     key={index}
                     className={`
-                      relative aspect-square rounded-lg border-2 transition-all duration-200 cursor-pointer p-2 flex flex-col items-center justify-center hover:scale-105 active:scale-95
-                      ${day.isCurrentMonth ? 'border-gray-200 hover:border-blue-300 bg-white' : 'border-transparent bg-gray-50'}
-                      ${day.isToday ? 'ring-2 ring-emerald-400 bg-emerald-50 border-emerald-200' : ''}
-                      ${selectedDate === day.date ? 'border-blue-500 bg-blue-100 shadow-lg' : ''}
-                      ${day.hasWatering && day.isCurrentMonth && !day.isToday ? 'bg-blue-500 border-blue-600 text-white hover:bg-blue-600' : ''}
+                      relative aspect-square rounded-lg border transition-all duration-200 cursor-pointer p-2 flex flex-col items-center justify-center hover:scale-105 active:scale-95 min-h-[80px]
+                      ${day.isCurrentMonth 
+                        ? day.hasWatering && !day.isToday
+                          ? 'bg-blue-500 border-blue-600 text-white hover:bg-blue-600' 
+                          : 'border-gray-200 hover:border-blue-300 bg-white'
+                        : 'border-transparent bg-gray-50'
+                      }
+                      ${day.isToday ? 'ring-2 ring-emerald-400 bg-emerald-50 border-emerald-200 text-emerald-700' : ''}
+                      ${selectedDate === day.date ? 'ring-2 ring-blue-400 shadow-lg' : ''}
                     `}
                     onClick={() => handleDateSelect(day.date)}
                   >
                     {/* Date */}
-                    <div className={`text-lg font-semibold ${
+                    <div className={`text-lg font-semibold mb-1 ${
+                      day.isToday ? 'text-emerald-700' :
                       day.hasWatering && day.isCurrentMonth && !day.isToday ? 'text-white' : 
                       day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
-                    } ${day.isToday ? 'text-emerald-600' : ''}`}>
+                    }`}>
                       {day.day}
                     </div>
 
                     {/* Schedule Indicators */}
-                    {day.hasWatering && (
-                      <div className="mt-1 flex flex-col items-center">
-                        <Droplets className={`w-3 h-3 ${
-                          day.hasWatering && day.isCurrentMonth && !day.isToday ? 'text-white' : 'text-blue-500'
+                    {day.hasWatering && day.isCurrentMonth && (
+                      <div className="flex flex-col items-center">
+                        <Droplets className={`w-3 h-3 mb-1 ${
+                          day.isToday ? 'text-emerald-600' :
+                          day.hasWatering && !day.isToday ? 'text-white' : 'text-blue-500'
                         }`} />
                         <span className={`text-xs font-medium ${
-                          day.hasWatering && day.isCurrentMonth && !day.isToday ? 'text-white' : 'text-blue-600'
+                          day.isToday ? 'text-emerald-700' :
+                          day.hasWatering && !day.isToday ? 'text-white' : 'text-blue-600'
                         }`}>
                           {getTotalVolume(day.schedule)}L
                         </span>
