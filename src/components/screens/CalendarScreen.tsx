@@ -163,7 +163,7 @@ const CalendarScreen = () => {
                   <Calendar className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold text-gray-900">Calendar View</h1>
+                  <h1 className="text-lg font-bold text-gray-900">Next 2 Weeks</h1>
                   <p className="text-xs text-gray-600">Plot {plotId} Schedule</p>
                 </div>
               </div>
@@ -198,40 +198,56 @@ const CalendarScreen = () => {
             </CardHeader>
 
             <CardContent>
+              {/* Legend */}
+              <div className="flex items-center justify-center gap-6 mb-6 p-4 bg-gray-50 rounded-xl">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full bg-emerald-100 border-2 border-emerald-400"></div>
+                  <span className="text-sm font-medium text-gray-700">Today</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full bg-blue-100 border-2 border-blue-400"></div>
+                  <span className="text-sm font-medium text-gray-700">Scheduled</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-300"></div>
+                  <span className="text-sm font-medium text-gray-700">Available</span>
+                </div>
+              </div>
+
               {/* Week Headers */}
-              <div className="grid grid-cols-7 gap-2 mb-4">
+              <div className="grid grid-cols-7 gap-3 mb-4">
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                  <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
+                  <div key={day} className="text-center text-sm font-bold text-gray-700 py-2">
                     {day}
                   </div>
                 ))}
               </div>
 
               {/* Calendar Grid */}
-              <div className="grid grid-cols-7 gap-2">
+              <div className="grid grid-cols-7 gap-3">
                 {calendarDays.map((day, index) => (
                   <div
                     key={index}
                     className={`
-                      relative aspect-square rounded-lg border-2 transition-all duration-200 cursor-pointer p-2 flex flex-col items-center justify-center
-                      ${day.isCurrentMonth ? 'border-gray-200 hover:border-blue-300 bg-white' : 'border-transparent bg-gray-50'}
-                      ${day.isToday ? 'ring-2 ring-emerald-400 bg-emerald-50 border-emerald-200' : ''}
-                      ${day.hasWatering && day.isCurrentMonth ? 'bg-blue-50 border-blue-200' : ''}
+                      relative aspect-square rounded-xl border-2 transition-all duration-200 cursor-pointer p-3 flex flex-col items-center justify-center hover:scale-105 hover:shadow-lg
+                      ${day.isCurrentMonth ? 'border-gray-300 hover:border-blue-400 bg-white shadow-sm' : 'border-transparent bg-gray-100/50'}
+                      ${day.isToday ? 'ring-2 ring-emerald-400 bg-emerald-50 border-emerald-300 shadow-lg' : ''}
+                      ${day.hasWatering && day.isCurrentMonth ? 'bg-blue-50 border-blue-300 shadow-md' : ''}
                     `}
                     onClick={() => handleDateSelect(day.date)}
                   >
                     {/* Date */}
-                    <div className={`text-lg font-semibold ${
+                    <div className={`text-xl font-bold mb-1 ${
                       day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
-                    } ${day.isToday ? 'text-emerald-600' : ''}`}>
+                    } ${day.isToday ? 'text-emerald-700' : ''}`}>
                       {day.day}
                     </div>
 
                     {/* Schedule Indicators */}
-                    {day.hasWatering && (
-                      <div className="mt-1 flex flex-col items-center">
-                        <Droplets className="w-3 h-3 text-blue-500" />
-                        <span className="text-xs text-blue-600 font-medium">
+                    {day.hasWatering && day.isCurrentMonth && (
+                      <div className="flex flex-col items-center">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full mb-1"></div>
+                        <span className="text-xs text-blue-700 font-semibold">
                           {getTotalVolume(day.schedule)}L
                         </span>
                       </div>
