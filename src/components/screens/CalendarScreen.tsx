@@ -142,9 +142,9 @@ const CalendarScreen = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 -mt-16 lg:mt-0">
-      {/* Header - Completely flush with top, no gaps */}
-      <header className="bg-white border-b border-gray-200 sticky top-16 lg:top-0 z-40 shadow-sm pt-16 lg:pt-0">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header - Positioned like plot details screen */}
+      <header className="fixed top-16 left-0 right-0 z-40 bg-white border-b border-gray-200 shadow-sm lg:ml-64">
         <div className="px-4 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -170,7 +170,7 @@ const CalendarScreen = () => {
         </div>
       </header>
 
-      <div className="flex flex-col h-[calc(100vh-88px)]">
+      <div className="flex flex-col h-[calc(100vh-88px)] pt-24">
         {/* Calendar Section */}
         <div className="flex-1 px-6 pb-6">
           <Card className="border-0 shadow-lg rounded-2xl bg-white h-full overflow-hidden">
