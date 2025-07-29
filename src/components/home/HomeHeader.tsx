@@ -117,60 +117,17 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
               </div>
             </div>
             
-            {/* Header actions */}
-            <div className="flex items-center space-x-3">
-              {/* Notifications */}
-              <div className="relative">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => navigate('/app/notifications')}
-                  className="w-10 h-10 p-0 hover-scale tap-feedback"
-                >
-                  <Bell className="w-5 h-5" />
-                </Button>
-                {notifications > 0 && (
-                  <div className="absolute -top-1 -right-1">
-                    <NotificationBadge count={notifications} />
+            {/* Weather Widget */}
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white/20 glass hover-lift animate-slide-in-left">
+              <div className="flex items-center space-x-3">
+                <span className="text-2xl animate-bounce-subtle">{weather.icon}</span>
+                <div>
+                  <div className="text-lg font-bold text-gray-900 dark:text-white">
+                    {weather.temperature}°F
                   </div>
-                )}
-              </div>
-
-              {/* Analytics */}
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => navigate('/app/analytics')}
-                className="w-10 h-10 p-0 hover-scale tap-feedback"
-              >
-                <BarChart3 className="w-5 h-5" />
-              </Button>
-
-              {/* Settings */}
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => navigate('/app/account')}
-                className="w-10 h-10 p-0 hover-scale tap-feedback"
-              >
-                <Settings className="w-5 h-5" />
-              </Button>
-
-              {/* Theme switcher */}
-              <ThemeSwitcher />
-            </div>
-          </div>
-
-          {/* Weather Widget */}
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white/20 glass hover-lift animate-slide-in-left">
-            <div className="flex items-center space-x-3">
-              <span className="text-2xl animate-bounce-subtle">{weather.icon}</span>
-              <div>
-                <div className="text-lg font-bold text-gray-900 dark:text-white">
-                  {weather.temperature}°F
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
-                  {weather.condition} • {weather.humidity}% humidity
+                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                    {weather.condition} • {weather.humidity}% humidity
+                  </div>
                 </div>
               </div>
             </div>
