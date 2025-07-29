@@ -174,10 +174,10 @@ const CalendarScreen = () => {
         </div>
       </header>
 
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-88px)]">
+      <div className="flex flex-col min-h-[calc(100vh-88px)]">
         {/* Calendar Section */}
         <div className="flex-1 p-4">
-          <div className="bg-white rounded-xl">
+          <div className="bg-white rounded-xl shadow-sm">
             {/* Month Navigation */}
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
               <Button
@@ -215,20 +215,20 @@ const CalendarScreen = () => {
                   <div
                     key={index}
                     className={`
-                      relative rounded-xl transition-all duration-200 cursor-pointer p-3 flex flex-col items-center justify-center min-h-[70px] active:scale-95
+                      relative rounded-lg transition-all duration-200 cursor-pointer p-2 flex flex-col items-center justify-center h-16 active:scale-95
                       ${day.isCurrentMonth 
                         ? day.hasWatering && !day.isToday
-                          ? 'bg-blue-500 text-white shadow-md' 
+                          ? 'bg-blue-500 text-white shadow-sm' 
                           : 'bg-gray-50 hover:bg-gray-100'
                         : 'bg-transparent'
                       }
                       ${day.isToday ? 'ring-2 ring-emerald-400 bg-emerald-50' : ''}
-                      ${selectedDate === day.date ? 'ring-2 ring-blue-400 shadow-lg' : ''}
+                      ${selectedDate === day.date ? 'ring-2 ring-blue-400 shadow-md' : ''}
                     `}
                     onClick={() => handleDateSelect(day.date)}
                   >
                     {/* Date */}
-                    <div className={`text-lg font-bold mb-1 ${
+                    <div className={`text-base font-bold ${
                       day.isToday ? 'text-emerald-600' :
                       day.hasWatering && day.isCurrentMonth && !day.isToday ? 'text-white' : 
                       day.isCurrentMonth ? 'text-gray-900' : 'text-gray-300'
@@ -238,8 +238,8 @@ const CalendarScreen = () => {
 
                     {/* Schedule Indicators */}
                     {day.hasWatering && day.isCurrentMonth && (
-                      <div className="flex flex-col items-center">
-                        <Droplets className={`w-3 h-3 mb-1 ${
+                      <div className="flex items-center mt-1">
+                        <Droplets className={`w-2.5 h-2.5 mr-1 ${
                           day.isToday ? 'text-emerald-600' :
                           day.hasWatering && !day.isToday ? 'text-white' : 'text-blue-500'
                         }`} />
@@ -258,131 +258,130 @@ const CalendarScreen = () => {
           </div>
         </div>
 
-        {/* Schedule Editor */}
+        {/* Schedule Editor - Bottom Sheet Style */}
         {selectedDate && (
-          <div className="w-full lg:w-96 p-6 border-l border-gray-200">
-            <Card className="border-0 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  {new Date(selectedDate).toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {editingSchedule && (
-                  <>
-                    {/* Morning Schedule */}
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <Sun className="w-5 h-5 text-yellow-500" />
-                        <Label className="font-medium">Morning (6:00 AM)</Label>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Volume</span>
-                           <span className="text-lg font-bold text-blue-600">
-                             {editingSchedule.morning?.volume || 0}L
-                           </span>
-                        </div>
-                         <Slider
-                           value={[editingSchedule.morning?.volume || 0]}
-                           onValueChange={(value) => 
-                             setEditingSchedule(prev => ({
-                               ...prev!,
-                               morning: { ...(prev!.morning || { time: '06:00', volume: 0 }), volume: value[0] }
-                             }))
-                           }
-                          max={30}
-                          min={0}
-                          step={1}
-                          className="w-full"
-                        />
-                      </div>
-                    </div>
+          <div className="bg-white border-t border-gray-200 p-4 space-y-4 max-h-96 overflow-y-auto">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-gray-900">
+                {new Date(selectedDate).toLocaleDateString('en-US', { 
+                  weekday: 'short', 
+                  month: 'short', 
+                  day: 'numeric' 
+                })}
+              </h3>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setSelectedDate(null)}
+                className="w-8 h-8 p-0 rounded-full"
+              >
+                ×
+              </Button>
+            </div>
+            
+            {editingSchedule && (
+              <div className="space-y-4">
+                {/* Morning Schedule */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Sun className="w-4 h-4 text-yellow-500" />
+                    <Label className="font-medium text-sm">Morning (6:00 AM)</Label>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Volume</span>
+                    <span className="text-lg font-bold text-blue-600">
+                      {editingSchedule.morning?.volume || 0}L
+                    </span>
+                  </div>
+                  <Slider
+                    value={[editingSchedule.morning?.volume || 0]}
+                    onValueChange={(value) => 
+                      setEditingSchedule(prev => ({
+                        ...prev!,
+                        morning: { ...(prev!.morning || { time: '06:00', volume: 0 }), volume: value[0] }
+                      }))
+                    }
+                    max={30}
+                    min={0}
+                    step={1}
+                    className="w-full"
+                  />
+                </div>
 
-                    {/* Afternoon Schedule */}
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <Sun className="w-5 h-5 text-orange-500" />
-                        <Label className="font-medium">Afternoon (2:00 PM)</Label>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Volume</span>
-                           <span className="text-lg font-bold text-blue-600">
-                             {editingSchedule.afternoon?.volume || 0}L
-                           </span>
-                        </div>
-                         <Slider
-                           value={[editingSchedule.afternoon?.volume || 0]}
-                           onValueChange={(value) => 
-                             setEditingSchedule(prev => ({
-                               ...prev!,
-                               afternoon: { ...(prev!.afternoon || { time: '14:00', volume: 0 }), volume: value[0] }
-                             }))
-                           }
-                          max={20}
-                          min={0}
-                          step={1}
-                          className="w-full"
-                        />
-                      </div>
-                    </div>
+                {/* Afternoon Schedule */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Sun className="w-4 h-4 text-orange-500" />
+                    <Label className="font-medium text-sm">Afternoon (2:00 PM)</Label>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Volume</span>
+                    <span className="text-lg font-bold text-blue-600">
+                      {editingSchedule.afternoon?.volume || 0}L
+                    </span>
+                  </div>
+                  <Slider
+                    value={[editingSchedule.afternoon?.volume || 0]}
+                    onValueChange={(value) => 
+                      setEditingSchedule(prev => ({
+                        ...prev!,
+                        afternoon: { ...(prev!.afternoon || { time: '14:00', volume: 0 }), volume: value[0] }
+                      }))
+                    }
+                    max={20}
+                    min={0}
+                    step={1}
+                    className="w-full"
+                  />
+                </div>
 
-                    {/* Evening Schedule */}
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <Sunset className="w-5 h-5 text-purple-500" />
-                        <Label className="font-medium">Evening (6:00 PM)</Label>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Volume</span>
-                           <span className="text-lg font-bold text-blue-600">
-                             {editingSchedule.evening?.volume || 0}L
-                           </span>
-                        </div>
-                         <Slider
-                           value={[editingSchedule.evening?.volume || 0]}
-                           onValueChange={(value) => 
-                             setEditingSchedule(prev => ({
-                               ...prev!,
-                               evening: { ...(prev!.evening || { time: '18:00', volume: 0 }), volume: value[0] }
-                             }))
-                           }
-                          max={15}
-                          min={0}
-                          step={1}
-                          className="w-full"
-                        />
-                      </div>
-                    </div>
+                {/* Evening Schedule */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Sunset className="w-4 h-4 text-purple-500" />
+                    <Label className="font-medium text-sm">Evening (6:00 PM)</Label>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Volume</span>
+                    <span className="text-lg font-bold text-blue-600">
+                      {editingSchedule.evening?.volume || 0}L
+                    </span>
+                  </div>
+                  <Slider
+                    value={[editingSchedule.evening?.volume || 0]}
+                    onValueChange={(value) => 
+                      setEditingSchedule(prev => ({
+                        ...prev!,
+                        evening: { ...(prev!.evening || { time: '18:00', volume: 0 }), volume: value[0] }
+                      }))
+                    }
+                    max={15}
+                    min={0}
+                    step={1}
+                    className="w-full"
+                  />
+                </div>
 
-                    {/* Total Volume */}
-                    <div className="pt-4 border-t border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-gray-900">Daily Total</span>
-                        <span className="text-2xl font-bold text-emerald-600">
-                          {getTotalVolume(editingSchedule)}L
-                        </span>
-                      </div>
-                    </div>
+                {/* Total Volume */}
+                <div className="pt-3 border-t border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-gray-900">Daily Total</span>
+                    <span className="text-xl font-bold text-emerald-600">
+                      {getTotalVolume(editingSchedule)}L
+                    </span>
+                  </div>
+                </div>
 
-                    {/* Save Button */}
-                    <Button
-                      onClick={saveSchedule}
-                      className="w-full bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600"
-                    >
-                      <Save className="w-4 h-4 mr-2" />
-                      Save Schedule
-                    </Button>
-                  </>
-                )}
-              </CardContent>
-            </Card>
+                {/* Save Button */}
+                <Button
+                  onClick={saveSchedule}
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Schedule
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>
