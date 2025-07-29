@@ -409,24 +409,7 @@ const SpecificDayScreen = () => {
             )}
           </Button>
 
-          {/* Mini Map Preview */}
-          <Card className="border-0 shadow-md">
-            <CardHeader>
-              <CardTitle>Location</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="relative w-full h-32 bg-gradient-to-br from-blue-100 to-green-100 rounded-lg">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="w-6 h-6 text-blue-600 mx-auto mb-1" />
-                    <p className="text-xs text-gray-600">
-                      {latitude.toFixed(4)}, {longitude.toFixed(4)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Location section removed as requested */}
         </div>
       </ScrollArea>
     </div>
