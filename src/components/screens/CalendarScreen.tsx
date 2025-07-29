@@ -174,7 +174,7 @@ const CalendarScreen = () => {
         </div>
       </header>
 
-      <div className="flex flex-col min-h-[calc(100vh-88px)]">
+      <div className="flex flex-col h-[calc(100vh-88px)]">
         {/* Calendar Section */}
         <div className="flex-1 p-4">
           <div className="bg-white rounded-xl shadow-sm">
