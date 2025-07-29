@@ -146,7 +146,7 @@ const CalendarScreen = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 flex flex-col">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40 shadow-sm">
         <div className="px-4 py-3">
@@ -174,12 +174,12 @@ const CalendarScreen = () => {
         </div>
       </header>
 
-      <div className="flex flex-col h-[calc(100vh-88px)]">
+      <div className="flex-1 flex flex-col bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 overflow-hidden">
         {/* Calendar Section */}
-        <div className="flex-1 p-4">
-          <div className="bg-white rounded-xl shadow-sm">
+        <div className="flex-1 p-4 bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+          <div className="bg-white rounded-xl shadow-sm h-full flex flex-col">
             {/* Month Navigation */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100 flex-shrink-0">
               <Button
                 variant="ghost"
                 size="sm"
@@ -199,7 +199,7 @@ const CalendarScreen = () => {
               </Button>
             </div>
 
-            <div className="p-4">
+            <div className="p-4 flex-1 flex flex-col overflow-hidden">
               {/* Week Headers */}
               <div className="grid grid-cols-7 gap-1 mb-3">
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
