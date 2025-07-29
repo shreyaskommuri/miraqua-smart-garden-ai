@@ -175,13 +175,36 @@ const CalendarScreen = () => {
         <div className="flex-1 p-6 pt-12">
           <Card className="border-0 shadow-lg rounded-2xl bg-white h-full overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white">
-              <CardTitle className="text-xl flex items-center space-x-3">
-                <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                  <Calendar className="w-4 h-4" />
+              <CardTitle className="text-xl flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold">
+                      {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                    </h3>
+                    <p className="text-emerald-100 text-sm">Tap dates for details</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold">Calendar</h3>
-                  <p className="text-emerald-100 text-sm">Tap dates for details</p>
+                
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}
+                    className="text-white hover:bg-white/20 w-8 h-8 p-0"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}
+                    className="text-white hover:bg-white/20 w-8 h-8 p-0"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
                 </div>
               </CardTitle>
             </CardHeader>
