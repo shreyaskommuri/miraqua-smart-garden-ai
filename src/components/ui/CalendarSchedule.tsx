@@ -70,9 +70,7 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
 
   const calendarDays = generateNext14Days();
 
-  const handleDayClick = (day: any, e: React.MouseEvent) => {
-    e.stopPropagation();
-    
+  const handleDayClick = (day: any) => {
     const searchParams = new URLSearchParams({
       date: day.date,
       lat: '37.7749',
@@ -141,15 +139,14 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
                     day.isToday && "ring-2 ring-emerald-400 bg-emerald-50 border-emerald-300 shadow-lg",
                     day.hasWatering && !day.isToday && "bg-blue-50 border-blue-200"
                   )}
-                  onClick={() => handleCalendarClick(day)}
+                  onClick={() => handleDayClick(day)}
                 >
-                  {/* Date Number - clickable for day details */}
+                  {/* Date Number */}
                   <div 
                     className={cn(
-                      "text-sm font-bold transition-all cursor-pointer hover:scale-110 mb-1",
+                      "text-sm font-bold transition-all mb-1",
                       day.isToday ? "text-emerald-600" : "text-gray-900"
                     )}
-                    onClick={(e) => handleDayClick(day, e)}
                   >
                     {day.day}
                   </div>
@@ -213,15 +210,14 @@ export const CalendarSchedule: React.FC<CalendarScheduleProps> = ({
                     day.isToday && "ring-2 ring-emerald-400 bg-emerald-50 border-emerald-300 shadow-lg",
                     day.hasWatering && !day.isToday && "bg-blue-50 border-blue-200"
                   )}
-                  onClick={() => handleCalendarClick(day)}
+                  onClick={() => handleDayClick(day)}
                 >
-                  {/* Date Number - clickable for day details */}
+                  {/* Date Number */}
                   <div 
                     className={cn(
-                      "text-sm font-bold transition-all cursor-pointer hover:scale-110 mb-1",
+                      "text-sm font-bold transition-all mb-1",
                       day.isToday ? "text-emerald-600" : "text-gray-900"
                     )}
-                    onClick={(e) => handleDayClick(day, e)}
                   >
                     {day.day}
                   </div>
