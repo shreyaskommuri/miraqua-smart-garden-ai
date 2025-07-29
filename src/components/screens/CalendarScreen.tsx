@@ -69,45 +69,34 @@ const CalendarScreen = () => {
     return data;
   };
 
-  const generateCalendarDays = () => {
-    const year = currentMonth.getFullYear();
-    const month = currentMonth.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const startDate = new Date(firstDay);
-    startDate.setDate(startDate.getDate() - firstDay.getDay());
-
-    const days = [];
+  const generateNext14Days = () => {
     const today = new Date();
+    const days = [];
     
-    for (let i = 0; i < 42; i++) {
-      const currentDate = new Date(startDate);
-      currentDate.setDate(startDate.getDate() + i);
+    for (let i = 0; i < 14; i++) {
+      const currentDate = new Date(today);
+      currentDate.setDate(today.getDate() + i);
       
       const dateStr = currentDate.toISOString().split('T')[0];
-      const isCurrentMonth = currentDate.getMonth() === month;
-      const isToday = currentDate.toDateString() === today.toDateString();
+      const todayStr = today.toISOString().split('T')[0];
+      const isToday = dateStr === todayStr;
+      
       const schedule = scheduleData[dateStr];
+      const hasWatering = !!schedule;
       
       days.push({
         date: dateStr,
         day: currentDate.getDate(),
-        isCurrentMonth,
+        dayOfWeek: currentDate.toLocaleDateString('en-US', { weekday: 'short' }),
         isToday,
-        schedule,
-        hasWatering: !!schedule
+        hasWatering,
+        schedule
       });
     }
     
     return days;
   };
 
-  const navigateMonth = (direction: 'prev' | 'next') => {
-    setCurrentMonth(prev => {
-      const newDate = new Date(prev);
-      newDate.setMonth(prev.getMonth() + (direction === 'next' ? 1 : -1));
-      return newDate;
-    });
-  };
 
   const getTotalVolume = (schedule: ScheduleEntry | null) => {
     if (!schedule) return 0;
@@ -136,8 +125,7 @@ const CalendarScreen = () => {
     });
   };
 
-  const calendarDays = generateCalendarDays();
-  const monthName = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const calendarDays = generateNext14Days();
 
   useEffect(() => {
     setScheduleData(generateScheduleData());
@@ -175,85 +163,130 @@ const CalendarScreen = () => {
       <div className="flex flex-col h-[calc(100vh-88px)]">
         {/* Calendar Section */}
         <div className="flex-1 p-6">
-          <Card className="border-0 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm h-full">
-            {/* Month Navigation */}
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigateMonth('prev')}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <CardTitle className="text-xl">{monthName}</CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigateMonth('next')}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </div>
+          <Card className="border-0 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm h-full overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white">
+              <CardTitle className="text-xl flex items-center space-x-3">
+                <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                  <Calendar className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold">Next 2 Weeks</h3>
+                  <p className="text-emerald-100 text-sm">Tap dates for details</p>
+                </div>
+              </CardTitle>
             </CardHeader>
 
-            <CardContent>
-              {/* Legend */}
-              <div className="flex items-center justify-center gap-6 mb-6 p-4 bg-gray-50 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-emerald-100 border-2 border-emerald-400"></div>
-                  <span className="text-sm font-medium text-gray-700">Today</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-blue-100 border-2 border-blue-400"></div>
-                  <span className="text-sm font-medium text-gray-700">Scheduled</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-300"></div>
-                  <span className="text-sm font-medium text-gray-700">Available</span>
-                </div>
-              </div>
-
+            <CardContent className="p-4">
               {/* Week Headers */}
-              <div className="grid grid-cols-7 gap-3 mb-4">
+              <div className="grid grid-cols-7 gap-1 mb-3">
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                  <div key={day} className="text-center text-sm font-bold text-gray-700 py-2">
+                  <div key={day} className="text-center text-xs font-semibold text-gray-600 py-2">
                     {day}
                   </div>
                 ))}
               </div>
 
-              {/* Calendar Grid */}
-              <div className="grid grid-cols-7 gap-3">
-                {calendarDays.map((day, index) => (
-                  <div
-                    key={index}
-                    className={`
-                      relative aspect-square rounded-xl border-2 transition-all duration-200 cursor-pointer p-3 flex flex-col items-center justify-center hover:scale-105 hover:shadow-lg
-                      ${day.isCurrentMonth ? 'border-gray-300 hover:border-blue-400 bg-white shadow-sm' : 'border-transparent bg-gray-100/50'}
-                      ${day.isToday ? 'ring-2 ring-emerald-400 bg-emerald-50 border-emerald-300 shadow-lg' : ''}
-                      ${day.hasWatering && day.isCurrentMonth ? 'bg-blue-50 border-blue-300 shadow-md' : ''}
-                    `}
-                    onClick={() => handleDateSelect(day.date)}
-                  >
-                    {/* Date */}
-                    <div className={`text-xl font-bold mb-1 ${
-                      day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
-                    } ${day.isToday ? 'text-emerald-700' : ''}`}>
-                      {day.day}
-                    </div>
-
-                    {/* Schedule Indicators */}
-                    {day.hasWatering && day.isCurrentMonth && (
-                      <div className="flex flex-col items-center">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mb-1"></div>
-                        <span className="text-xs text-blue-700 font-semibold">
-                          {getTotalVolume(day.schedule)}L
-                        </span>
+              {/* Calendar Days - Next 2 Weeks */}
+              <div className="space-y-3">
+                {/* First Week */}
+                <div className="grid grid-cols-7 gap-2">
+                  {calendarDays.slice(0, 7).map((day, index) => (
+                    <div
+                      key={`week1-${index}`}
+                      className={`
+                        relative rounded-lg border transition-all duration-200 p-2 flex flex-col items-center justify-center cursor-pointer active:scale-95 min-h-[60px]
+                        border-gray-200 hover:border-blue-300 bg-white hover:shadow-md
+                        ${day.isToday ? 'ring-2 ring-emerald-400 bg-emerald-50 border-emerald-300 shadow-lg' : ''}
+                        ${day.hasWatering && !day.isToday ? 'bg-blue-50 border-blue-200' : ''}
+                      `}
+                      onClick={() => handleDateSelect(day.date)}
+                    >
+                      {/* Date Number */}
+                      <div className={`text-lg font-bold mb-1 ${
+                        day.isToday ? 'text-emerald-600' : 'text-gray-900'
+                      }`}>
+                        {day.day}
                       </div>
-                    )}
+
+                      {/* Watering Indicator */}
+                      {day.hasWatering && (
+                        <div className="flex flex-col items-center">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full mb-1"></div>
+                          <span className="text-xs text-blue-700 font-semibold">
+                            {getTotalVolume(day.schedule)}L
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Today Pulse Indicator */}
+                      {day.isToday && (
+                        <div className="absolute inset-0 rounded-lg ring-2 ring-emerald-400 ring-opacity-30 animate-pulse pointer-events-none" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Second Week */}
+                <div className="grid grid-cols-7 gap-2">
+                  {calendarDays.slice(7, 14).map((day, index) => (
+                    <div
+                      key={`week2-${index}`}
+                      className={`
+                        relative rounded-lg border transition-all duration-200 p-2 flex flex-col items-center justify-center cursor-pointer active:scale-95 min-h-[60px]
+                        border-gray-200 hover:border-blue-300 bg-white hover:shadow-md
+                        ${day.isToday ? 'ring-2 ring-emerald-400 bg-emerald-50 border-emerald-300 shadow-lg' : ''}
+                        ${day.hasWatering && !day.isToday ? 'bg-blue-50 border-blue-200' : ''}
+                      `}
+                      onClick={() => handleDateSelect(day.date)}
+                    >
+                      {/* Date Number */}
+                      <div className={`text-lg font-bold mb-1 ${
+                        day.isToday ? 'text-emerald-600' : 'text-gray-900'
+                      }`}>
+                        {day.day}
+                      </div>
+
+                      {/* Watering Indicator */}
+                      {day.hasWatering && (
+                        <div className="flex flex-col items-center">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full mb-1"></div>
+                          <span className="text-xs text-blue-700 font-semibold">
+                            {getTotalVolume(day.schedule)}L
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Today Pulse Indicator */}
+                      {day.isToday && (
+                        <div className="absolute inset-0 rounded-lg ring-2 ring-emerald-400 ring-opacity-30 animate-pulse pointer-events-none" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Legend */}
+        <div className="px-6 pb-6">
+          <Card className="border-0 shadow-md rounded-2xl bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-emerald-100 border-2 border-emerald-400 rounded-md animate-pulse" />
+                  <span className="text-gray-700">Today</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-blue-100 border-2 border-blue-200 rounded-md flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
                   </div>
-                ))}
+                  <span className="text-gray-700">Scheduled</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-white border-2 border-gray-200 rounded-md" />
+                  <span className="text-gray-700">Available</span>
+                </div>
               </div>
             </CardContent>
           </Card>
