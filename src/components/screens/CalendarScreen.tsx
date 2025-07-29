@@ -132,9 +132,9 @@ const CalendarScreen = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40 shadow-sm">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -151,7 +151,7 @@ const CalendarScreen = () => {
                   <Calendar className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold text-gray-900">Next 2 Weeks</h1>
+                  <h1 className="text-lg font-bold text-gray-900">Calendar</h1>
                   <p className="text-xs text-gray-600">Plot {plotId} Schedule</p>
                 </div>
               </div>
@@ -163,14 +163,14 @@ const CalendarScreen = () => {
       <div className="flex flex-col h-[calc(100vh-88px)]">
         {/* Calendar Section */}
         <div className="flex-1 p-6">
-          <Card className="border-0 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm h-full overflow-hidden">
+          <Card className="border-0 shadow-lg rounded-2xl bg-white h-full overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white">
               <CardTitle className="text-xl flex items-center space-x-3">
                 <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                   <Calendar className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold">Next 2 Weeks</h3>
+                  <h3 className="text-lg font-bold">Calendar</h3>
                   <p className="text-emerald-100 text-sm">Tap dates for details</p>
                 </div>
               </CardTitle>
@@ -210,12 +210,7 @@ const CalendarScreen = () => {
 
                       {/* Watering Indicator */}
                       {day.hasWatering && (
-                        <div className="flex flex-col items-center">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mb-1"></div>
-                          <span className="text-xs text-blue-700 font-semibold">
-                            {getTotalVolume(day.schedule)}L
-                          </span>
-                        </div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                       )}
 
                       {/* Today Pulse Indicator */}
@@ -248,12 +243,7 @@ const CalendarScreen = () => {
 
                       {/* Watering Indicator */}
                       {day.hasWatering && (
-                        <div className="flex flex-col items-center">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mb-1"></div>
-                          <span className="text-xs text-blue-700 font-semibold">
-                            {getTotalVolume(day.schedule)}L
-                          </span>
-                        </div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                       )}
 
                       {/* Today Pulse Indicator */}
@@ -270,7 +260,7 @@ const CalendarScreen = () => {
 
         {/* Legend */}
         <div className="px-6 pb-6">
-          <Card className="border-0 shadow-md rounded-2xl bg-white/80 backdrop-blur-sm">
+          <Card className="border-0 shadow-md rounded-2xl bg-white">
             <CardContent className="p-3">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center space-x-2">
