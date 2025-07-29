@@ -144,7 +144,7 @@ const CalendarScreen = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header - Positioned like plot details screen */}
-      <header className="fixed top-[63px] left-0 right-0 z-40 bg-white border-b border-gray-200 shadow-sm lg:ml-64 lg:top-0">
+      <header className="fixed top-[64px] left-0 right-0 z-40 bg-white shadow-sm lg:ml-64 lg:top-0 border-t-0">
         <div className="px-4 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
