@@ -92,13 +92,6 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
     <>
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden">
-        {/* Network status indicator */}
-        {!isOnline && (
-          <div className="bg-destructive text-destructive-foreground px-4 py-2 text-center text-sm animate-slide-up">
-            <WifiOff className="w-4 h-4 inline mr-2" />
-            You're offline. Some features may be limited.
-          </div>
-        )}
         
         {/* Welcome Header */}
         <div className="px-6 pt-8 pb-4">
@@ -107,14 +100,9 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
                 {getGreeting()}! 👋
               </h1>
-              <div className="flex items-center space-x-2">
-                <p className="text-gray-600 dark:text-gray-300">
-                  Your gardens are looking great today
-                </p>
-                {isOnline && (
-                  <Wifi className="w-4 h-4 text-success" />
-                )}
-              </div>
+              <p className="text-gray-600 dark:text-gray-300">
+                Your gardens are looking great today
+              </p>
             </div>
             
             {/* Weather Widget */}
