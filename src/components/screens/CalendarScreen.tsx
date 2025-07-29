@@ -115,13 +115,11 @@ const CalendarScreen = () => {
   };
 
   const handleDateSelect = (dateStr: string) => {
-    setSelectedDate(dateStr);
-    const existing = scheduleData[dateStr];
-    setEditingSchedule({
-      morning: existing?.morning || { time: '06:00', volume: 10 },
-      afternoon: existing?.afternoon || { time: '14:00', volume: 5 },
-      evening: existing?.evening || { time: '18:00', volume: 3 }
-    });
+    // Get latitude and longitude from search params or use defaults
+    const latitude = parseFloat(searchParams.get('lat') || '37.7749');
+    const longitude = parseFloat(searchParams.get('lon') || '-122.4194');
+    // Navigate to the specific day view instead of opening the schedule editor
+    navigate(`/app/plot/${plotId}/day/${dateStr}?lat=${latitude}&lon=${longitude}&date=${dateStr}`);
   };
 
   const saveSchedule = () => {
@@ -174,7 +172,7 @@ const CalendarScreen = () => {
         </div>
       </header>
 
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-88px)]">
+      <div className="flex flex-col h-[calc(100vh-88px)]">
         {/* Calendar Section */}
         <div className="flex-1 p-6">
           <Card className="border-0 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm h-full">
@@ -218,7 +216,6 @@ const CalendarScreen = () => {
                       relative aspect-square rounded-lg border-2 transition-all duration-200 cursor-pointer p-2 flex flex-col items-center justify-center
                       ${day.isCurrentMonth ? 'border-gray-200 hover:border-blue-300 bg-white' : 'border-transparent bg-gray-50'}
                       ${day.isToday ? 'ring-2 ring-emerald-400 bg-emerald-50 border-emerald-200' : ''}
-                      ${selectedDate === day.date ? 'border-blue-500 bg-blue-50' : ''}
                       ${day.hasWatering && day.isCurrentMonth ? 'bg-blue-50 border-blue-200' : ''}
                     `}
                     onClick={() => handleDateSelect(day.date)}
@@ -245,134 +242,6 @@ const CalendarScreen = () => {
             </CardContent>
           </Card>
         </div>
-
-        {/* Schedule Editor */}
-        {selectedDate && (
-          <div className="w-full lg:w-96 p-6 border-l border-gray-200">
-            <Card className="border-0 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  {new Date(selectedDate).toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {editingSchedule && (
-                  <>
-                    {/* Morning Schedule */}
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <Sun className="w-5 h-5 text-yellow-500" />
-                        <Label className="font-medium">Morning (6:00 AM)</Label>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Volume</span>
-                           <span className="text-lg font-bold text-blue-600">
-                             {editingSchedule.morning?.volume || 0}L
-                           </span>
-                        </div>
-                         <Slider
-                           value={[editingSchedule.morning?.volume || 0]}
-                           onValueChange={(value) => 
-                             setEditingSchedule(prev => ({
-                               ...prev!,
-                               morning: { ...(prev!.morning || { time: '06:00', volume: 0 }), volume: value[0] }
-                             }))
-                           }
-                          max={30}
-                          min={0}
-                          step={1}
-                          className="w-full"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Afternoon Schedule */}
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <Sun className="w-5 h-5 text-orange-500" />
-                        <Label className="font-medium">Afternoon (2:00 PM)</Label>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Volume</span>
-                           <span className="text-lg font-bold text-blue-600">
-                             {editingSchedule.afternoon?.volume || 0}L
-                           </span>
-                        </div>
-                         <Slider
-                           value={[editingSchedule.afternoon?.volume || 0]}
-                           onValueChange={(value) => 
-                             setEditingSchedule(prev => ({
-                               ...prev!,
-                               afternoon: { ...(prev!.afternoon || { time: '14:00', volume: 0 }), volume: value[0] }
-                             }))
-                           }
-                          max={20}
-                          min={0}
-                          step={1}
-                          className="w-full"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Evening Schedule */}
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <Sunset className="w-5 h-5 text-purple-500" />
-                        <Label className="font-medium">Evening (6:00 PM)</Label>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Volume</span>
-                           <span className="text-lg font-bold text-blue-600">
-                             {editingSchedule.evening?.volume || 0}L
-                           </span>
-                        </div>
-                         <Slider
-                           value={[editingSchedule.evening?.volume || 0]}
-                           onValueChange={(value) => 
-                             setEditingSchedule(prev => ({
-                               ...prev!,
-                               evening: { ...(prev!.evening || { time: '18:00', volume: 0 }), volume: value[0] }
-                             }))
-                           }
-                          max={15}
-                          min={0}
-                          step={1}
-                          className="w-full"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Total Volume */}
-                    <div className="pt-4 border-t border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-gray-900">Daily Total</span>
-                        <span className="text-2xl font-bold text-emerald-600">
-                          {getTotalVolume(editingSchedule)}L
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Save Button */}
-                    <Button
-                      onClick={saveSchedule}
-                      className="w-full bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600"
-                    >
-                      <Save className="w-4 h-4 mr-2" />
-                      Save Schedule
-                    </Button>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        )}
       </div>
     </div>
   );
