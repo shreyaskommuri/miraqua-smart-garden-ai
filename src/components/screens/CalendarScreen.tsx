@@ -215,16 +215,17 @@ const CalendarScreen = () => {
                   <div
                     key={index}
                     className={`
-                      relative aspect-square rounded-lg border-2 transition-all duration-200 cursor-pointer p-2 flex flex-col items-center justify-center
+                      relative aspect-square rounded-lg border-2 transition-all duration-200 cursor-pointer p-2 flex flex-col items-center justify-center hover:scale-105 active:scale-95
                       ${day.isCurrentMonth ? 'border-gray-200 hover:border-blue-300 bg-white' : 'border-transparent bg-gray-50'}
                       ${day.isToday ? 'ring-2 ring-emerald-400 bg-emerald-50 border-emerald-200' : ''}
-                      ${selectedDate === day.date ? 'border-blue-500 bg-blue-50' : ''}
-                      ${day.hasWatering && day.isCurrentMonth ? 'bg-blue-50 border-blue-200' : ''}
+                      ${selectedDate === day.date ? 'border-blue-500 bg-blue-100 shadow-lg' : ''}
+                      ${day.hasWatering && day.isCurrentMonth && !day.isToday ? 'bg-blue-500 border-blue-600 text-white hover:bg-blue-600' : ''}
                     `}
                     onClick={() => handleDateSelect(day.date)}
                   >
                     {/* Date */}
                     <div className={`text-lg font-semibold ${
+                      day.hasWatering && day.isCurrentMonth && !day.isToday ? 'text-white' : 
                       day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
                     } ${day.isToday ? 'text-emerald-600' : ''}`}>
                       {day.day}
@@ -233,8 +234,12 @@ const CalendarScreen = () => {
                     {/* Schedule Indicators */}
                     {day.hasWatering && (
                       <div className="mt-1 flex flex-col items-center">
-                        <Droplets className="w-3 h-3 text-blue-500" />
-                        <span className="text-xs text-blue-600 font-medium">
+                        <Droplets className={`w-3 h-3 ${
+                          day.hasWatering && day.isCurrentMonth && !day.isToday ? 'text-white' : 'text-blue-500'
+                        }`} />
+                        <span className={`text-xs font-medium ${
+                          day.hasWatering && day.isCurrentMonth && !day.isToday ? 'text-white' : 'text-blue-600'
+                        }`}>
                           {getTotalVolume(day.schedule)}L
                         </span>
                       </div>
