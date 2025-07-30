@@ -1,60 +1,36 @@
 
 import React, { useEffect } from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { I18nProvider } from './contexts/I18nContext';
-import AppNavigator from './components/navigation/AppNavigator';
+import AppNavigator from './navigation/AppNavigator';
 import { ErrorBoundaryProvider } from './components/ui/ErrorBoundaryProvider';
-import NetworkStatus from './components/ui/NetworkStatus';
-import { InstallPrompt } from './components/ui/InstallPrompt';
 import { Toaster } from './components/ui/toaster';
 import { logger } from './services/logger';
 import './utils/errorHandling';
 
-function App() {
+export default function App() {
   useEffect(() => {
     logger.info('Miraqua application starting');
     
-    // Register service worker for PWA functionality
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then((registration) => {
-            logger.info('Service Worker registered successfully', { registration });
-          })
-          .catch((registrationError) => {
-            logger.error('Service Worker registration failed', registrationError);
-          });
-      });
-    }
-
-    // Add manifest link to head
-    const manifestLink = document.createElement('link');
-    manifestLink.rel = 'manifest';
-    manifestLink.href = '/manifest.json';
-    document.head.appendChild(manifestLink);
-
+    // Initialize app-specific configurations
+    // Note: Service worker registration is not available in React Native
+    // PWA functionality is handled differently in mobile apps
+    
     return () => {
-      if (document.head.contains(manifestLink)) {
-        document.head.removeChild(manifestLink);
-      }
+      // Cleanup if needed
     };
   }, []);
 
   return (
     <ErrorBoundaryProvider>
-      <BrowserRouter>
-        <ThemeProvider>
-          <I18nProvider>
-            <AppNavigator />
-            <NetworkStatus />
-            <InstallPrompt />
-            <Toaster />
-          </I18nProvider>
-        </ThemeProvider>
-      </BrowserRouter>
+      <ThemeProvider>
+        <I18nProvider>
+          <StatusBar style="auto" />
+          <AppNavigator />
+          <Toaster />
+        </I18nProvider>
+      </ThemeProvider>
     </ErrorBoundaryProvider>
   );
 }
-
-export default App;

@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Language = 'en' | 'es' | 'hi' | 'fr';
 
@@ -121,16 +122,31 @@ interface I18nContextType {
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguage] = useState<Language>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('miraqua-language') as Language) || 'en';
-    }
-    return 'en';
-  });
+  const [language, setLanguageState] = useState<Language>('en');
 
+  // Load language from AsyncStorage on mount
   useEffect(() => {
-    localStorage.setItem('miraqua-language', language);
-  }, [language]);
+    const loadLanguage = async () => {
+      try {
+        const savedLanguage = await AsyncStorage.getItem('miraqua-language');
+        if (savedLanguage) {
+          setLanguageState(savedLanguage as Language);
+        }
+      } catch (error) {
+        console.log('Error loading language:', error);
+      }
+    };
+    loadLanguage();
+  }, []);
+
+  const setLanguage = async (lang: Language) => {
+    setLanguageState(lang);
+    try {
+      await AsyncStorage.setItem('miraqua-language', lang);
+    } catch (error) {
+      console.log('Error saving language:', error);
+    }
+  };
 
   const t = (key: string): string => {
     return translations[language]?.[key] || translations.en[key] || key;

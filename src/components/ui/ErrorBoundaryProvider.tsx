@@ -1,5 +1,6 @@
 
 import React, { ReactNode } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { logger } from '@/services/logger';
 
@@ -19,25 +20,75 @@ export const ErrorBoundaryProvider: React.FC<ErrorBoundaryProviderProps> = ({ ch
   return (
     <ErrorBoundary
       fallback={({ error, resetError }) => (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Something went wrong</h2>
-            <p className="text-gray-600 mb-4">
+        <View style={styles.container}>
+          <View style={styles.card}>
+            <Text style={styles.title}>Something went wrong</Text>
+            <Text style={styles.message}>
               {error?.message || 'An unexpected error occurred'}
-            </p>
-            <button
-              onClick={resetError}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+            </Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={resetError}
             >
-              Try again
-            </button>
-          </div>
-        </div>
+              <Text style={styles.buttonText}>Try again</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       )}
     >
       {children}
     </ErrorBoundary>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f9fafb',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+  },
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 24,
+    maxWidth: 400,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  message: {
+    fontSize: 16,
+    color: '#6b7280',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  button: {
+    backgroundColor: '#3b82f6',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
 
 export default ErrorBoundaryProvider;

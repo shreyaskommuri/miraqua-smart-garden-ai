@@ -1,10 +1,10 @@
 
 const environment = {
-  isDevelopment: import.meta.env.MODE === 'development',
-  isProduction: import.meta.env.MODE === 'production',
+  isDevelopment: __DEV__,
+  isProduction: !__DEV__,
   apiUrl: 'https://api.miraqua.app/v1',
   websocketUrl: 'wss://ws.miraqua.app',
-  enableLogging: import.meta.env.MODE === 'development'
+  enableLogging: __DEV__
 };
 
 export { environment };

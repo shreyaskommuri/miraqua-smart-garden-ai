@@ -6,8 +6,6 @@ export interface ErrorInfo {
   componentStack?: string;
   userId?: string;
   timestamp: string;
-  url: string;
-  userAgent: string;
 }
 
 export class ErrorHandler {
@@ -17,16 +15,16 @@ export class ErrorHandler {
       stack: error.stack,
       componentStack: errorInfo?.componentStack,
       timestamp: new Date().toISOString(),
-      url: window.location.href,
-      userAgent: navigator.userAgent
     };
 
     logger.error('Application error captured', errorData);
 
     // In production, send to error tracking service
-    if (import.meta.env.PROD) {
+    // Note: import.meta is not supported in React Native
+    // You can use __DEV__ global variable instead
+    if (!__DEV__) {
       // Replace with your error tracking service (e.g., Sentry, Bugsnag)
-      // window.ErrorTracker?.captureException(error, errorData);
+      // ErrorTracker?.captureException(error, errorData);
     }
   }
 
@@ -40,15 +38,5 @@ export class ErrorHandler {
   }
 }
 
-// Global error handler for unhandled promises
-window.addEventListener('unhandledrejection', (event) => {
-  ErrorHandler.captureException('Unhandled Promise Rejection', {
-    reason: event.reason,
-    promise: event.promise
-  });
-});
-
-// Global error handler for uncaught errors
-window.addEventListener('error', (event) => {
-  ErrorHandler.captureError(event.error || new Error(event.message));
-});
+// Note: Global error handlers are not available in React Native
+// Use React Native's error boundary components instead

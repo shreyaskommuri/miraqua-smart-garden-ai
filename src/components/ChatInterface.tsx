@@ -1,14 +1,10 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { X, Send, Bot, User, Droplets, Calendar, Settings } from "lucide-react";
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Modal, Alert } from "react-native";
 
 interface ChatInterfaceProps {
   onClose: () => void;
+  visible: boolean;
 }
 
 interface Message {
@@ -19,7 +15,7 @@ interface Message {
   suggestions?: string[];
 }
 
-const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
+const ChatInterface = ({ onClose, visible }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -119,143 +115,332 @@ const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl h-[600px] bg-white/95 backdrop-blur-sm border-green-100 flex flex-col">
-        <CardHeader className="pb-4 border-b border-green-100">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-500 rounded-lg flex items-center justify-center">
-                <Bot className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <CardTitle className="text-lg text-green-800">AI Assistant</CardTitle>
-                <CardDescription className="text-green-600">Smart irrigation commands & help</CardDescription>
-              </div>
-            </div>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-        </CardHeader>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={onClose}
+    >
+      <View style={styles.overlay}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <View style={styles.headerContent}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>🤖</Text>
+              </View>
+              <View style={styles.headerText}>
+                <Text style={styles.title}>AI Assistant</Text>
+                <Text style={styles.subtitle}>Smart irrigation commands & help</Text>
+              </View>
+            </View>
+            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>✕</Text>
+            </TouchableOpacity>
+          </View>
 
-        <CardContent className="flex-1 flex flex-col p-0">
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4">
-              {messages.map((message) => (
-                <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] ${message.type === 'user' ? 'order-2' : 'order-1'}`}>
-                    <div className={`flex items-start space-x-2 ${message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        message.type === 'user' 
-                          ? 'bg-blue-100' 
-                          : 'bg-green-100'
-                      }`}>
-                        {message.type === 'user' ? (
-                          <User className="w-4 h-4 text-blue-600" />
-                        ) : (
-                          <Bot className="w-4 h-4 text-green-600" />
-                        )}
-                      </div>
-                      <div className={`rounded-lg p-3 ${
-                        message.type === 'user'
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        <p className="text-sm">{message.content}</p>
-                        <p className={`text-xs mt-1 ${
-                          message.type === 'user' ? 'text-blue-100' : 'text-gray-500'
-                        }`}>
-                          {formatTime(message.timestamp)}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {message.suggestions && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {message.suggestions.map((suggestion, index) => (
-                          <Badge 
-                            key={index}
-                            variant="outline"
-                            className="cursor-pointer hover:bg-green-50 border-green-200 text-green-700"
-                            onClick={() => handleSuggestionClick(suggestion)}
-                          >
-                            {suggestion}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-              
-              {isTyping && (
-                <div className="flex justify-start">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <Bot className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div className="bg-gray-100 rounded-lg p-3">
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </ScrollArea>
+          <ScrollView style={styles.messagesContainer}>
+            {messages.map((message) => (
+              <View key={message.id} style={[
+                styles.messageContainer,
+                message.type === 'user' ? styles.userMessage : styles.aiMessage
+              ]}>
+                <View style={[
+                  styles.messageBubble,
+                  message.type === 'user' ? styles.userBubble : styles.aiBubble
+                ]}>
+                  <Text style={[
+                    styles.messageText,
+                    message.type === 'user' ? styles.userText : styles.aiText
+                  ]}>
+                    {message.content}
+                  </Text>
+                  <Text style={[
+                    styles.messageTime,
+                    message.type === 'user' ? styles.userTime : styles.aiTime
+                  ]}>
+                    {formatTime(message.timestamp)}
+                  </Text>
+                </View>
+                
+                {message.suggestions && (
+                  <View style={styles.suggestionsContainer}>
+                    {message.suggestions.map((suggestion, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.suggestionBadge}
+                        onPress={() => handleSuggestionClick(suggestion)}
+                      >
+                        <Text style={styles.suggestionText}>{suggestion}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </View>
+            ))}
+            
+            {isTyping && (
+              <View style={styles.typingContainer}>
+                <View style={styles.typingBubble}>
+                  <View style={styles.typingDots}>
+                    <View style={[styles.dot, styles.dot1]} />
+                    <View style={[styles.dot, styles.dot2]} />
+                    <View style={[styles.dot, styles.dot3]} />
+                  </View>
+                </View>
+              </View>
+            )}
+          </ScrollView>
 
-          <div className="border-t border-green-100 p-4">
-            <div className="flex space-x-2">
-              <Input
+          <View style={styles.inputContainer}>
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.input}
                 placeholder="Type a command like 'skip watering tomorrow'..."
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                className="flex-1 border-green-200 focus:ring-green-500"
+                onChangeText={setInputValue}
+                multiline
               />
-              <Button 
-                onClick={handleSendMessage}
+              <TouchableOpacity
+                style={[styles.sendButton, !inputValue.trim() && styles.sendButtonDisabled]}
+                onPress={handleSendMessage}
                 disabled={!inputValue.trim()}
-                className="bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600"
               >
-                <Send className="w-4 h-4" />
-              </Button>
-            </div>
+                <Text style={styles.sendButtonText}>➤</Text>
+              </TouchableOpacity>
+            </View>
             
-            <div className="flex flex-wrap gap-2 mt-3">
-              <Badge 
-                variant="outline"
-                className="cursor-pointer hover:bg-green-50 border-green-200 text-green-700"
-                onClick={() => handleSuggestionClick("Skip watering today")}
+            <View style={styles.quickActions}>
+              <TouchableOpacity
+                style={styles.quickAction}
+                onPress={() => handleSuggestionClick("Skip watering today")}
               >
-                <Calendar className="w-3 h-3 mr-1" />
-                Skip watering today
-              </Badge>
-              <Badge 
-                variant="outline"
-                className="cursor-pointer hover:bg-green-50 border-green-200 text-green-700"
-                onClick={() => handleSuggestionClick("Water now")}
+                <Text style={styles.quickActionText}>📅 Skip watering today</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.quickAction}
+                onPress={() => handleSuggestionClick("Water now")}
               >
-                <Droplets className="w-3 h-3 mr-1" />
-                Water now
-              </Badge>
-              <Badge 
-                variant="outline"
-                className="cursor-pointer hover:bg-green-50 border-green-200 text-green-700"
-                onClick={() => handleSuggestionClick("Show schedule")}
+                <Text style={styles.quickActionText}>💧 Water now</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.quickAction}
+                onPress={() => handleSuggestionClick("Show schedule")}
               >
-                <Settings className="w-3 h-3 mr-1" />
-                Show schedule
-              </Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+                <Text style={styles.quickActionText}>⚙️ Show schedule</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </View>
+    </Modal>
   );
 };
+
+const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  container: {
+    width: '90%',
+    height: '80%',
+    backgroundColor: 'white',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
+    backgroundColor: '#f9fafb',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: '#10b981',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  avatarText: {
+    fontSize: 20,
+  },
+  headerText: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#065f46',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#059669',
+  },
+  closeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#f3f4f6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: '#6b7280',
+  },
+  messagesContainer: {
+    flex: 1,
+    padding: 16,
+  },
+  messageContainer: {
+    marginBottom: 16,
+  },
+  userMessage: {
+    alignItems: 'flex-end',
+  },
+  aiMessage: {
+    alignItems: 'flex-start',
+  },
+  messageBubble: {
+    maxWidth: '80%',
+    padding: 12,
+    borderRadius: 12,
+  },
+  userBubble: {
+    backgroundColor: '#3b82f6',
+  },
+  aiBubble: {
+    backgroundColor: '#f3f4f6',
+  },
+  messageText: {
+    fontSize: 16,
+    lineHeight: 20,
+  },
+  userText: {
+    color: 'white',
+  },
+  aiText: {
+    color: '#374151',
+  },
+  messageTime: {
+    fontSize: 12,
+    marginTop: 4,
+  },
+  userTime: {
+    color: 'rgba(255, 255, 255, 0.7)',
+  },
+  aiTime: {
+    color: '#9ca3af',
+  },
+  suggestionsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 8,
+    gap: 8,
+  },
+  suggestionBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#10b981',
+    backgroundColor: 'white',
+  },
+  suggestionText: {
+    fontSize: 12,
+    color: '#059669',
+  },
+  typingContainer: {
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  typingBubble: {
+    backgroundColor: '#f3f4f6',
+    padding: 12,
+    borderRadius: 12,
+  },
+  typingDots: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#9ca3af',
+  },
+  dot1: {
+    opacity: 0.4,
+  },
+  dot2: {
+    opacity: 0.6,
+  },
+  dot3: {
+    opacity: 0.8,
+  },
+  inputContainer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 8,
+  },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    maxHeight: 100,
+  },
+  sendButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#10b981',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sendButtonDisabled: {
+    backgroundColor: '#d1d5db',
+  },
+  sendButtonText: {
+    fontSize: 16,
+    color: 'white',
+  },
+  quickActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 12,
+    gap: 8,
+  },
+  quickAction: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#10b981',
+    backgroundColor: 'white',
+  },
+  quickActionText: {
+    fontSize: 12,
+    color: '#059669',
+  },
+});
 
 export default ChatInterface;

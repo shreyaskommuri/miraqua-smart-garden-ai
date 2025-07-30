@@ -1,14 +1,6 @@
 
 import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, ChevronRight, Droplets, Calendar, MapPin, Settings, Check, Sparkles, Navigation, Map } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert } from "react-native";
 
 interface OnboardingFlowProps {
   onComplete: (plotData: any) => void;
@@ -17,10 +9,6 @@ interface OnboardingFlowProps {
 
 const OnboardingFlow = ({ onComplete, onCancel }: OnboardingFlowProps) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [locationMethod, setLocationMethod] = useState<'coordinates' | 'current'>('coordinates');
-  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
-  const [locationError, setLocationError] = useState("");
-  
   const [plotData, setPlotData] = useState({
     name: "",
     crop: "",
@@ -35,23 +23,19 @@ const OnboardingFlow = ({ onComplete, onCancel }: OnboardingFlowProps) => {
   const steps = [
     {
       title: "Welcome to Miraqua",
-      description: "Let's set up your smart irrigation system",
-      icon: Sparkles
+      description: "Let's set up your smart irrigation system"
     },
     {
       title: "Plot Details",
-      description: "Tell us about your garden",
-      icon: Settings
+      description: "Tell us about your garden"
     },
     {
       title: "Location Setup",
-      description: "Configure your precise location",
-      icon: MapPin
+      description: "Configure your precise location"
     },
     {
       title: "All Ready!",
-      description: "Your smart irrigation is configured",
-      icon: Check
+      description: "Your smart irrigation is configured"
     }
   ];
 
@@ -59,34 +43,6 @@ const OnboardingFlow = ({ onComplete, onCancel }: OnboardingFlowProps) => {
     "Tomatoes", "Lettuce", "Carrots", "Peppers", "Herbs", "Strawberries",
     "Cucumbers", "Beans", "Squash", "Corn", "Other"
   ];
-
-  const getCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      setLocationError("Geolocation is not supported by this browser.");
-      return;
-    }
-
-    setIsLoadingLocation(true);
-    setLocationError("");
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude.toFixed(6);
-        const lon = position.coords.longitude.toFixed(6);
-        setPlotData(prev => ({ ...prev, latitude: lat, longitude: lon }));
-        setIsLoadingLocation(false);
-      },
-      (error) => {
-        setLocationError("Unable to get your location. Please enter coordinates manually.");
-        setIsLoadingLocation(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 300000
-      }
-    );
-  };
 
   const validateCoordinates = () => {
     const lat = parseFloat(plotData.latitude);
@@ -115,10 +71,7 @@ const OnboardingFlow = ({ onComplete, onCancel }: OnboardingFlowProps) => {
         status: "healthy"
       };
       onComplete(newPlot);
-      toast({
-        title: "Plot Added Successfully!",
-        description: "Your AI irrigation system is now monitoring your plot.",
-      });
+      Alert.alert("Success!", "Your AI irrigation system is now monitoring your plot.");
     }
   };
 
@@ -144,304 +97,490 @@ const OnboardingFlow = ({ onComplete, onCancel }: OnboardingFlowProps) => {
   };
 
   const progress = ((currentStep + 1) / steps.length) * 100;
-  const CurrentIcon = steps[currentStep].icon;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl bg-white border-0 shadow-lg">
-        <CardHeader className="text-center pb-6 pt-8">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-sm">
-              <CurrentIcon className="w-8 h-8 text-white" />
-            </div>
-          </div>
-          <CardTitle className="text-2xl font-semibold text-gray-900">{steps[currentStep].title}</CardTitle>
-          <CardDescription className="text-gray-500 text-base">{steps[currentStep].description}</CardDescription>
-          <div className="mt-6">
-            <Progress value={progress} className="h-2" />
-            <p className="text-sm text-gray-400 mt-2">Step {currentStep + 1} of {steps.length}</p>
-          </div>
-        </CardHeader>
+    <ScrollView style={styles.container}>
+      <View style={styles.card}>
+        <View style={styles.header}>
+          <View style={styles.iconContainer}>
+            <Text style={styles.icon}>🌱</Text>
+          </View>
+          <Text style={styles.title}>{steps[currentStep].title}</Text>
+          <Text style={styles.description}>{steps[currentStep].description}</Text>
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBar}>
+              <View style={[styles.progressFill, { width: `${progress}%` }]} />
+            </View>
+            <Text style={styles.progressText}>Step {currentStep + 1} of {steps.length}</Text>
+          </View>
+        </View>
 
-        <CardContent className="space-y-6 pb-8">
+        <View style={styles.content}>
           {currentStep === 0 && (
-            <div className="text-center space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-6 bg-blue-50 rounded-xl">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <Droplets className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <h4 className="font-medium text-gray-900 mb-2">Smart Watering</h4>
-                  <p className="text-sm text-gray-600">AI-optimized schedules</p>
-                </div>
-                <div className="p-6 bg-green-50 rounded-xl">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <Calendar className="w-5 h-5 text-green-600" />
-                  </div>
-                  <h4 className="font-medium text-gray-900 mb-2">Weather Smart</h4>
-                  <p className="text-sm text-gray-600">Real-time integration</p>
-                </div>
-                <div className="p-6 bg-purple-50 rounded-xl">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <Settings className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <h4 className="font-medium text-gray-900 mb-2">Easy Control</h4>
-                  <p className="text-sm text-gray-600">Natural commands</p>
-                </div>
-              </div>
-            </div>
+            <View style={styles.welcomeStep}>
+              <View style={styles.featureGrid}>
+                <View style={styles.featureCard}>
+                  <Text style={styles.featureIcon}>💧</Text>
+                  <Text style={styles.featureTitle}>Smart Watering</Text>
+                  <Text style={styles.featureDescription}>AI-optimized schedules</Text>
+                </View>
+                <View style={styles.featureCard}>
+                  <Text style={styles.featureIcon}>📅</Text>
+                  <Text style={styles.featureTitle}>Weather Smart</Text>
+                  <Text style={styles.featureDescription}>Real-time integration</Text>
+                </View>
+                <View style={styles.featureCard}>
+                  <Text style={styles.featureIcon}>⚙️</Text>
+                  <Text style={styles.featureTitle}>Easy Control</Text>
+                  <Text style={styles.featureDescription}>Natural commands</Text>
+                </View>
+              </View>
+            </View>
           )}
 
           {currentStep === 1 && (
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="plotName" className="text-sm font-medium text-gray-700">Plot Name</Label>
-                <Input
-                  id="plotName"
+            <View style={styles.formStep}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Plot Name</Text>
+                <TextInput
+                  style={styles.input}
                   placeholder="e.g., Tomato Garden"
                   value={plotData.name}
-                  onChange={(e) => setPlotData({ ...plotData, name: e.target.value })}
-                  className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                  onChangeText={(text) => setPlotData({ ...plotData, name: text })}
                 />
-              </div>
+              </View>
 
-              <div className="space-y-2">
-                <Label htmlFor="crop" className="text-sm font-medium text-gray-700">Crop Type</Label>
-                <Select value={plotData.crop} onValueChange={(value) => setPlotData({ ...plotData, crop: value })}>
-                  <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500">
-                    <SelectValue placeholder="Select a crop type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cropOptions.map((crop) => (
-                      <SelectItem key={crop} value={crop}>{crop}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Crop Type</Text>
+                <View style={styles.pickerContainer}>
+                  {cropOptions.map((crop) => (
+                    <TouchableOpacity
+                      key={crop}
+                      style={[
+                        styles.pickerOption,
+                        plotData.crop === crop && styles.pickerOptionSelected
+                      ]}
+                      onPress={() => setPlotData({ ...plotData, crop })}
+                    >
+                      <Text style={[
+                        styles.pickerOptionText,
+                        plotData.crop === crop && styles.pickerOptionTextSelected
+                      ]}>
+                        {crop}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="area" className="text-sm font-medium text-gray-700">Area</Label>
-                  <Input
-                    id="area"
-                    type="number"
+              <View style={styles.row}>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>Area</Text>
+                  <TextInput
+                    style={styles.input}
                     placeholder="100"
+                    keyboardType="numeric"
                     value={plotData.area}
-                    onChange={(e) => setPlotData({ ...plotData, area: e.target.value })}
-                    className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                    onChangeText={(text) => setPlotData({ ...plotData, area: text })}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="unit" className="text-sm font-medium text-gray-700">Unit</Label>
-                  <Select value={plotData.areaUnit} onValueChange={(value) => setPlotData({ ...plotData, areaUnit: value })}>
-                    <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="sq ft">Square Feet</SelectItem>
-                      <SelectItem value="sq m">Square Meters</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+                </View>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>Unit</Text>
+                  <View style={styles.pickerContainer}>
+                    {["sq ft", "sq m"].map((unit) => (
+                      <TouchableOpacity
+                        key={unit}
+                        style={[
+                          styles.pickerOption,
+                          plotData.areaUnit === unit && styles.pickerOptionSelected
+                        ]}
+                        onPress={() => setPlotData({ ...plotData, areaUnit: unit })}
+                      >
+                        <Text style={[
+                          styles.pickerOptionText,
+                          plotData.areaUnit === unit && styles.pickerOptionTextSelected
+                        ]}>
+                          {unit}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              </View>
 
-              <div className="space-y-2">
-                <Label htmlFor="plantingDate" className="text-sm font-medium text-gray-700">Planting Date</Label>
-                <Input
-                  id="plantingDate"
-                  type="date"
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Planting Date</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="YYYY-MM-DD"
                   value={plotData.plantingDate}
-                  onChange={(e) => setPlotData({ ...plotData, plantingDate: e.target.value })}
-                  max={new Date().toISOString().split('T')[0]}
-                  className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                  onChangeText={(text) => setPlotData({ ...plotData, plantingDate: text })}
                 />
-              </div>
-            </div>
+              </View>
+            </View>
           )}
 
           {currentStep === 2 && (
-            <div className="space-y-6">
-              <Tabs value={locationMethod} onValueChange={(value) => setLocationMethod(value as 'coordinates' | 'current')} className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="coordinates" className="flex items-center space-x-2">
-                    <Map className="w-4 h-4" />
-                    <span>Enter Coordinates</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="current" className="flex items-center space-x-2">
-                    <Navigation className="w-4 h-4" />
-                    <span>Use Current Location</span>
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="coordinates" className="space-y-4 mt-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="latitude" className="text-sm font-medium text-gray-700">Latitude</Label>
-                      <Input
-                        id="latitude"
-                        type="number"
-                        placeholder="37.7749"
-                        value={plotData.latitude}
-                        onChange={(e) => setPlotData({ ...plotData, latitude: e.target.value })}
-                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                        min={-90}
-                        max={90}
-                        step={0.000001}
-                      />
-                      <p className="text-xs text-gray-500">Range: -90 to 90</p>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="longitude" className="text-sm font-medium text-gray-700">Longitude</Label>
-                      <Input
-                        id="longitude"
-                        type="number"
-                        placeholder="-122.4194"
-                        value={plotData.longitude}
-                        onChange={(e) => setPlotData({ ...plotData, longitude: e.target.value })}
-                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                        min={-180}
-                        max={180}
-                        step={0.000001}
-                      />
-                      <p className="text-xs text-gray-500">Range: -180 to 180</p>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="current" className="space-y-4 mt-4">
-                  <div className="text-center">
-                    <Button
-                      onClick={getCurrentLocation}
-                      disabled={isLoadingLocation}
-                      className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      {isLoadingLocation ? (
-                        "Getting your location..."
-                      ) : (
-                        <>
-                          <Navigation className="w-4 h-4 mr-2" />
-                          Get Current Location
-                        </>
-                      )}
-                    </Button>
-                    
-                    {locationError && (
-                      <p className="text-sm text-red-600 mt-2">{locationError}</p>
-                    )}
-                    
-                    {plotData.latitude && plotData.longitude && (
-                      <div className="mt-4 p-4 bg-green-50 rounded-lg">
-                        <p className="text-sm text-green-800">
-                          <strong>Location found:</strong><br />
-                          Lat: {plotData.latitude}, Lon: {plotData.longitude}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </TabsContent>
-              </Tabs>
+            <View style={styles.formStep}>
+              <View style={styles.row}>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>Latitude</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="37.7749"
+                    keyboardType="numeric"
+                    value={plotData.latitude}
+                    onChangeText={(text) => setPlotData({ ...plotData, latitude: text })}
+                  />
+                  <Text style={styles.hint}>Range: -90 to 90</Text>
+                </View>
+                <View style={[styles.inputGroup, styles.halfWidth]}>
+                  <Text style={styles.label}>Longitude</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="-122.4194"
+                    keyboardType="numeric"
+                    value={plotData.longitude}
+                    onChangeText={(text) => setPlotData({ ...plotData, longitude: text })}
+                  />
+                  <Text style={styles.hint}>Range: -180 to 180</Text>
+                </View>
+              </View>
 
               {validateCoordinates() && (
-                <Card className="border-blue-200 bg-blue-50">
-                  <CardContent className="p-4">
-                    <div className="flex items-center space-x-3">
-                      <MapPin className="w-5 h-5 text-blue-600" />
-                      <div>
-                        <h4 className="font-semibold text-blue-900">Valid Coordinates</h4>
-                        <p className="text-sm text-blue-700">
-                          Lat: {parseFloat(plotData.latitude).toFixed(4)}, Lon: {parseFloat(plotData.longitude).toFixed(4)}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <View style={styles.validCard}>
+                  <Text style={styles.validTitle}>Valid Coordinates</Text>
+                  <Text style={styles.validText}>
+                    Lat: {parseFloat(plotData.latitude).toFixed(4)}, Lon: {parseFloat(plotData.longitude).toFixed(4)}
+                  </Text>
+                </View>
               )}
 
-              <div className="space-y-3">
-                <Label className="text-sm font-medium text-gray-700">Watering Flexibility</Label>
-                <div className="grid grid-cols-2 gap-4">
-                  <Card 
-                    className={`cursor-pointer transition-all border-2 ${plotData.flexType === 'daily' ? 'border-blue-200 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
-                    onClick={() => setPlotData({ ...plotData, flexType: 'daily' })}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Watering Flexibility</Text>
+                <View style={styles.row}>
+                  <TouchableOpacity
+                    style={[
+                      styles.flexCard,
+                      plotData.flexType === 'daily' && styles.flexCardSelected
+                    ]}
+                    onPress={() => setPlotData({ ...plotData, flexType: 'daily' })}
                   >
-                    <CardContent className="p-4 text-center">
-                      <h4 className="font-medium text-gray-900 mb-1">Daily</h4>
-                      <p className="text-sm text-gray-600">Water every day as needed</p>
-                    </CardContent>
-                  </Card>
-                  <Card 
-                    className={`cursor-pointer transition-all border-2 ${plotData.flexType === 'flexible' ? 'border-blue-200 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
-                    onClick={() => setPlotData({ ...plotData, flexType: 'flexible' })}
+                    <Text style={styles.flexTitle}>Daily</Text>
+                    <Text style={styles.flexDescription}>Water every day as needed</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.flexCard,
+                      plotData.flexType === 'flexible' && styles.flexCardSelected
+                    ]}
+                    onPress={() => setPlotData({ ...plotData, flexType: 'flexible' })}
                   >
-                    <CardContent className="p-4 text-center">
-                      <h4 className="font-medium text-gray-900 mb-1">Flexible</h4>
-                      <p className="text-sm text-gray-600">Skip days when possible</p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </div>
+                    <Text style={styles.flexTitle}>Flexible</Text>
+                    <Text style={styles.flexDescription}>Skip days when possible</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
           )}
 
           {currentStep === 3 && (
-            <div className="text-center space-y-6">
-              <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto">
-                <Check className="w-10 h-10 text-green-600" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Perfect!</h3>
-                <p className="text-gray-600 max-w-md mx-auto">
-                  Your plot "{plotData.name}" is ready for AI-powered irrigation at coordinates{' '}
-                  {plotData.latitude && plotData.longitude && (
-                    <span className="font-medium">
-                      {parseFloat(plotData.latitude).toFixed(4)}, {parseFloat(plotData.longitude).toFixed(4)}
-                    </span>
-                  )}. 
-                  The system will analyze weather and soil conditions automatically.
-                </p>
-              </div>
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h4 className="font-medium text-gray-900 mb-3">What's next:</h4>
-                <ul className="text-sm text-gray-600 space-y-2 text-left max-w-sm mx-auto">
-                  <li className="flex items-center">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></div>
-                    Monitor real-time metrics
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></div>
-                    View 7-day schedule
-                  </li>
-                  <li className="flex items-center">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-3"></div>
-                    Chat with AI assistant
-                  </li>
-                </ul>
-              </div>
-            </div>
+            <View style={styles.completeStep}>
+              <View style={styles.successIcon}>
+                <Text style={styles.successIconText}>✅</Text>
+              </View>
+              <Text style={styles.successTitle}>Perfect!</Text>
+              <Text style={styles.successDescription}>
+                Your plot "{plotData.name}" is ready for AI-powered irrigation at coordinates{' '}
+                {plotData.latitude && plotData.longitude && (
+                  <Text style={styles.coordinates}>
+                    {parseFloat(plotData.latitude).toFixed(4)}, {parseFloat(plotData.longitude).toFixed(4)}
+                  </Text>
+                )}. 
+                The system will analyze weather and soil conditions automatically.
+              </Text>
+            </View>
           )}
 
-          <div className="flex justify-between pt-6">
-            <Button
-              variant="outline"
-              onClick={currentStep === 0 ? onCancel : handlePrev}
-              className="border-gray-200 text-gray-600 hover:bg-gray-50"
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={currentStep === 0 ? onCancel : handlePrev}
             >
-              <ChevronLeft className="w-4 h-4 mr-1" />
-              {currentStep === 0 ? "Cancel" : "Back"}
-            </Button>
-            <Button
-              onClick={handleNext}
+              <Text style={styles.backButtonText}>
+                {currentStep === 0 ? "Cancel" : "Back"}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.nextButton, !canProceed() && styles.nextButtonDisabled]}
+              onPress={handleNext}
               disabled={!canProceed()}
-              className="bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-300"
             >
-              {currentStep === steps.length - 1 ? "Complete Setup" : "Continue"}
-              {currentStep < steps.length - 1 && <ChevronRight className="w-4 h-4 ml-1" />}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+              <Text style={styles.nextButtonText}>
+                {currentStep === steps.length - 1 ? "Complete Setup" : "Continue"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f9fafb',
+  },
+  card: {
+    backgroundColor: 'white',
+    margin: 16,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  header: {
+    padding: 24,
+    alignItems: 'center',
+  },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    backgroundColor: '#3b82f6',
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  icon: {
+    fontSize: 32,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  description: {
+    fontSize: 16,
+    color: '#6b7280',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  progressContainer: {
+    width: '100%',
+  },
+  progressBar: {
+    height: 8,
+    backgroundColor: '#e5e7eb',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#3b82f6',
+  },
+  progressText: {
+    fontSize: 14,
+    color: '#9ca3af',
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  content: {
+    padding: 24,
+  },
+  welcomeStep: {
+    alignItems: 'center',
+  },
+  featureGrid: {
+    width: '100%',
+  },
+  featureCard: {
+    backgroundColor: '#f3f4f6',
+    padding: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  featureIcon: {
+    fontSize: 24,
+    marginBottom: 12,
+  },
+  featureTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  featureDescription: {
+    fontSize: 14,
+    color: '#6b7280',
+    textAlign: 'center',
+  },
+  formStep: {
+    width: '100%',
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: 'white',
+  },
+  hint: {
+    fontSize: 12,
+    color: '#9ca3af',
+    marginTop: 4,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  halfWidth: {
+    flex: 1,
+  },
+  pickerContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  pickerOption: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    backgroundColor: 'white',
+  },
+  pickerOptionSelected: {
+    backgroundColor: '#3b82f6',
+    borderColor: '#3b82f6',
+  },
+  pickerOptionText: {
+    fontSize: 14,
+    color: '#374151',
+  },
+  pickerOptionTextSelected: {
+    color: 'white',
+  },
+  validCard: {
+    backgroundColor: '#dbeafe',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  validTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1e40af',
+    marginBottom: 4,
+  },
+  validText: {
+    fontSize: 14,
+    color: '#1e40af',
+  },
+  flexCard: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#e5e7eb',
+    alignItems: 'center',
+  },
+  flexCardSelected: {
+    borderColor: '#3b82f6',
+    backgroundColor: '#dbeafe',
+  },
+  flexTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  flexDescription: {
+    fontSize: 14,
+    color: '#6b7280',
+    textAlign: 'center',
+  },
+  completeStep: {
+    alignItems: 'center',
+  },
+  successIcon: {
+    width: 80,
+    height: 80,
+    backgroundColor: '#dcfce7',
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  successIconText: {
+    fontSize: 40,
+  },
+  successTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 8,
+  },
+  successDescription: {
+    fontSize: 16,
+    color: '#6b7280',
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  coordinates: {
+    fontWeight: '600',
+    color: '#111827',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 24,
+  },
+  backButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    backgroundColor: 'white',
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#6b7280',
+  },
+  nextButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: '#3b82f6',
+  },
+  nextButtonDisabled: {
+    backgroundColor: '#d1d5db',
+  },
+  nextButtonText: {
+    fontSize: 16,
+    color: 'white',
+    fontWeight: '600',
+  },
+});
 
 export default OnboardingFlow;
